@@ -1,10 +1,19 @@
-# Secrets - Never commit
+# Secrets - API keys, tokens, passwords
 secrets/
+
+# Private - Personal/company information, machine-specific paths
+private/
 
 # Zsh session history
 zsh/.zsh_history
 zsh/.zsh_sessions/
 
+# Vim history
+vim/.viminfo
+
 # macOS
 .DS_Store
 **/.DS_Store
+
+# Spicetify user-specific cache
+spicetify/CustomApps/marketplace-dist.zip
