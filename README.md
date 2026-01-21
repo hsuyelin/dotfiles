@@ -87,9 +87,12 @@ Designed for macOS; other OSes should treat this repo as a reference.
 
 ## Privacy
 
-This repo is safe to publish: personal/company info and tokens are not committed.
+Keep anything personal or environment-specific in `secrets/` and `private/`.
+Both are gitignored, so you won’t see my actual structure in this repo.
+If you want a reference, see:
 
-- Put machine-specific or sensitive bits in `secrets/` and `private/` (both are gitignored).
+- ![private](assets/private.png)
+- ![secrets](assets/secrets.png)
 
 ## Getting started
 

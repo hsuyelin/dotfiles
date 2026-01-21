@@ -87,9 +87,12 @@
 
 ## 隐私
 
-该仓库可以直接开源：个人/公司信息与 token 不会被提交。
+和自己相关的隐私文件、环境变量等请按需放在 `secrets/`、`private/`。
+这两个目录已在 gitignore 中忽略，因此你无法直接看到我的结构。
+如果需要参考，请查看：
 
-- 建议把机器相关 / 敏感内容放到 `secrets/`、`private/`（两者均已 gitignore）。
+- ![private](assets/private.png)
+- ![secrets](assets/secrets.png)
 
 ## 快速开始
 
