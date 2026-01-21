@@ -158,7 +158,7 @@ Trade-offs:
 
 ## Reference
 
-- Structure overview: `docs/STRUCTURE.md`
+- Structure overview: [`docs/STRUCTURE.md`](docs/STRUCTURE.md)
 
 ## License
 
