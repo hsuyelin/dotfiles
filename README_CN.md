@@ -5,12 +5,20 @@
 <p align="center">
   <strong>Dotfiles</strong>
   <br />
-  个人 dotfiles（主要面向 <strong>macOS</strong>）。
+  面向 macOS 的终端 + 编辑器偏好配置集合。
   <br />
-  <a href="README.md">English</a> | <a href="README_CN.md">中文</a>
+  <a href="README.md">English</a> · <a href="README_CN.md">中文</a>
 </p>
 
 ---
+
+## 亮点
+
+- Zsh + zi + Powerlevel10k
+- Neovim（Lua）+ LSP/DAP/常用增强插件
+- tmux 工作流 + 会话持久化
+- AeroSpace 平铺 + 工作区分流
+- Git aliases + delta diff
 
 ## 适用范围与兼容性
 
@@ -29,23 +37,13 @@
 - `git/`：Git 全局配置与别名。
 - `alias/`、`bash/`、`bin/`：常用命令别名与脚本。
 
-## 隐私与开源
+## 隐私（开源友好）
 
-为避免开源泄露隐私，本仓库将敏感内容拆分为两类并默认忽略：
+该仓库可以直接开源：个人/公司信息与 token 不会被提交。
 
-- `secrets/`：API Key/Token（**不提交**）。
-- `private/`：个人/公司标识、机器路径等（**不提交**）。
+- 请自行在本地创建 `secrets/`、`private/` 下的文件（两者均已 gitignore）。
 
-### 需要在本地创建的文件
-
-（以下文件会被 git 忽略，请自行创建）
-
-- `~/.config/secrets/.ai.secrets`
-- `~/.config/secrets/.env.secrets`
-- `~/.config/private/git.config`
-- `~/.config/private/zsh.zprofile`
-
-更多目录结构说明见：`docs/STRUCTURE.md`。
+目录结构说明见：`docs/STRUCTURE.md`。
 
 ## 快速使用
 

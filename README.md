@@ -5,12 +5,20 @@
 <p align="center">
   <strong>Dotfiles</strong>
   <br />
-  Personal dotfiles for <strong>macOS</strong>.
+  A fast, opinionated macOS setup for terminal + editor.
   <br />
-  <a href="README.md">English</a> | <a href="README_CN.md">中文</a>
+  <a href="README.md">English</a> · <a href="README_CN.md">中文</a>
 </p>
 
 ---
+
+## Highlights
+
+- Zsh + zi + Powerlevel10k
+- Neovim (Lua) with LSP/DAP/quality-of-life plugins
+- tmux workflow with session persistence
+- AeroSpace tiling + workspace routing
+- Git aliases + delta diff
 
 ## Scope and Compatibility
 
@@ -20,7 +28,7 @@
 - Other macOS machines may require adjustments.
 - Other operating systems should treat this repo as a reference only.
 
-## What’s Included
+## What’s Inside
 
 - `zsh/`: Zsh setup using **zi** and Powerlevel10k.
 - `nvim/`: Neovim (Lua) configuration.
@@ -29,23 +37,11 @@
 - `git/`: global Git configuration and aliases.
 - `alias/`, `bash/`, `bin/`: shell helpers and scripts.
 
-## Privacy / Open Source Safety
+## Private Stuff
 
-This repository is structured so you can publish it to GitHub without leaking:
+This repo is safe to publish: personal/company info and tokens are **not** committed.
 
-- `secrets/` is **gitignored** and intended for tokens/keys.
-- `private/` is **gitignored** and intended for personal/company identifiers and machine-specific paths.
-
-### Required local files
-
-Create these files locally (they are ignored by git):
-
-- `~/.config/secrets/.ai.secrets`
-- `~/.config/secrets/.env.secrets`
-- `~/.config/private/git.config`
-- `~/.config/private/zsh.zprofile`
-
-See `docs/STRUCTURE.md` for details.
+- Create your own local files under `secrets/` and `private/` (both are gitignored).
 
 ## Quick Start
 
