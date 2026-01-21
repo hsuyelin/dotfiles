@@ -25,7 +25,8 @@
 </p>
 
 > [!NOTE]
-> This repo is a production-tested personal setup. It’s published for reference and reuse, not as a one-size-fits-all installer.
+> * This repo is a production-tested personal setup. It’s published for reference and reuse, not as a one-size-fits-all installer.
+> * Some parts are inspired by other great GitHub dotfiles, and others are based on my personal understanding. They may not be the most optimal or advanced, so please take them as a reference.
 
 ## Audience
 
@@ -161,4 +162,4 @@ Trade-offs:
 
 ## License
 
-This repo is licensed under the MIT License. Use, copy, and modify freely, but it comes with no warranty. See `LICENSE` for details.
+This repo is licensed under the MIT License. Use, copy, and modify freely. Please respect the MIT terms. See [`LICENSE`](LICENSE) for details.
