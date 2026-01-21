@@ -80,7 +80,7 @@
 - `git/`：Git 配置与别名
 - `alias/`、`bash/`、`bin/`：常用别名与脚本
 
-完整目录清单见：`docs/STRUCTURE.md`。
+完整目录清单见：[`docs/STRUCTURE.md`](docs/STRUCTURE.md)。
 
 ## 兼容性
 
@@ -107,7 +107,7 @@
 
 如果你只是想“借用”其中一部分而非全量采用，建议按以下方式操作：
 
-1. **先看结构**：从 `docs/STRUCTURE.md` 了解目录与配置入口。
+1. **先看结构**：从 [`docs/STRUCTURE.md`](docs/STRUCTURE.md) 了解目录与配置入口。
 2. **先选一个层级**：优先从 shell / editor / tmux / git 中选一块开始。
 3. **复制配置，不复制假设**：移植对应文件后再根据你的路径、字体、插件做调整。
 4. **本地化私密内容**：机器相关或敏感信息统一放在 `secrets/`、`private/`。
