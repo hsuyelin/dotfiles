@@ -1,6 +1,16 @@
-# Dotfiles
+<p align="center">
+  <img src="assets/logo.svg" alt="Dotfiles" width="120" />
+</p>
 
-Personal dotfiles for **macOS**.
+<p align="center">
+  <strong>Dotfiles</strong>
+  <br />
+  Personal dotfiles for <strong>macOS</strong>.
+  <br />
+  <a href="README.md">English</a> | <a href="README_CN.md">中文</a>
+</p>
+
+---
 
 ## Scope and Compatibility
 
