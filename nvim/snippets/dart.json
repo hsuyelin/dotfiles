@@ -1,0 +1,143 @@
+{
+	"cle": {
+		"prefix": "cle",
+		"body": [
+			"class ${1:ClassName} extends ${2:ParentClassName} {",
+				"\t$0",
+				"}",
+				""
+		]
+	},
+	"fgame": {
+		"prefix": "fgame",
+		"body": [
+			"class $1 extends FlameGame{",
+				"\t$0",
+				"}",
+				""
+		]
+	},
+	"fmodel": {
+		"prefix": "fmodel",
+		"body": [
+			"import 'package:freezed_annotation/freezed_annotation.dart';",
+			"",
+			"part '$1.freezed.dart';",
+			"part '$1.g.dart';",
+			"",
+			"@freezed",
+			"abstract class $2 with _\\$$2 {",
+				"  const factory $2({",
+					"\t\t$0",
+					"  }) = _$2;",
+					"",
+					"  factory $2.fromJson(Map<String, Object?> json)",
+					"      => _\\$$2FromJson(json);",
+					"}",
+					"\t\t"
+		]
+	},
+	"notifier": {
+		"prefix": "notifier",
+		"body": [
+			" ",
+			"import 'package:riverpod_annotation/riverpod_annotation.dart';",
+			"",
+			"part '$1.g.dart';",
+			"",
+			"@riverpod",
+			"class $2 extends _\\$$2 {",
+				"",
+				"  @override",
+				"  ${3:void} build() {",
+					"    return $4;",
+					"  }",
+					"}",
+					"\t$0",
+					"\t"
+		]
+	},
+	"provider": {
+		"prefix": "provider",
+		"body": [
+			"import 'package:flutter_riverpod/flutter_riverpod.dart';",
+			"import 'package:riverpod_annotation/riverpod_annotation.dart';",
+			"",
+			"part '${1}.g.dart';",
+			"",
+			"@riverpod",
+			"${2:dynamic} ${3}(Ref ref) {",
+				"\t${0}",
+				"} "
+		]
+	},
+	"routename": {
+		"prefix": "routename",
+		"body": [
+			"static const routeName = '/$0';"
+		]
+	},
+	"sh": {
+		"prefix": "sh",
+		"body": [
+			"SizedBox(height: $1),$0"
+		]
+	},
+	"slConsumer": {
+		"prefix": "slConsumer",
+		"body": [
+			"import 'package:flutter/material.dart';",
+			"import 'package:flutter_riverpod/flutter_riverpod.dart';",
+			"",
+			"class $1 extends ConsumerWidget {",
+				"  const $1({super.key});",
+				"",
+				"  @override",
+				"  Widget build(BuildContext context, WidgetRef ref) {",
+					"    return ${0:const Container()};",
+					"  }",
+					"}",
+					""
+		]
+	},
+	"stfConsumer": {
+		"prefix": "stfConsumer",
+		"body": [
+			"import 'package:flutter/material.dart';",
+			"import 'package:flutter_riverpod/flutter_riverpod.dart';",
+			"",
+			"class $1 extends ConsumerStatefulWidget {",
+				"  const $1({super.key});",
+				"",
+				"  @override",
+				"  ConsumerState<ConsumerStatefulWidget> createState() => _$1State();",
+				"}",
+				"",
+				"class _$1State extends ConsumerState<$1> {",
+					"  @override",
+					"  Widget build(BuildContext context) {",
+						"    return ${0:Container()};",
+						"  }",
+						"}",
+						""
+		]
+	},
+	"sw": {
+		"prefix": "sw",
+		"body": [
+			"SizedBox(width: $1),$0"
+		]
+	},
+	"t": {
+		"prefix": "t",
+		"body": [
+			"Text(\"$1\")$0"
+		]
+	},
+	"todo": {
+		"prefix": "todo",
+		"body": [
+			"// TODO: ${0:implement this}"
+		]
+	}
+}

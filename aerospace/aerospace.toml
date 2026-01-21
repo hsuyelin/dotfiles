@@ -1,0 +1,255 @@
+# Place a copy of this config to ~/.aerospace.toml
+# After that, you can edit ~/.aerospace.toml to your liking
+
+# --- Core Configuration ---
+# Start AeroSpace at login
+start-at-login = true
+
+# Normalizations. Enable to keep layouts clean and predictable.
+enable-normalization-flatten-containers = true
+enable-normalization-opposite-orientation-for-nested-containers = true
+
+# Accordion padding size
+accordion-padding = 10
+
+# Default layout when creating a new workspace. 'tiles' is recommended.
+default-root-container-layout = 'tiles'
+
+# Default orientation for the root container.
+default-root-container-orientation = 'auto'
+
+# Keyboard mapping preset
+key-mapping.preset = 'qwerty'
+
+# Mouse follows focus when the focused monitor changes
+on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
+
+# Gaps between windows and monitor edges.
+[gaps]
+# Inner gaps (between windows)
+inner.horizontal = [ { monitor."Built-in Retina Display" = 15 }, 20 ]
+inner.vertical =   [ { monitor."Built-in Retina Display" = 15 }, 20 ]
+# Outer gaps (between windows and monitor edges)
+outer.left =       [ { monitor."Built-in Retina Display" = 20 }, 25 ]
+outer.bottom =     [ { monitor."Built-in Retina Display" = 20 }, 25 ]
+outer.top =        [ { monitor."Built-in Retina Display" = 20 }, 25 ]
+outer.right =      [ { monitor."Built-in Retina Display" = 20 }, 25 ]
+
+# --- Main Binding Mode: main ---
+# The primary mode for window management.
+[mode.main.binding]
+
+# Layout commands
+alt-slash = 'layout tiles horizontal vertical' # Toggle tile orientation
+alt-comma = 'layout accordion horizontal vertical' # Toggle accordion orientation
+alt-f = 'fullscreen' # Toggle fullscreen mode
+
+# Focus commands (Vim style: h-j-k-l)
+alt-h = 'focus left'
+alt-j = 'focus down'
+alt-k = 'focus up'
+alt-l = 'focus right'
+
+# Move window commands (alt + shift + h-j-k-l)
+alt-shift-h = 'move left'
+alt-shift-j = 'move down'
+alt-shift-k = 'move up'
+alt-shift-l = 'move right'
+
+# Resize window commands
+alt-shift-minus = 'resize smart -100'
+alt-shift-equal = 'resize smart +100'
+
+# Quick application launch examples
+alt-enter = 'exec-and-forget open -a iTerm2' # Launch Terminal (iTerm2)
+alt-g = 'exec-and-forget open -a "Google Chrome"' # Launch Web Browser
+
+# Workspace switching (based on suggested categories)
+alt-1 = 'workspace D' # Dev
+alt-2 = 'workspace T' # Terminal/SQL
+alt-3 = 'workspace W' # Web
+alt-4 = 'workspace C' # Comms
+alt-5 = 'workspace O' # Docs/Office
+alt-6 = 'workspace F' # Files/Cloud
+alt-7 = 'workspace L' # Float/Media
+alt-8 = 'workspace 8'
+alt-9 = 'workspace 9'
+
+# Move window to workspace (alt + shift + number)
+alt-shift-1 = 'move-node-to-workspace D'
+alt-shift-2 = 'move-node-to-workspace T'
+alt-shift-3 = 'move-node-to-workspace W'
+alt-shift-4 = 'move-node-to-workspace C'
+alt-shift-5 = 'move-node-to-workspace O'
+alt-shift-6 = 'move-node-to-workspace F'
+alt-shift-7 = 'move-node-to-workspace L'
+alt-shift-8 = 'move-node-to-workspace 8'
+alt-shift-9 = 'move-node-to-workspace 9'
+
+# Workspace back and forth
+alt-tab = 'workspace-back-and-forth'
+# Move current workspace to the next monitor
+alt-shift-tab = 'move-workspace-to-monitor --wrap-around next'
+
+# Enter Service Mode (for advanced actions)
+alt-semicolon = 'mode service' 
+
+# # Close the focused window
+alt-q = '''exec-and-forget osascript -e '
+    tell application "System Events"
+        keystroke "w" using command down
+    end tell
+'
+'''
+
+# Focus on Typora window if it exists on the current monitor
+ctrl-alt-t = [
+    'workspace O',
+    'exec-and-forget open -a Typora'
+]
+
+# Focus on Telegram (App name: Telegram)
+ctrl-alt-g = [
+    'workspace C',
+    'exec-and-forget open -a Telegram'
+]
+
+# Focus on WeChat (App name: WeChat)
+ctrl-alt-w = [
+    'workspace C',
+    'exec-and-forget open -a WeChat'
+]
+
+# Focus on LarkSuite (App name: LarkSuite)
+ctrl-alt-l = [
+    'workspace C',
+    'exec-and-forget open -a LarkSuite'
+]
+
+# --- Service Binding Mode: service ---
+[mode.service.binding]
+esc = ['reload-config', 'mode main'] # Reload config and exit mode
+r = ['flatten-workspace-tree', 'mode main'] # Reset layout and exit mode
+f = ['layout floating tiling', 'mode main'] # Toggle between floating and tiling layout
+q = ['enable toggle'] # Disable window management
+backspace = ['close-all-windows-but-current', 'mode main'] # Close all but the focused window
+alt-shift-h = ['join-with left', 'mode main'] # Join containers
+alt-shift-j = ['join-with down', 'mode main']
+alt-shift-k = ['join-with up', 'mode main']
+alt-shift-l = ['join-with right', 'mode main']
+
+# --- Event Listeners: on-window-detected ---
+# Automatically move new windows to specific workspaces.
+# Use `aerospace list-windows` to confirm the exact App IDs.
+
+## 1. Dev (D)
+[[on-window-detected]]
+if.app-id = 'com.jetbrains.PyCharm'
+run = 'move-node-to-workspace D'
+
+[[on-window-detected]]
+if.app-id = 'com.jetbrains.RustRover'
+run = 'move-node-to-workspace D'
+
+[[on-window-detected]]
+if.app-id = 'com.apple.dt.Xcode'
+run = 'move-node-to-workspace D'
+
+[[on-window-detected]]
+if.app-id = 'com.sublimetext.4'
+run = 'move-node-to-workspace D'
+
+[[on-window-detected]]
+if.app-id = 'com.todesktop.230313mzl4w4u92' # Cursor.app
+run = 'move-node-to-workspace D'
+
+## 2. Terminal (T)
+[[on-window-detected]]
+if.app-id = 'com.googlecode.iterm2'
+run = 'move-node-to-workspace T'
+
+[[on-window-detected]]
+if.app-id = 'com.termius-dmg.mac'
+run = 'move-node-to-workspace T'
+
+[[on-window-detected]]
+if.app-id = 'net.sourceforge.sqlitebrowser' # DB Browser for SQLite
+run = 'move-node-to-workspace T'
+
+## 3. Web (W)
+[[on-window-detected]]
+if.app-id = 'com.apple.Safari'
+run = 'move-node-to-workspace W'
+
+[[on-window-detected]]
+if.app-id = 'com.google.Chrome'
+run = 'move-node-to-workspace W'
+
+## 4. Comms (C)
+[[on-window-detected]]
+if.app-id = 'com.tencent.xinWeChat'
+run = 'move-node-to-workspace C'
+
+[[on-window-detected]]
+if.app-id = 'com.larksuite.larkApp'
+run = 'move-node-to-workspace C'
+
+[[on-window-detected]]
+if.app-id = 'ru.keepcoder.Telegram'
+run = 'move-node-to-workspace C'
+
+## 5. Docs/Office (O)
+[[on-window-detected]]
+if.app-id = 'abnerworks.Typora'
+run = 'move-node-to-workspace O'
+
+[[on-window-detected]]
+if.app-id = 'com.kingsoft.wpsoffice.mac' # wpsoffice.app
+run = 'move-node-to-workspace O'
+
+[[on-window-detected]]
+if.app-id = 'com.adobe.Acrobat.Pro' # Adobe Acrobat DC - Check the exact ID
+run = 'move-node-to-workspace O'
+
+## 6. Files/Cloud (F)
+[[on-window-detected]]
+if.app-id = 'com.baidu.Netdisk-mac' # BaiduNetdisk_mac.app
+run = 'move-node-to-workspace F'
+
+[[on-window-detected]]
+if.app-id = 'com.alicloud.drive.mac' # aDrive.app
+run = 'move-node-to-workspace F'
+
+## 7. Float (L) - Set to Floating and Move to dedicated workspace (L)
+[[on-window-detected]]
+if.app-id = 'com.spotify.client'
+run = ['move-node-to-workspace L', 'layout floating']
+
+[[on-window-detected]]
+if.app-id = 'com.colliderli.iina'
+run = ['move-node-to-workspace L', 'layout floating']
+
+[[on-window-detected]]
+if.app-id = 'com.wuziqi.SenPlayer'
+run = ['move-node-to-workspace L', 'layout floating']
+
+## 8. General Float Apps - Only set to floating, keep on current workspace
+[[on-window-detected]]
+if.app-id = 'com.nssurge.surge-mac' # Surge.app
+run = ['layout floating']
+
+[[on-window-detected]]
+if.app-id = 'com.zzd.Xnip'
+run = ['layout floating']
+
+[[on-window-detected]]
+if.app-id = 'com.motrix.client' # Motrix.app
+run = ['layout floating']
+
+[[on-window-detected]]
+if.app-id = 'com.macpaw.AppCleaner' # App Cleaner 9.app
+run = ['layout floating']
+
+[[on-window-detected]]
+if.app-id = 'imagetasks.iStatistica-Pro' # iStatistica Pro.app
+run = ['layout floating']
