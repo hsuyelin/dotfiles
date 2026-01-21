@@ -91,8 +91,10 @@
 这两个目录已在 gitignore 中忽略，因此你无法直接看到我的结构。
 如果需要参考，请查看：
 
-- ![private](assets/private.png)
-- ![secrets](assets/secrets.png)
+<p>
+  <img src="assets/private.png" alt="private" width="48%" />
+  <img src="assets/secrets.png" alt="secrets" width="48%" />
+</p>
 
 ## 快速开始
 

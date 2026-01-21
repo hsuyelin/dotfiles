@@ -91,8 +91,10 @@ Keep anything personal or environment-specific in `secrets/` and `private/`.
 Both are gitignored, so you won’t see my actual structure in this repo.
 If you want a reference, see:
 
-- ![private](assets/private.png)
-- ![secrets](assets/secrets.png)
+<p>
+  <img src="assets/private.png" alt="private" width="48%" />
+  <img src="assets/secrets.png" alt="secrets" width="48%" />
+</p>
 
 ## Getting started
 
