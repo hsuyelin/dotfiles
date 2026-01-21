@@ -1,0 +1,33 @@
+# Secrets - API keys, tokens, passwords
+.config/secrets/
+
+# Private - Personal/company information, machine-specific paths
+.config/private/
+
+# Zsh session history
+.config/zsh/.zsh_history
+.config/zsh/.zsh_sessions/
+
+# Vim history
+.config/vim/.viminfo
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Spicetify user-specific cache
+.config/spicetify/CustomApps/marketplace-dist.zip
+
+# Zsh compiled bytecode cache
+.config/**/*.zwc
+
+# Third-party plugins (keep folders, ignore contents)
+# These are installed by plugin managers at runtime
+.config/zi/plugins/*
+!.config/zi/plugins/.gitkeep
+.config/zi/bin/*
+!.config/zi/bin/.gitkeep
+.config/tmux/plugins/*
+!.config/tmux/plugins/.gitkeep
+.config/vim/.vim/plugged/*
+!.config/vim/.vim/plugged/.gitkeep
