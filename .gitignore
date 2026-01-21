@@ -1,0 +1,10 @@
+# Secrets - Never commit
+secrets/
+
+# Zsh session history
+zsh/.zsh_history
+zsh/.zsh_sessions/
+
+# macOS
+.DS_Store
+**/.DS_Store
