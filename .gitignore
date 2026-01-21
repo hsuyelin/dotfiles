@@ -4,6 +4,9 @@ secrets/
 # Private - Personal/company information, machine-specific paths
 private/
 
+# Brew package
+brew/*.txt
+
 # Zsh session history
 zsh/.zsh_history
 zsh/.zsh_sessions/
