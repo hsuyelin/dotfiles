@@ -17,3 +17,15 @@ vim/.viminfo
 
 # Spicetify user-specific cache
 spicetify/CustomApps/marketplace-dist.zip
+
+# Zsh compiled bytecode cache
+**/*.zwc
+
+# Third-party plugins (keep folders, ignore contents)
+# These are installed by plugin managers at runtime
+zi/plugins/*
+!zi/plugins/.gitkeep
+tmux/plugins/*
+!tmux/plugins/.gitkeep
+vim/.vim/plugged/*
+!vim/.vim/plugged/.gitkeep
