@@ -25,8 +25,7 @@
 # These are installed by plugin managers at runtime
 .config/zi/plugins/*
 !.config/zi/plugins/.gitkeep
-.config/zi/bin/*
-!.config/zi/bin/.gitkeep
+.config/zi/bin
 .config/tmux/plugins/*
 !.config/tmux/plugins/.gitkeep
 .config/vim/.vim/plugged/*

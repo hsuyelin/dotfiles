@@ -1,0 +1,23 @@
+{
+  "oisimple": {
+    "prefix": "simple",
+    "body": [
+      "#include <iostream>",
+      "using namespace std;",
+      "",
+      "int main() {",
+      "  ${0:cout << \"hello world\" << endl};",
+      "  return 0;",
+      "}"
+    ]
+  },
+  "redirect": {
+    "prefix": "redirect",
+    "body": [
+      "#ifdef LOCAL",
+      "  freopen(\"in.txt\", \"r\", stdin);",
+      "  freopen(\"out.txt\", \"w\", stdout);",
+      "#endif"
+    ]
+  }
+}

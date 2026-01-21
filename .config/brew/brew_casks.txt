@@ -1,0 +1,12 @@
+aerospace
+applite
+claude-code
+codex
+db-browser-for-sqlite
+font-fira-code
+font-fira-code-nerd-font
+lyricsx
+oracle-jdk@25
+pearcleaner
+swiftformat-for-xcode
+xcodes-app

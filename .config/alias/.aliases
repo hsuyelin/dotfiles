@@ -1,0 +1,314 @@
+# -----------------------------
+# Proxy helpers
+# -----------------------------
+proxy_off() {
+  unset https_proxy http_proxy all_proxy
+  echo "Proxy disabled."
+}
+
+proxy_on() {
+  export https_proxy="http://127.0.0.1:6152"
+  export http_proxy="http://127.0.0.1:6152"
+  export all_proxy="socks5://127.0.0.1:6153"
+  echo "Proxy enabled."
+}
+
+# Optional: quick check
+proxy_status() {
+  echo "http_proxy=${http_proxy:-<unset>}"
+  echo "https_proxy=${https_proxy:-<unset>}"
+  echo "all_proxy=${all_proxy:-<unset>}"
+}
+
+# -----------------------------
+# Bash profile shortcuts
+# -----------------------------
+alias bash-reload='source "$HOME/.config/bash/.bash_profile"'
+alias bash-edit='subl "$HOME/.config/bash/.bash_profile"'
+
+# -----------------------------
+# Tool shortcuts
+# -----------------------------
+alias rvminstall='"$HOME/.rvm/.rvminstall.sh"'
+alias carthage_build='"$HOME/.config/bin/carthage_build.sh"'
+alias brew_export='"$HOME/.config/bin/brew_export.sh"'
+alias xcode-switch='"$HOME/.config/bin/xcode.sh"'
+alias rubyfmt='rubocop -A'
+
+# Xcode launchers (keep your naming, but make them consistent)
+alias xed16='open -a /Applications/Xcode-16.4.0.app'
+alias xed26='open -a /Applications/Xcode-26.1.0.app'
+
+
+# -----------------------------
+# eza / git helpers
+# - If eza exists, use it. Otherwise fall back to system ls.
+# -----------------------------
+if command -v eza >/dev/null 2>&1; then
+  alias ls='eza --icons --group-directories-first'
+  alias l='eza -l --icons --git --header --group-directories-first --color-scale'
+  alias ll='eza -la --icons --git --header --group-directories-first --color-scale'
+  alias la='eza -a --icons --group-directories-first'
+  alias lr='eza -l --sort=modified --icons --git --header --group-directories-first --color-scale'
+  alias lb='eza -l --sort=size --icons --git --header --group-directories-first --color-scale'
+  alias lt='eza --tree --level=2 --icons --group-directories-first'
+  alias lta='eza --tree -a --level=2 --icons --group-directories-first'
+else
+  # Minimal fallbacks if eza isn't installed
+  alias l='ls -lh'
+  alias ll='ls -lah'
+  alias la='ls -A'
+fi
+
+command -v lazygit >/dev/null 2>&1 && alias lg='lazygit'
+
+# Keep a literal rm available
+alias real-rm='\rm'
+
+
+# -----------------------------
+# System helpers
+# -----------------------------
+alias dns:flush='sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder'
+
+
+# -----------------------------
+# Safer rm wrapper
+# - Keeps -f semantics: if -f provided, missing targets won't warn.
+# - Uses safe-trash if available; otherwise falls back to /bin/rm.
+# -----------------------------
+rm() {
+  local targets=()
+  local force=false
+
+  for arg in "$@"; do
+    case "$arg" in
+      -*)
+        [[ "$arg" == *"f"* ]] && force=true
+        ;;
+      *)
+        targets+=("$arg")
+        ;;
+    esac
+  done
+
+  # No targets: behave like rm (show usage-ish)
+  if [ ${#targets[@]} -eq 0 ]; then
+    /bin/rm "$@"
+    return $?
+  fi
+
+  for target in "${targets[@]}"; do
+    if [ -e "$target" ]; then
+      if command -v safe-trash >/dev/null 2>&1; then
+        safe-trash "$target"
+      else
+        # Fallback to real rm if safe-trash isn't installed
+        /bin/rm -rf -- "$target"
+      fi
+    else
+      if [ "$force" = false ]; then
+        echo "rm: $target: No such file or directory"
+      fi
+    fi
+  done
+}
+
+
+# -----------------------------
+# fix: convert `cmd` => $(cmd) in clipboard content
+# -----------------------------
+fix() {
+  local clipboard_content fixed_content
+
+  clipboard_content="$(pbpaste)"
+  fixed_content="$(echo "$clipboard_content" | sed -E 's/\`([^\`]+)\`/$(\1)/g')"
+
+  echo "$fixed_content" | pbcopy
+  echo -e "Fixed command copied to clipboard. Output:\n\n$fixed_content\n"
+}
+
+
+# -----------------------------
+# rd: ratatui directory picker
+# -----------------------------
+rd() {
+  local RATATUI_BETTER_CD="rd-better-cd"
+  local TEMP_FILE="/tmp/rd_selected_dir"
+  local SELECTED_DIR
+
+  if ! command -v "$RATATUI_BETTER_CD" >/dev/null 2>&1; then
+    echo "Error: '$RATATUI_BETTER_CD' not found." >&2
+    return 1
+  fi
+
+  real-rm -rf "$TEMP_FILE"
+  "$RATATUI_BETTER_CD"
+
+  # If user cancelled, temp file won't exist
+  [ -f "$TEMP_FILE" ] || return 0
+
+  read -r SELECTED_DIR < "$TEMP_FILE"
+  real-rm -rf "$TEMP_FILE"
+
+  if [ -n "$SELECTED_DIR" ] && [ -d "$SELECTED_DIR" ]; then
+    cd "$SELECTED_DIR" || return 1
+  else
+    echo "Invalid directory: $SELECTED_DIR" >&2
+    return 1
+  fi
+}
+
+
+# -----------------------------
+# ipshow: show local / public ip
+# -----------------------------
+ipshow() {
+  local iface
+  iface="$(route get default 2>/dev/null | awk '/interface:/{print $2}')"
+
+  case "$1" in
+    --local|-l)
+      echo "LAN: $(ipconfig getifaddr "$iface")"
+      ;;
+    --public|-p)
+      echo "WAN: $(curl -s ifconfig.me)"
+      ;;
+    "")
+      echo "LAN: $(ipconfig getifaddr "$iface")"
+      echo "WAN: $(curl -s ifconfig.me)"
+      ;;
+    *)
+      echo "Usage: ipshow [--local|-l | --public|-p]"
+      ;;
+  esac
+}
+
+
+# -----------------------------
+# xcode: build / clean
+# -----------------------------
+_parse_xcode_args() {
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --workspace)
+        workspace="$2"
+        shift 2
+        ;;
+      --scheme)
+        scheme="$2"
+        shift 2
+        ;;
+      --configuration)
+        configuration="$2"
+        shift 2
+        ;;
+      *)
+        echo "❌ Unknown option: $1"
+        return 1
+        ;;
+    esac
+  done
+
+  [ -z "$workspace" ] && echo "❌ Missing required option: --workspace" && return 1
+  [ -z "$scheme" ] && echo "❌ Missing required option: --scheme" && return 1
+  [ -z "$configuration" ] && echo "❌ Missing required option: --configuration" && return 1
+
+  return 0
+}
+
+# xcode clean
+xclean() {
+  unset workspace scheme configuration
+
+  _parse_xcode_args "$@" || {
+    echo "Usage:"
+    echo "  xclean --workspace <name> --scheme <name> --configuration <name>"
+    echo "Example:"
+    echo "  xclean --workspace MiFit --scheme MiDong --configuration Release"
+    return 1
+  }
+
+  xcodebuild \
+    -workspace "${workspace}.xcworkspace" \
+    -scheme "$scheme" \
+    -sdk iphoneos \
+    -configuration "$configuration" \
+    clean | xcbeautify
+}
+
+# xcode build
+xbuild() {
+  unset workspace scheme configuration
+
+  _parse_xcode_args "$@" || {
+    echo "Usage:"
+    echo "  xbuild --workspace <name> --scheme <name> --configuration <name>"
+    echo "Example:"
+    echo "  xbuild --workspace MiFit --scheme MiDong --configuration Release"
+    return 1
+  }
+
+  xcodebuild \
+    -workspace "${workspace}.xcworkspace" \
+    -scheme "$scheme" \
+    -sdk iphoneos \
+    -configuration "$configuration" \
+    build | xcbeautify
+}
+
+# xcode archive
+xarchive() {
+  unset workspace scheme configuration archive_path
+
+  # parse args (reuse same style, with an extra flag)
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --workspace)
+        workspace="$2"; shift 2 ;;
+      --scheme)
+        scheme="$2"; shift 2 ;;
+      --configuration)
+        configuration="$2"; shift 2 ;;
+      --archive-path)
+        archive_path="$2"; shift 2 ;;
+      *)
+        echo "❌ Unknown option: $1"
+        echo "Usage:"
+        echo "  xarchive --workspace <name> --scheme <name> --configuration <name> --archive-path <path>"
+        echo "Example:"
+        echo "  xarchive --workspace MiFit --scheme MiDong --configuration Release --archive-path ./build/MiDong.xcarchive"
+        return 1
+        ;;
+    esac
+  done
+
+  [ -z "$workspace" ] && echo "❌ Missing required option: --workspace" && return 1
+  [ -z "$scheme" ] && echo "❌ Missing required option: --scheme" && return 1
+  [ -z "$configuration" ] && echo "❌ Missing required option: --configuration" && return 1
+  [ -z "$archive_path" ] && echo "❌ Missing required option: --archive-path" && return 1
+
+  xcodebuild \
+    -workspace "${workspace}.xcworkspace" \
+    -scheme "$scheme" \
+    -sdk iphoneos \
+    -configuration "$configuration" \
+    archive \
+    -archivePath "$archive_path" | xcbeautify
+}
+
+
+# -----------------------------
+# git & fzf
+# -----------------------------
+
+alias gba='git branch -a | fzf --height=40% --border --preview "git log --oneline --color=always -- {} | head -80" | sed "s/.* //" | xargs git checkout'
+
+
+# -----------------------------
+# Other
+# -----------------------------
+
+mrrss() {
+   "$HOME/.config/bin/mrrss_update.sh" "$@"
+}

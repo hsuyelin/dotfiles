@@ -1,0 +1,10 @@
+{
+	"fproject": {
+		"prefix": "fproject",
+		"body": [
+			"require(\"flutter-tools\").setup_project({",
+			"\t\t\t$0",
+			"})"
+		]
+	}
+}
