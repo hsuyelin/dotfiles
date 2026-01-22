@@ -80,7 +80,7 @@ This is the machine these configs are primarily tuned and iterated on:
 - `git/` — Git config + aliases
 - `alias/`, `bash/`, `bin/` — helpers and scripts
 
-For the complete list of directories, see [`docs/STRUCTURE.md`](docs/STRUCTURE.md).
+For the complete list of directories, see [`STRUCTURE.md`](docs/STRUCTURE.md).
 
 ## Compatibility
 
@@ -107,7 +107,7 @@ If you want a reference, see:
 
 If you want to borrow parts of this setup rather than adopt it wholesale:
 
-1. **Scan the layout**: start with [`docs/STRUCTURE.md`](docs/STRUCTURE.md) to locate the area you care about.
+1. **Scan the layout**: start with [`STRUCTURE.md`](docs/STRUCTURE.md) to locate the area you care about.
 2. **Pick one surface**: shell, editor, tmux, or git — adopt a single layer at a time.
 3. **Copy configs, not assumptions**: port the files you need, then adjust paths, fonts, and plugin lists for your system.
 4. **Keep secrets local**: anything machine-specific belongs in `secrets/` or `private/`.
@@ -158,7 +158,7 @@ Trade-offs:
 
 ## Reference
 
-- Structure overview: [`docs/STRUCTURE.md`](docs/STRUCTURE.md)
+- Structure overview: [`STRUCTURE.md`](docs/STRUCTURE.md)
 
 ## License
 
