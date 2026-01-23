@@ -32,3 +32,4 @@ tmux/plugins/*
 !tmux/plugins/.gitkeep
 vim/.vim/plugged/*
 !vim/.vim/plugged/.gitkeep
+bundle/cache
