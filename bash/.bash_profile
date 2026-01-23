@@ -20,9 +20,3 @@ export BASH_SILENCE_DEPRECATION_WARNING=1
 # Env
 export COCOAPODS_NO_BUNDLER=1
 export PYTHONWARNINGS="ignore:NotOpenSSLWarning"
-
-# Load secrets
-[[ -f "$HOME/.config/secrets/.env.secrets" ]] && source "$HOME/.config/secrets/.env.secrets"
-
-# Add Cargo
-[[ -s "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"

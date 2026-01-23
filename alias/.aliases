@@ -32,7 +32,7 @@ alias bash-edit='subl "$HOME/.config/bash/.bash_profile"'
 alias rvminstall='"$HOME/.rvm/.rvminstall.sh"'
 alias carthage_build='"$HOME/.config/bin/carthage_build.sh"'
 alias brew_export='"$HOME/.config/bin/brew_export.sh"'
-alias xcode-switch='"$HOME/.config/bin/xcode.sh"'
+alias xcode='"$HOME/.config/bin/xcode.sh"'
 alias rubyfmt='rubocop -A'
 
 # Xcode launchers (keep your naming, but make them consistent)

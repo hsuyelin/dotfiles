@@ -1,16 +1,23 @@
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
+# ============================================================
+# Powerlevel10k Instant Prompt
+# ============================================================
+# Must stay near the top of ~/.zshrc. Any code that may require console input
+# (password prompts, [y/n] confirmations, etc.) must go above this block.
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-# -------------------------------------------------------------------
+# ============================================================
 # ZI Initialization
-# -------------------------------------------------------------------
+# ============================================================
 typeset -A ZI
-ZI[HOME_DIR]="${HOME}/.config/zi"
+ZI[HOME_DIR]="${XDG_CONFIG_HOME}/zi"
 ZI[BIN_DIR]="${ZI[HOME_DIR]}/bin"
+
+# ============================================================
+# z (agkozak/zsh-z) State (XDG)
+# ============================================================
+export _Z_DATA="$XDG_STATE_HOME/z/z"
 
 if [[ ! -f "${ZI[BIN_DIR]}/zi.zsh" ]]; then
   print -P "%F{33}▓▒░ %F{160}Installing (%F{33}z-shell/zi%F{160})…%f"
@@ -23,18 +30,17 @@ source "${ZI[BIN_DIR]}/zi.zsh"
 
 autoload -Uz _zi
 (( ${+_comps} )) && _comps[zi]=_zi
-setopt NO_AUTO_MENU
 
+setopt NO_AUTO_MENU
 zstyle ':completion:*' menu select
 zstyle ':completion:*' list-colors "${(@s.:.)LS_COLORS}"
 zstyle ':completion:*:*:cp:*' file-sort size
 zstyle ':completion:*' file-sort modification
 
-# =========================
+# ============================================================
 # FZF Core
-# =========================
-
-export FZF_ALT_C_OPTS='
+# ============================================================
+export FZF_ALT_C_OPTS=$'
 --walker=dir,follow,hidden
 --walker-skip=.git,node_modules,target
 --height=40%
@@ -57,14 +63,14 @@ ZSH_AUTOSUGGEST_CLEAR_WIDGETS+=(
   fzf-cd-widget
 )
 
-# -------------------------------------------------------------------
+# ============================================================
 # ZI Theme
-# -------------------------------------------------------------------
+# ============================================================
 zi light "romkatv/powerlevel10k"
 
-# -------------------------------------------------------------------
+# ============================================================
 # ZI Initiative Plugins
-# -------------------------------------------------------------------
+# ============================================================
 zi ice wait lucid atinit='zpcompinit'
 zi light "zdharma-continuum/fast-syntax-highlighting"
 
@@ -76,47 +82,68 @@ bindkey '^?' backward-delete-char
 zi ice lucid
 zi light "zsh-users/zsh-completions"
 
-# -------------------------------------------------------------------
+# ============================================================
 # ZI Passive Plugins
-# -------------------------------------------------------------------
+# ============================================================
 zi light "agkozak/zsh-z"
 zi light "z-shell/zsh-eza"
 zi light "DarrinTisdale/zsh-aliases-exa"
 
-# -------------------------------------------------------------------
+# ============================================================
 # ZI Snippets
-# -------------------------------------------------------------------
+# ============================================================
 zi snippet OMZP::git
 zi snippet OMZP::autojump
 zi snippet OMZL::completion.zsh
 zi snippet OMZL::key-bindings.zsh
 
-# -------------------------------------------------------------------
+# ============================================================
 # Environment Setup
-# -------------------------------------------------------------------
-# To customize user config
-[[ ! -f "$HOME/.config/bash/.bash_profile" ]] || source "$HOME/.config/bash/.bash_profile"
+# ============================================================
 
-# Auto load alias
-[[ ! -f "$HOME/.config/alias/.aliases" ]] || source "$HOME/.config/alias/.aliases"
+# bash profile compatibility (if you keep bash config in XDG)
+[[ -f "${XDG_CONFIG_HOME}/bash/.bash_profile" ]] && source "${XDG_CONFIG_HOME}/bash/.bash_profile"
 
-# Auto ai env
-[[ ! -f "$HOME/.config/bash/.ai" ]] || source "$HOME/.config/bash/.ai"
+# Aliases (XDG)
+[[ -f "${XDG_CONFIG_HOME}/alias/.aliases" ]] && source "${XDG_CONFIG_HOME}/alias/.aliases"
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+# AI env (XDG)
+[[ -f "${XDG_CONFIG_HOME}/bash/.ai" ]] && source "${XDG_CONFIG_HOME}/bash/.ai"
 
-# Add Rvm (RVM loading line should be near the end of the file)
+# Powerlevel10k config (XDG)
+[[ -f "${XDG_CONFIG_HOME}/zsh/.p10k.zsh" ]] && source "${XDG_CONFIG_HOME}/zsh/.p10k.zsh"
+
+# ============================================================
+# Antigravity / RVM
+# ============================================================
+
 # Added by Antigravity
 export PATH="$HOME/.antigravity/antigravity/bin:$PATH"
 
-# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
+# RVM (keep this near the end of the file; last PATH mutation)
 export PATH="$PATH:$HOME/.rvm/bin"
 
-# -------------------------------------------------------------------
+# ============================================================
+# Env modules
+# ============================================================
+for f in "$ZDOTDIR"/env/*.zsh; do
+  [[ -r "$f" ]] && source "$f"
+done
+
+# ============================================================
+# Bin modules
+# ============================================================
+
+# Secrets (XDG)
+[[ -f "${XDG_CONFIG_HOME}/secrets/.env.secrets" ]] && source "${XDG_CONFIG_HOME}/secrets/.env.secrets"
+
+# Cargo env (rustup/cargo may drop an env helper here)
+[[ -s "${CARGO_HOME}/env" ]] && source "${CARGO_HOME}/env"
+
+# ============================================================
 # Fzf Setup
-# -------------------------------------------------------------------
-[ ! -f ~/.fzf.zsh ] || source ~/.fzf.zsh
+# ============================================================
+[[ -f "${XDG_CONFIG_HOME}/fzf/fzf.zsh" ]] && source "${XDG_CONFIG_HOME}/fzf/fzf.zsh"
 
 zi ice lucid
 zi light "Aloxaf/fzf-tab"
