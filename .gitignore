@@ -30,3 +30,5 @@
 !.config/tmux/plugins/.gitkeep
 .config/vim/.vim/plugged/*
 !.config/vim/.vim/plugged/.gitkeep
+/.config/swiftpm
+.config/bundle/cache/*
