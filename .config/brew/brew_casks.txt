@@ -2,6 +2,7 @@ aerospace
 applite
 claude-code
 codex
+codexbar
 db-browser-for-sqlite
 font-fira-code
 font-fira-code-nerd-font
