@@ -133,6 +133,83 @@ preflight_check() {
 }
 
 # =============================================================================
+# Step 0: Check iTerm2 and offer to install / switch
+# =============================================================================
+
+check_iterm2() {
+    log_step "Checking iTerm2"
+
+    local iterm_app="/Applications/iTerm.app"
+
+    if [[ -d "$iterm_app" ]]; then
+        log_success "iTerm2 is installed"
+        return
+    fi
+
+    log_info "iTerm2 is not installed"
+    echo ""
+
+    while true; do
+        echo -en "     ${BOLD}Would you like to install iTerm2? [y/N]:${RESET} "
+        read -r answer
+        case "$answer" in
+            [yY]|[yY][eE][sS])
+                break
+                ;;
+            [nN]|[nN][oO]|"")
+                log_info "skipping iTerm2 installation, continuing in current terminal"
+                return
+                ;;
+            *)
+                log_warn "please enter y or n"
+                ;;
+        esac
+    done
+
+    # Install iTerm2 via brew cask (Homebrew may not be available yet, use curl)
+    if command -v brew &>/dev/null; then
+        log_info "installing iTerm2 via Homebrew..."
+        brew install --cask iterm2
+    else
+        log_info "Homebrew not available yet, downloading iTerm2 directly..."
+        local tmpdir
+        tmpdir="$(mktemp -d)"
+        local zip_path="$tmpdir/iTerm2.zip"
+        curl -fsSL "https://iterm2.com/downloads/stable/latest" -o "$zip_path"
+        unzip -q "$zip_path" -d "$tmpdir"
+        mv "$tmpdir/iTerm.app" /Applications/
+        rm -rf "$tmpdir"
+    fi
+
+    log_success "iTerm2 installed to /Applications"
+    echo ""
+
+    while true; do
+        echo -en "     ${BOLD}Open iTerm2 and re-run this script there? [y/N]:${RESET} "
+        read -r answer
+        case "$answer" in
+            [yY]|[yY][eE][sS])
+                echo ""
+                log_info "opening iTerm2..."
+                log_info "please re-run the script with:"
+                echo ""
+                echo -e "     ${CYAN}cd $(printf '%q' "$SCRIPT_DIR") && ./install.sh${RESET}"
+                echo ""
+                open -a iTerm
+                exit 0
+                ;;
+            [nN]|[nN][oO]|"")
+                log_info "continuing in current terminal"
+                return
+                ;;
+            *)
+                log_warn "please enter y or n"
+                ;;
+        esac
+    done
+}
+
+# =============================================================================
 # Step 1: Check architecture (Apple Silicon only)
 # =============================================================================
 
@@ -595,6 +672,51 @@ request_sudo() {
 }
 
 # =============================================================================
+# Post-check: Prompt to install Xcode via Xcodes
+# =============================================================================
+
+prompt_xcode() {
+    log_step "Checking Xcode"
+
+    # Detect Xcode.app in common locations
+    if [[ -d "/Applications/Xcode.app" ]] || [[ -d "$HOME/Applications/Xcode.app" ]]; then
+        log_success "Xcode is installed"
+        return
+    fi
+
+    log_warn "Xcode is not installed"
+    log_info "Xcode is required for iOS/macOS development"
+
+    # Check if Xcodes app is available
+    local xcodes_app="/Applications/Xcodes.app"
+    if [[ ! -d "$xcodes_app" ]]; then
+        log_info "Xcodes app not found either — you can install Xcode manually from the App Store"
+        return
+    fi
+
+    echo ""
+    while true; do
+        echo -en "     ${BOLD}Open Xcodes to install Xcode? [y/N]:${RESET} "
+        read -r answer
+        case "$answer" in
+            [yY]|[yY][eE][sS])
+                log_info "opening Xcodes..."
+                open -a Xcodes
+                log_success "Xcodes launched — please select and install your preferred Xcode version"
+                return
+                ;;
+            [nN]|[nN][oO]|"")
+                log_info "skipping Xcode installation"
+                return
+                ;;
+            *)
+                log_warn "please enter y or n"
+                ;;
+        esac
+    done
+}
+
+# =============================================================================
 # Main
 # =============================================================================
 
@@ -605,6 +727,7 @@ main() {
     echo -e "${BOLD}╚══════════════════════════════════════════════════╝${RESET}"
     echo ""
 
+    check_iterm2
     check_architecture
     ensure_cli_essentials
     preflight_check
@@ -620,6 +743,7 @@ main() {
     install_ruby
     install_cocoapods
     verify_environment
+    prompt_xcode
 
     echo ""
     log_step "Bootstrap complete"
