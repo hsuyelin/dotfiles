@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =============================================================================
-# install.sh — Bootstrap script for a fresh Apple Silicon Mac
+# install.sh — Bootstrap script for a fresh Mac (Apple Silicon / Intel)
 #
 # Usage:
 #     chmod +x install.sh && ./install.sh
@@ -163,7 +163,11 @@ ensure_brew_env() {
     if command -v brew &>/dev/null; then
         eval "$(brew shellenv)" 2>/dev/null || true
     elif [[ -x "/opt/homebrew/bin/brew" ]]; then
+        # Apple Silicon default path
         eval "$(/opt/homebrew/bin/brew shellenv)" 2>/dev/null || true
+    elif [[ -x "/usr/local/bin/brew" ]]; then
+        # Intel Mac default path
+        eval "$(/usr/local/bin/brew shellenv)" 2>/dev/null || true
     fi
 }
 
@@ -392,7 +396,7 @@ check_iterm2() {
 }
 
 # =============================================================================
-# Step 1: Check architecture (Apple Silicon only)
+# Step 1: Check architecture
 # =============================================================================
 
 check_architecture() {
@@ -401,13 +405,38 @@ check_architecture() {
     local arch
     arch="$(uname -m)"
 
-    if [[ "$arch" != "arm64" ]]; then
-        log_error "This script requires Apple Silicon (arm64)."
-        log_error "Detected: ${arch}. Exiting."
+    if [[ "$arch" == "arm64" ]]; then
+        log_success "Apple Silicon (arm64) detected"
+    elif [[ "$arch" == "x86_64" ]]; then
+        echo ""
+        log_warn "Intel (x86_64) architecture detected."
+        log_warn "This dotfiles setup is primarily tested on Apple Silicon."
+        log_warn "Most features should work, but some paths or behaviours may differ."
+        echo ""
+        while true; do
+            echo -en "     ${BOLD}Continue anyway? [y/N]:${RESET} "
+            read -r answer
+            case "$answer" in
+                [yY]|[yY][eE][sS])
+                    log_success "proceeding on Intel Mac..."
+                    echo ""
+                    break
+                    ;;
+                [nN]|[nN][oO]|"")
+                    echo ""
+                    log_info "no worries — see you next time :)"
+                    echo ""
+                    exit 0
+                    ;;
+                *)
+                    log_warn "please enter y or n"
+                    ;;
+            esac
+        done
+    else
+        log_error "Unsupported architecture: ${arch}. Exiting."
         exit 1
     fi
-
-    log_success "Apple Silicon (arm64) detected"
 }
 
 # =============================================================================
@@ -501,7 +530,11 @@ setup_xdg() {
     export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
     export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
     export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
-    export HOMEBREW_PREFIX="${HOMEBREW_PREFIX:-/opt/homebrew}"
+    if [[ "$(uname -m)" == "arm64" ]]; then
+        export HOMEBREW_PREFIX="${HOMEBREW_PREFIX:-/opt/homebrew}"
+    else
+        export HOMEBREW_PREFIX="${HOMEBREW_PREFIX:-/usr/local}"
+    fi
     log_success "XDG variables set (full .zshenv will be sourced by zsh on next login)"
 }
 
@@ -976,7 +1009,7 @@ prompt_xcode() {
 main() {
     echo ""
     echo -e "${BOLD}╔════════════════════════════════════════════════════╗${RESET}"
-    echo -e "${BOLD}║       Dotfiles Bootstrap — Apple Silicon Mac       ║${RESET}"
+    echo -e "${BOLD}║          Dotfiles Bootstrap — macOS                ║${RESET}"
     echo -e "${BOLD}╚════════════════════════════════════════════════════╝${RESET}"
     echo ""
 
