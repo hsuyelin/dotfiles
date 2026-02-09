@@ -227,6 +227,18 @@ export XDG_CACHE_HOME="$HOME/.cache"
 
 将以上变量写入你的 shell profile（例如 `~/.zprofile`），确保相关工具优先读取 `~/.config`。
 
+你可以使用 [`xdg-ninja`](https://github.com/b3nj5m1n/xdg-ninja) 检测 `$HOME` 下哪些文件可以迁移到 XDG 规范路径：
+
+```bash
+brew install xdg-ninja
+xdg-ninja
+```
+
+![xdg-ninja](assets/xdg-ninja.png)
+
+> [!CAUTION]
+> `xdg-ninja` 的建议**仅供参考**。盲目将所有配置迁移到 XDG 路径可能会导致部分工具出现意想不到的问题。迁移前请务必查阅对应工具的社区文档或上游 issue。
+
 ## 优势与取舍
 
 优势：

@@ -227,6 +227,18 @@ export XDG_CACHE_HOME="$HOME/.cache"
 
 Place these in your shell profile (e.g. `~/.zprofile`) to ensure tools load configs from `~/.config`.
 
+You can use [`xdg-ninja`](https://github.com/b3nj5m1n/xdg-ninja) to audit which files in your `$HOME` could be moved to XDG-compliant paths:
+
+```bash
+brew install xdg-ninja
+xdg-ninja
+```
+
+![xdg-ninja](assets/xdg-ninja.png)
+
+> [!CAUTION]
+> The suggestions from `xdg-ninja` are **for reference only**. Blindly migrating everything to XDG paths may cause unexpected issues with some tools. Always check the relevant community docs or upstream issue tracker before moving a specific config.
+
 ## Benefits & trade-offs
 
 Benefits:
