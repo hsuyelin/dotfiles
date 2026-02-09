@@ -135,7 +135,7 @@ Profile 主要参数：
 - **文件列表**：[`eza`](https://github.com/eza-community/eza) 带图标和 Git 状态
 - **模糊搜索**：[`fzf`](https://github.com/junegunn/fzf) + `fzf-tab` 搜索历史、文件和补全
 - **目录跳转**：[`zoxide`](https://github.com/ajeetdsouza/zoxide) — 基于访问频率的智能 `cd`
-- **Ruby 工具链**：[RVM](https://rvm.io) + CocoaPods（面向 iOS / macOS 开发）
+- **Ruby 工具链**：[RVM](https://rvm.io) + [CocoaPods](https://cocoapods.org)（面向 iOS / macOS 开发）
 
 ## 理念
 

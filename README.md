@@ -135,7 +135,7 @@ If you already have your own iTerm2 profile and only want the One Dark Pro color
 - **File listing**: [`eza`](https://github.com/eza-community/eza) with icons and git status
 - **Fuzzy finder**: [`fzf`](https://github.com/junegunn/fzf) + `fzf-tab` for history, files, and completion
 - **Directory jump**: [`zoxide`](https://github.com/ajeetdsouza/zoxide) — frequency-based smart `cd`
-- **Ruby toolchain**: [RVM](https://rvm.io) + CocoaPods (for iOS / macOS development)
+- **Ruby toolchain**: [RVM](https://rvm.io) + [CocoaPods](https://cocoapods.org) (for iOS / macOS development)
 
 ## Philosophy
 
