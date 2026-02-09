@@ -57,6 +57,14 @@
 
 ![iTerm2 预览](assets/preview.png)
 
+日常工作流：常用工具版本、二进制路径，以及 `z`（zoxide + fzf）目录跳转效果：
+
+![开发预览](assets/dev.png)
+
+Neovim：Neo-tree 侧边栏、Buffer 标签页、LSP 编辑界面：
+
+![Neovim 预览](assets/nvim.png)
+
 ## iTerm2 配置
 
 仓库中包含两个 iTerm2 相关资源：

@@ -57,6 +57,14 @@ This is the machine these configs are primarily tuned and iterated on:
 
 ![iTerm2 Preview](assets/preview.png)
 
+Daily workflow: common tool versions, binary paths, and `z` (zoxide + fzf) directory jump in action:
+
+![Dev Preview](assets/dev.png)
+
+Neovim with Neo-tree sidebar, buffer tabs, and LSP-powered editing:
+
+![Neovim Preview](assets/nvim.png)
+
 ## iTerm2 configuration
 
 This repo ships two iTerm2 assets:
