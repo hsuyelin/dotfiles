@@ -332,39 +332,7 @@ cat error.log | claude "analyze this error"
 Ctrl+A y
 ```
 
-## 9. hm (Custom Commands)
-
-These are team-specific commands, not part of this repo.
-
-**Push Code**
-
-```bash
-# Push code and add reviewer (gx = developer abbreviation)
-hm push gx
-# Effect: push to remote and add gaoxiang@zepp.com as reviewer
-```
-
-**Log Parsing**
-
-```bash
-# Parse logs in current directory, output as txt
-hm logp . -o . --txt
-
-# Default output is sqlite format
-hm logp . -o .
-
-# Specify log file path
-hm logp /path/to/log -o /path/to/output --txt
-```
-
-**Crash Log Symbolication**
-
-```bash
-# Symbolicate a crash file
-hm crashp /path/to/crash.ips
-```
-
-## 10. Ruby & CocoaPods
+## 9. Ruby & CocoaPods
 
 ```bash
 # Install a specific Ruby version (via rvminstall script)
@@ -382,7 +350,7 @@ pod update
 pod repo update
 ```
 
-## 11. Disable Neovim AI Features
+## 10. Disable Neovim AI Features
 
 AI plugins are in `~/.config/nvim/lua/plugins/ai.lua`:
 
@@ -423,7 +391,7 @@ return {
 
 Restart Neovim and run `:Lazy` to confirm plugins are no longer loaded.
 
-## 12. Other Commands
+## 11. Other Commands
 
 ```bash
 # Ruby code formatting
