@@ -57,6 +57,60 @@ This is the machine these configs are primarily tuned and iterated on:
 
 ![iTerm2 Preview](assets/preview.png)
 
+## iTerm2 configuration
+
+This repo ships two iTerm2 assets:
+
+| File | Description |
+| --- | --- |
+| [`iTerm2-template.json`](iTerm2-template.json) | Full profile (font, window, keys, colors, etc.) |
+| [`one-dark-pro.itermcolors`](one-dark-pro.itermcolors) | Standalone One Dark Pro color preset |
+
+Profile highlights:
+
+| Setting | Value |
+| --- | --- |
+| Color scheme | One Dark Pro |
+| Font | Fira Code Nerd Font Mono, 16pt |
+| Window size | 110 columns x 35 rows |
+| Transparency | ~20%, blur enabled |
+
+**Import the full profile:**
+
+1. Open iTerm2 → **Settings** → **Profiles**.
+2. Click **Other Actions...** (bottom-left) → **Import JSON Profiles...**.
+3. Select `iTerm2-template.json` and set as **Default** if desired.
+
+**Import the color scheme only:**
+
+If you already have your own iTerm2 profile and only want the One Dark Pro colors:
+
+1. Open iTerm2 → **Settings** → **Profiles** → **Colors** tab.
+2. Click **Color Presets...** (bottom-right) → **Import...**.
+3. Select `one-dark-pro.itermcolors`, then choose **One Dark Pro** from the preset list.
+
+<details>
+<summary><strong>One Dark Pro palette reference</strong></summary>
+
+| Role | Hex | Color |
+| --- | --- | --- |
+| Background | `#282C34` | ![#282C34](https://img.shields.io/badge/-%23282C34-282C34?style=flat-square) |
+| Foreground | `#ABB2BF` | ![#ABB2BF](https://img.shields.io/badge/-%23ABB2BF-ABB2BF?style=flat-square) |
+| Black (ANSI 0) | `#21252B` | ![#21252B](https://img.shields.io/badge/-%2321252B-21252B?style=flat-square) |
+| Red (ANSI 1) | `#E06C75` | ![#E06C75](https://img.shields.io/badge/-%23E06C75-E06C75?style=flat-square) |
+| Green (ANSI 2) | `#98C379` | ![#98C379](https://img.shields.io/badge/-%2398C379-98C379?style=flat-square) |
+| Yellow (ANSI 3) | `#E5C07B` | ![#E5C07B](https://img.shields.io/badge/-%23E5C07B-E5C07B?style=flat-square) |
+| Blue (ANSI 4) | `#61AFEF` | ![#61AFEF](https://img.shields.io/badge/-%2361AFEF-61AFEF?style=flat-square) |
+| Magenta (ANSI 5) | `#C678DD` | ![#C678DD](https://img.shields.io/badge/-%23C678DD-C678DD?style=flat-square) |
+| Cyan (ANSI 6) | `#56B6C2` | ![#56B6C2](https://img.shields.io/badge/-%2356B6C2-56B6C2?style=flat-square) |
+| White (ANSI 7) | `#ABB2BF` | ![#ABB2BF](https://img.shields.io/badge/-%23ABB2BF-ABB2BF?style=flat-square) |
+| Selection | `#323844` | ![#323844](https://img.shields.io/badge/-%23323844-323844?style=flat-square) |
+
+</details>
+
+> [!TIP]
+> The color scheme is also embedded in the profile JSON. If you prefer a different theme, either import a new `.itermcolors` file or replace the `Ansi *` / `Background` / `Foreground` color entries directly in the JSON.
+
 ## What’s included
 
 - **Shell**: Zsh + [`zi`](https://wiki.zshell.dev) + [Powerlevel10k](https://github.com/romkatv/powerlevel10k)

@@ -57,6 +57,60 @@
 
 ![iTerm2 预览](assets/preview.png)
 
+## iTerm2 配置
+
+仓库中包含两个 iTerm2 相关资源：
+
+| 文件 | 说明 |
+| --- | --- |
+| [`iTerm2-template.json`](iTerm2-template.json) | 完整 Profile（字体、窗口、快捷键、配色等） |
+| [`one-dark-pro.itermcolors`](one-dark-pro.itermcolors) | 独立的 One Dark Pro 配色方案文件 |
+
+Profile 主要参数：
+
+| 配置项 | 值 |
+| --- | --- |
+| 配色方案 | One Dark Pro |
+| 字体 | Fira Code Nerd Font Mono, 16pt |
+| 窗口大小 | 110 列 x 35 行 |
+| 透明度 | ~20%，启用模糊 |
+
+**导入完整 Profile：**
+
+1. 打开 iTerm2 → **Settings** → **Profiles**。
+2. 点击左下角 **Other Actions...** → **Import JSON Profiles...**。
+3. 选择 `iTerm2-template.json`，按需设为 **Default**。
+
+**仅导入配色方案：**
+
+如果你已有自己的 iTerm2 Profile，只想使用 One Dark Pro 配色：
+
+1. 打开 iTerm2 → **Settings** → **Profiles** → **Colors** 标签页。
+2. 点击右下角 **Color Presets...** → **Import...**。
+3. 选择 `one-dark-pro.itermcolors`，然后从预设列表中选择 **One Dark Pro**。
+
+<details>
+<summary><strong>One Dark Pro 色板参考</strong></summary>
+
+| 角色 | Hex | 色块 |
+| --- | --- | --- |
+| 背景 | `#282C34` | ![#282C34](https://img.shields.io/badge/-%23282C34-282C34?style=flat-square) |
+| 前景 | `#ABB2BF` | ![#ABB2BF](https://img.shields.io/badge/-%23ABB2BF-ABB2BF?style=flat-square) |
+| 黑色 (ANSI 0) | `#21252B` | ![#21252B](https://img.shields.io/badge/-%2321252B-21252B?style=flat-square) |
+| 红色 (ANSI 1) | `#E06C75` | ![#E06C75](https://img.shields.io/badge/-%23E06C75-E06C75?style=flat-square) |
+| 绿色 (ANSI 2) | `#98C379` | ![#98C379](https://img.shields.io/badge/-%2398C379-98C379?style=flat-square) |
+| 黄色 (ANSI 3) | `#E5C07B` | ![#E5C07B](https://img.shields.io/badge/-%23E5C07B-E5C07B?style=flat-square) |
+| 蓝色 (ANSI 4) | `#61AFEF` | ![#61AFEF](https://img.shields.io/badge/-%2361AFEF-61AFEF?style=flat-square) |
+| 品红 (ANSI 5) | `#C678DD` | ![#C678DD](https://img.shields.io/badge/-%23C678DD-C678DD?style=flat-square) |
+| 青色 (ANSI 6) | `#56B6C2` | ![#56B6C2](https://img.shields.io/badge/-%2356B6C2-56B6C2?style=flat-square) |
+| 白色 (ANSI 7) | `#ABB2BF` | ![#ABB2BF](https://img.shields.io/badge/-%23ABB2BF-ABB2BF?style=flat-square) |
+| 选中背景 | `#323844` | ![#323844](https://img.shields.io/badge/-%23323844-323844?style=flat-square) |
+
+</details>
+
+> [!TIP]
+> 配色方案同时内嵌在 Profile JSON 中。如果你想换一套主题，可以导入新的 `.itermcolors` 文件，或者直接替换 JSON 中的 `Ansi *` / `Background` / `Foreground` 颜色值。
+
 ## 包含内容
 
 - **Shell**：Zsh + [`zi`](https://wiki.zshell.dev) + [Powerlevel10k](https://github.com/romkatv/powerlevel10k)
