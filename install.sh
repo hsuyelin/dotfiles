@@ -199,19 +199,40 @@ preflight_check() {
     log_step "Scanning for existing configurations"
 
     local targets=(
+        # Home-level dotfiles
         "$HOME/.zshrc"
         "$HOME/.zshenv"
         "$HOME/.zprofile"
         "$HOME/.bashrc"
         "$HOME/.bash_profile"
+        "$HOME/.profile"
         "$HOME/.tmux.conf"
         "$HOME/.gitconfig"
         "$HOME/.vimrc"
+        "$HOME/.npmrc"
+        "$HOME/.gemrc"
+        "$HOME/.rvmrc"
+        "$HOME/.swiftlint.yml"
+        "$HOME/.p10k.zsh"
+        # XDG config directories (matching this repo)
         "$HOME/.config/nvim"
         "$HOME/.config/zsh"
         "$HOME/.config/tmux"
         "$HOME/.config/git"
         "$HOME/.config/aerospace"
+        "$HOME/.config/bash"
+        "$HOME/.config/alias"
+        "$HOME/.config/bin"
+        "$HOME/.config/fzf"
+        "$HOME/.config/lazygit"
+        "$HOME/.config/btop"
+        "$HOME/.config/borders"
+        "$HOME/.config/glow"
+        "$HOME/.config/vim"
+        "$HOME/.config/swiftformat"
+        "$HOME/.config/iterm2"
+        "$HOME/.config/zi"
+        # Runtime directories
         "$HOME/.rvm"
     )
 
@@ -244,11 +265,20 @@ preflight_check() {
     echo ""
 
     while true; do
-        echo -en "     ${BOLD}Continue with installation? [y/N]:${RESET} "
+        echo -en "     ${BOLD}Auto-backup and continue? [y/N]:${RESET} "
         read -r answer
         case "$answer" in
             [yY]|[yY][eE][sS])
-                log_success "user confirmed, proceeding..."
+                local backup_dir="$HOME/dotfiles-backup/$(date +%Y%m%d-%H%M%S)"
+                mkdir -p "$backup_dir"
+                log_info "backing up to ${backup_dir} ..."
+                for f in "${found[@]}"; do
+                    cp -a "$f" "$backup_dir/" 2>/dev/null && \
+                        log_success "backed up ${f}" || \
+                        log_warn "failed to back up ${f}"
+                done
+                echo ""
+                log_success "backup complete, proceeding with installation..."
                 echo ""
                 return
                 ;;
