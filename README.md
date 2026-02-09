@@ -30,12 +30,17 @@
 
 ## Audience
 
-This repo is for developers who want a reproducible macOS CLI stack with high leverage:
+This repo is for developers who want a reproducible macOS CLI stack — especially if you find setting up a dev environment boring, frustrating, and time-consuming (e.g. iOS / macOS developers). It provides:
 
-- An iOS / macOS developer who finds setting up a dev environment boring, frustrating, and time-consuming
-- A cohesive Zsh + tmux + Neovim workflow
-- A consistent visual and interaction model across the terminal stack
-- A pragmatic setup you can iterate on without losing track
+- A cohesive Zsh + tmux + Neovim workflow out of the box
+- A consistent visual and interaction model across the terminal stack (fonts, colors, keybindings)
+- One-command bootstrap (`install.sh`) — Homebrew, packages, shell, Ruby toolchain, done
+- Built-in Git aliases, fuzzy finder, smart directory jump, and safe-delete for daily efficiency
+- Neovim with LSP / DAP, file explorer, and AI plugins pre-configured
+- Zsh powered by [Zi](https://wiki.zshell.dev) — a fast, feature-rich plugin manager that replaces Oh My Zsh
+- A pragmatic, reproducible setup you can iterate on without losing track
+
+> **Why Zi instead of Oh My Zsh?** Oh My Zsh loads all plugins at startup, which noticeably slows down shell init as your plugin list grows. [Zi](https://wiki.zshell.dev) supports lazy loading, turbo mode, and fine-grained control over each plugin, resulting in 50–80% faster Zsh startup — while remaining fully compatible with Oh My Zsh plugins and Prezto modules.
 
 If you want a general-purpose “one script installs everything for everyone” project, use this repo as a reference, not a drop-in solution.
 
