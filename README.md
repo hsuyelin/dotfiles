@@ -204,7 +204,9 @@ mv ~/.zshrc ~/.zprofile ~/.tmux.conf ~/.gitconfig ~/dotfiles-backup/$(date +%Y%m
 mv ~/.config/nvim ~/dotfiles-backup/$(date +%Y%m%d)/ 2>/dev/null
 ```
 
-XDG base directory variables help tools resolve configs from `~/.config`:
+[XDG Base Directory](https://wiki.archlinux.org/title/XDG_Base_Directory) is a freedesktop.org specification that standardizes where applications store config, data, state, and cache files. Instead of scattering dotfiles across `$HOME`, XDG consolidates them into a few well-defined directories, keeping your home directory clean and configs easy to back up or version-control.
+
+This repo relies on the following XDG variables:
 
 ```bash
 export XDG_CONFIG_HOME="$HOME/.config"

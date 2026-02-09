@@ -204,7 +204,9 @@ mv ~/.zshrc ~/.zprofile ~/.tmux.conf ~/.gitconfig ~/dotfiles-backup/$(date +%Y%m
 mv ~/.config/nvim ~/dotfiles-backup/$(date +%Y%m%d)/ 2>/dev/null
 ```
 
-XDG 目录变量用于让工具从 `~/.config` 读取配置：
+[XDG Base Directory](https://wiki.archlinux.org/title/XDG_Base_Directory) 是 freedesktop.org 制定的规范，用于统一应用存放配置、数据、状态和缓存文件的位置。它避免了各类 dotfile 散落在 `$HOME` 中，让配置集中、易于备份和版本管理。
+
+本仓库依赖以下 XDG 变量：
 
 ```bash
 export XDG_CONFIG_HOME="$HOME/.config"
