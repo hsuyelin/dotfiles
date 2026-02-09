@@ -117,7 +117,6 @@ lb                  # sort by file size
 ```bash
 z <keyword>         # zoxide smart jump (frequency-based)
 cd <dir>            # AUTO_CD enabled, just type the directory name
-rd                  # ratatui directory picker
 ```
 
 **Search & Completion**
@@ -145,7 +144,7 @@ ipshow -p           # WAN only
 **DNS Flush**
 
 ```bash
-dns:flush           # flush macOS DNS cache
+dns-flush           # flush macOS DNS cache
 ```
 
 **Safe Delete**

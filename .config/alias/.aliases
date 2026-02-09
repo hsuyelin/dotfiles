@@ -72,7 +72,7 @@ alias real-rm='\rm'
 # -----------------------------
 # System helpers
 # -----------------------------
-alias dns:flush='sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder'
+alias dns-flush='sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder'
 
 
 # -----------------------------
