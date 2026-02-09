@@ -32,6 +32,7 @@
 
 This repo is for developers who want a reproducible macOS CLI stack with high leverage:
 
+- An iOS / macOS developer who finds setting up a dev environment boring, frustrating, and time-consuming
 - A cohesive Zsh + tmux + Neovim workflow
 - A consistent visual and interaction model across the terminal stack
 - A pragmatic setup you can iterate on without losing track
