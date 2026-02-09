@@ -7,6 +7,7 @@ proxy_off() {
 }
 
 proxy_on() {
+  # Change the ports below to match your proxy client (e.g. Clash, Surge, V2Ray, etc.)
   export https_proxy="http://127.0.0.1:6152"
   export http_proxy="http://127.0.0.1:6152"
   export all_proxy="socks5://127.0.0.1:6153"
@@ -35,7 +36,9 @@ alias brew_export='"$HOME/.config/bin/brew_export.sh"'
 alias xcode='"$HOME/.config/bin/xcode.sh"'
 alias rubyfmt='rubocop -A'
 
-# Xcode launchers (keep your naming, but make them consistent)
+# Xcode version launchers (optional)
+# Adjust the paths/versions to match your installed Xcode(s).
+# If you only have one Xcode installed, you can safely remove these lines.
 alias xed16='open -a /Applications/Xcode-16.4.0.app'
 alias xed26='open -a /Applications/Xcode-26.1.0.app'
 
@@ -130,37 +133,6 @@ fix() {
 
 
 # -----------------------------
-# rd: ratatui directory picker
-# -----------------------------
-rd() {
-  local RATATUI_BETTER_CD="rd-better-cd"
-  local TEMP_FILE="/tmp/rd_selected_dir"
-  local SELECTED_DIR
-
-  if ! command -v "$RATATUI_BETTER_CD" >/dev/null 2>&1; then
-    echo "Error: '$RATATUI_BETTER_CD' not found." >&2
-    return 1
-  fi
-
-  real-rm -rf "$TEMP_FILE"
-  "$RATATUI_BETTER_CD"
-
-  # If user cancelled, temp file won't exist
-  [ -f "$TEMP_FILE" ] || return 0
-
-  read -r SELECTED_DIR < "$TEMP_FILE"
-  real-rm -rf "$TEMP_FILE"
-
-  if [ -n "$SELECTED_DIR" ] && [ -d "$SELECTED_DIR" ]; then
-    cd "$SELECTED_DIR" || return 1
-  else
-    echo "Invalid directory: $SELECTED_DIR" >&2
-    return 1
-  fi
-}
-
-
-# -----------------------------
 # ipshow: show local / public ip
 # -----------------------------
 ipshow() {
@@ -225,7 +197,7 @@ xclean() {
     echo "Usage:"
     echo "  xclean --workspace <name> --scheme <name> --configuration <name>"
     echo "Example:"
-    echo "  xclean --workspace MiFit --scheme MiDong --configuration Release"
+    echo "  xclean --workspace <your_workspace> --scheme <your_scheme> --configuration Release"
     return 1
   }
 
@@ -245,7 +217,7 @@ xbuild() {
     echo "Usage:"
     echo "  xbuild --workspace <name> --scheme <name> --configuration <name>"
     echo "Example:"
-    echo "  xbuild --workspace MiFit --scheme MiDong --configuration Release"
+    echo "  xbuild --workspace <your_workspace> --scheme <your_scheme> --configuration Release"
     return 1
   }
 
@@ -277,7 +249,7 @@ xarchive() {
         echo "Usage:"
         echo "  xarchive --workspace <name> --scheme <name> --configuration <name> --archive-path <path>"
         echo "Example:"
-        echo "  xarchive --workspace MiFit --scheme MiDong --configuration Release --archive-path ./build/MiDong.xcarchive"
+        echo "  xarchive --workspace <your_workspace> --scheme <your_scheme> --configuration Release --archive-path ./build/<your_scheme>.xcarchive"
         return 1
         ;;
     esac
