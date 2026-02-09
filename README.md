@@ -166,9 +166,11 @@ If you want a reference, see:
 
 ### Fresh machine setup
 
-For a brand-new Apple Silicon Mac, an automated bootstrap script is provided:
+For a brand-new Apple Silicon Mac, clone the repo to any directory **outside** `~/.config` (the script will copy dotfiles into `~/.config` for you):
 
 ```bash
+git clone https://github.com/hsuyelin/dotfiles.git ~/dotfiles
+cd ~/dotfiles
 chmod +x install.sh && ./install.sh
 ```
 

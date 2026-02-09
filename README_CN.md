@@ -166,9 +166,11 @@ Profile 主要参数：
 
 ### 全新机器设置
 
-如果你使用的是全新 Apple Silicon Mac，可以使用自动化引导脚本：
+如果你使用的是全新 Apple Silicon Mac，将仓库克隆到 `~/.config` **以外**的任意目录（脚本会自动将 dotfiles 复制到 `~/.config`）：
 
 ```bash
+git clone https://github.com/hsuyelin/dotfiles.git ~/dotfiles
+cd ~/dotfiles
 chmod +x install.sh && ./install.sh
 ```
 
