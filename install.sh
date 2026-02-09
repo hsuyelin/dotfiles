@@ -575,6 +575,35 @@ install_brew_packages() {
         "$zsh_bin" -c "source '$HOME/.zshenv'" 2>/dev/null || true
         log_success ".zshenv sourced"
     fi
+
+}
+
+# =============================================================================
+# Step 5.5: Symlink swiftlint to /usr/local/bin for Xcode compatibility
+# =============================================================================
+
+symlink_swiftlint() {
+    log_step "Checking SwiftLint symlink"
+
+    ensure_brew_env
+
+    local swiftlint_bin
+    swiftlint_bin="$(command -v swiftlint 2>/dev/null || true)"
+
+    if [[ -z "$swiftlint_bin" ]]; then
+        log_warn "swiftlint not found, skipping symlink"
+        return
+    fi
+
+    if [[ -e /usr/local/bin/swiftlint ]]; then
+        log_success "swiftlint already in /usr/local/bin"
+        return
+    fi
+
+    log_info "symlinking ${swiftlint_bin} → /usr/local/bin/swiftlint"
+    sudo mkdir -p /usr/local/bin
+    sudo ln -s "$swiftlint_bin" /usr/local/bin/swiftlint
+    log_success "swiftlint symlinked"
 }
 
 # =============================================================================
@@ -938,6 +967,7 @@ main() {
     run_step "install_homebrew"   install_homebrew
     run_step "ensure_git"         ensure_git
     run_step "install_brew_pkgs"  install_brew_packages
+    run_step "symlink_swiftlint"  symlink_swiftlint
     run_step "setup_zsh"          setup_zsh
     run_step "install_zi"         install_zi
     run_step "install_rvm"        install_rvm
