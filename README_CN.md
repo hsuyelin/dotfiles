@@ -49,7 +49,7 @@
 | 系统 | macOS 26.1（Build 25B78） |
 | 硬件 | Apple M4（Mac mini），16 GB 内存 |
 | Shell | zsh 5.9 |
-| 编辑器 | Neovim 0.11.5 |
+| 编辑器 | Neovim 0.11.6 |
 | 复用会话 | tmux 3.6a |
 | Git | git 2.39.5 |
 

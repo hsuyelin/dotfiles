@@ -49,7 +49,7 @@ This is the machine these configs are primarily tuned and iterated on:
 | OS | macOS 26.1 (Build 25B78) |
 | Hardware | Apple M4 (Mac mini), 16 GB RAM |
 | Shell | zsh 5.9 |
-| Editor | Neovim 0.11.5 |
+| Editor | Neovim 0.11.6 |
 | Multiplexer | tmux 3.6a |
 | Git | git 2.39.5 |
 
