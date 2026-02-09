@@ -4,11 +4,20 @@ export PATH="$PATH:\
 /usr/local/sbin:/usr/local/bin:\
 /sbin:/bin:/usr/sbin:/usr/bin:\
 /root/bin:\
-$HOME/.local/bin:\
-$HOME/.rvm/bin:\
-/Applications/Xcode.app/Contents/SharedFrameworks/DVTFoundation.framework/Versions/A/Resources:\
-$ANDROID_SDK/platform-tools:\
-$ANDROID_SDK/tools"
+"
+
+# Optional paths (only if they exist)
+[[ -d "$HOME/.local/bin" ]] && export PATH="$PATH:$HOME/.local/bin"
+[[ -d "$HOME/.rvm/bin" ]] && export PATH="$PATH:$HOME/.rvm/bin"
+
+# Xcode DVTFoundation (only if Xcode is installed)
+XCODE_DVT="/Applications/Xcode.app/Contents/SharedFrameworks/DVTFoundation.framework/Versions/A/Resources"
+[[ -d "$XCODE_DVT" ]] && export PATH="$PATH:$XCODE_DVT"
+
+# Android SDK (only if ANDROID_SDK is set and exists)
+if [[ -n "${ANDROID_SDK:-}" ]] && [[ -d "$ANDROID_SDK" ]]; then
+    export PATH="$PATH:$ANDROID_SDK/platform-tools:$ANDROID_SDK/tools"
+fi
 
 # UTF-8 Local
 export LC_ALL=en_US.UTF-8

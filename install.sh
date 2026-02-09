@@ -9,7 +9,7 @@
 # so re-running it is safe.
 # =============================================================================
 
-set -euo pipefail
+set -uo pipefail
 
 # =============================================================================
 # Constants
@@ -22,6 +22,10 @@ BREW_FORMULAE="$DOTFILES_CONFIG/brew/brew_formulae.txt"
 BREW_CASKS="$DOTFILES_CONFIG/brew/brew_casks.txt"
 RVMINSTALL_SRC="$SCRIPT_DIR/.rvminstall.sh"
 RUBY_VERSION="3.3.7"
+ITERM_APP_V2="/Applications/iTerm2.app"
+ITERM_APP_V1="/Applications/iTerm.app"
+STATE_DIR="${TMPDIR:-/tmp}/dotfiles-install"
+mkdir -p "$STATE_DIR"
 
 # =============================================================================
 # Color & formatting helpers
@@ -33,6 +37,135 @@ YELLOW='\033[1;33m'
 CYAN='\033[0;36m'
 BOLD='\033[1m'
 RESET='\033[0m'
+
+# =============================================================================
+# State helpers — track progress, detect failures, resume on re-run
+# =============================================================================
+
+step_done() {
+    [[ -f "$STATE_DIR/$1.done" ]]
+}
+
+mark_done() {
+    touch "$STATE_DIR/$1.done"
+    # Clear any previous failure for this step
+    rm -f "$STATE_DIR/$1.failed"
+}
+
+mark_failed() {
+    local step="$1"
+    local reason="${2:-unknown error}"
+    echo "$reason" > "$STATE_DIR/$step.failed"
+}
+
+clear_state() {
+    rm -rf "$STATE_DIR"
+}
+
+# Run a step with automatic success/failure tracking
+run_step() {
+    local step_id="$1"
+    local step_fn="$2"
+
+    if step_done "$step_id"; then
+        return 0
+    fi
+
+    if "$step_fn"; then
+        mark_done "$step_id"
+    else
+        mark_failed "$step_id" "$step_fn returned non-zero"
+        log_error "step '${step_id}' failed (${step_fn})"
+        return 1
+    fi
+}
+
+# Detect previous failed run and prompt user
+check_previous_run() {
+    local has_progress=false
+    local failed_step=""
+    local failed_reason=""
+
+    # Check if any .done or .failed files exist
+    for f in "$STATE_DIR"/*.done "$STATE_DIR"/*.failed; do
+        [[ -f "$f" ]] && has_progress=true && break
+    done
+
+    if [[ "$has_progress" != true ]]; then
+        return 0
+    fi
+
+    # Find the failed step (if any)
+    for f in "$STATE_DIR"/*.failed; do
+        if [[ -f "$f" ]]; then
+            failed_step="$(basename "$f" .failed)"
+            failed_reason="$(cat "$f")"
+            break
+        fi
+    done
+
+    echo ""
+    log_warn "a previous run was detected"
+
+    # List completed steps
+    local completed=()
+    for f in "$STATE_DIR"/*.done; do
+        [[ -f "$f" ]] && completed+=("$(basename "$f" .done)")
+    done
+
+    if [[ ${#completed[@]} -gt 0 ]]; then
+        log_info "completed steps:"
+        for s in "${completed[@]}"; do
+            echo -e "     ${GREEN}✓${RESET} ${s}"
+        done
+    fi
+
+    if [[ -n "$failed_step" ]]; then
+        echo ""
+        log_error "last failure: step '${failed_step}'"
+        log_error "reason: ${failed_reason}"
+    fi
+
+    echo ""
+    while true; do
+        echo -e "     ${CYAN}Y = resume, n = start fresh, q = quit${RESET}"
+        echo -en "     ${BOLD}Your choice [Y/n/q]:${RESET} "
+        read -r answer
+        case "$answer" in
+            [yY]|[yY][eE][sS]|"")
+                log_info "resuming from last checkpoint..."
+                echo ""
+                return 0
+                ;;
+            [nN]|[nN][oO])
+                log_info "clearing state, starting from scratch..."
+                clear_state
+                mkdir -p "$STATE_DIR"
+                echo ""
+                return 0
+                ;;
+            [qQ]|[qQ][uU][iI][tT])
+                log_info "exiting — run ./install.sh again when ready"
+                exit 0
+                ;;
+            *)
+                log_warn "please enter Y, n, or q"
+                ;;
+        esac
+    done
+}
+
+# =============================================================================
+# Homebrew shell env helper — avoid hardcoding /opt/homebrew everywhere
+# =============================================================================
+
+ensure_brew_env() {
+    if command -v brew &>/dev/null; then
+        eval "$(brew shellenv)" 2>/dev/null || true
+    elif [[ -x "/opt/homebrew/bin/brew" ]]; then
+        eval "$(/opt/homebrew/bin/brew shellenv)" 2>/dev/null || true
+    fi
+}
 
 log_step() {
     echo -e "${GREEN}${BOLD}===> ${1}${RESET}"
@@ -139,10 +272,15 @@ preflight_check() {
 check_iterm2() {
     log_step "Checking iTerm2"
 
-    local iterm_app="/Applications/iTerm.app"
+    local iterm_app=""
+    if [[ -d "$ITERM_APP_V2" ]]; then
+        iterm_app="$ITERM_APP_V2"
+    elif [[ -d "$ITERM_APP_V1" ]]; then
+        iterm_app="$ITERM_APP_V1"
+    fi
 
-    if [[ -d "$iterm_app" ]]; then
-        log_success "iTerm2 is installed"
+    if [[ -n "$iterm_app" ]]; then
+        log_success "iTerm2 is installed (${iterm_app})"
         return
     fi
 
@@ -166,10 +304,10 @@ check_iterm2() {
         esac
     done
 
-    # Install iTerm2 via brew cask (Homebrew may not be available yet, use curl)
+    # Install iTerm2 (Homebrew may not be available yet, use curl as fallback)
     if command -v brew &>/dev/null; then
         log_info "installing iTerm2 via Homebrew..."
-        brew install --cask iterm2
+        brew install iterm2
     else
         log_info "Homebrew not available yet, downloading iTerm2 directly..."
         local tmpdir
@@ -177,11 +315,25 @@ check_iterm2() {
         local zip_path="$tmpdir/iTerm2.zip"
         curl -fsSL "https://iterm2.com/downloads/stable/latest" -o "$zip_path"
         unzip -q "$zip_path" -d "$tmpdir"
-        mv "$tmpdir/iTerm.app" /Applications/
+        mv "$tmpdir/iTerm.app" "$ITERM_APP_V2"
         rm -rf "$tmpdir"
     fi
 
-    log_success "iTerm2 installed to /Applications"
+    # Normalize name: rename iTerm.app → iTerm2.app if needed
+    if [[ -d "$ITERM_APP_V1" ]] && [[ ! -d "$ITERM_APP_V2" ]]; then
+        mv "$ITERM_APP_V1" "$ITERM_APP_V2"
+    fi
+
+    # Detect final installed path
+    if [[ -d "$ITERM_APP_V2" ]]; then
+        iterm_app="$ITERM_APP_V2"
+    elif [[ -d "$ITERM_APP_V1" ]]; then
+        iterm_app="$ITERM_APP_V1"
+    fi
+
+    local iterm_name
+    iterm_name="$(basename "$iterm_app" .app)"
+    log_success "iTerm2 installed to ${iterm_app}"
     echo ""
 
     while true; do
@@ -195,7 +347,7 @@ check_iterm2() {
                 echo ""
                 echo -e "     ${CYAN}cd $(printf '%q' "$SCRIPT_DIR") && ./install.sh${RESET}"
                 echo ""
-                open -a iTerm
+                open -a "$iterm_name"
                 exit 0
                 ;;
             [nN]|[nN][oO]|"")
@@ -313,10 +465,14 @@ setup_xdg() {
 
     log_success "XDG directories ready"
 
-    log_info "sourcing ~/.zshenv (errors ignored)..."
-    # shellcheck disable=SC1091
-    source "$HOME/.zshenv" 2>/dev/null || true
-    log_success ".zshenv sourced"
+    log_info "setting XDG variables from ~/.zshenv..."
+    export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+    export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+    export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
+    export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
+    export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
+    export HOMEBREW_PREFIX="${HOMEBREW_PREFIX:-/opt/homebrew}"
+    log_success "XDG variables set (full .zshenv will be sourced by zsh on next login)"
 }
 
 # =============================================================================
@@ -335,7 +491,7 @@ install_homebrew() {
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
     # Ensure brew is available in the current session
-    eval "$(/opt/homebrew/bin/brew shellenv)"
+    ensure_brew_env
     log_success "Homebrew installed"
 }
 
@@ -346,8 +502,7 @@ install_homebrew() {
 ensure_git() {
     log_step "Checking Git"
 
-    # Ensure brew is in PATH
-    eval "$(/opt/homebrew/bin/brew shellenv)" 2>/dev/null || true
+    ensure_brew_env
 
     if command -v git &>/dev/null; then
         log_success "git available ($(git --version 2>/dev/null | head -1))"
@@ -366,39 +521,26 @@ ensure_git() {
 install_brew_packages() {
     log_step "Installing Homebrew packages"
 
-    # Ensure brew is in PATH
-    eval "$(/opt/homebrew/bin/brew shellenv)" 2>/dev/null || true
-
-    local installed_formulae
-    installed_formulae="$(brew list --formula 2>/dev/null || true)"
-
-    local installed_casks
-    installed_casks="$(brew list --cask 2>/dev/null || true)"
+    ensure_brew_env
 
     # --- Formulae ---
     if [[ -f "$BREW_FORMULAE" ]]; then
         log_info "reading formulae from brew_formulae.txt..."
-        local total=0 skipped=0 installed=0
+        local total=0 failed=0
 
         while IFS= read -r pkg || [[ -n "$pkg" ]]; do
             pkg="$(echo "$pkg" | xargs)"
             [[ -z "$pkg" || "$pkg" == \#* ]] && continue
             ((total++))
 
-            if echo "$installed_formulae" | grep -qx "$pkg" 2>/dev/null; then
-                ((skipped++))
-                continue
-            fi
-
             log_info "installing formula: ${pkg}"
-            if brew install "$pkg" 2>/dev/null; then
-                ((installed++))
-            else
+            if ! brew install "$pkg"; then
                 log_warn "failed to install formula: ${pkg}"
+                ((failed++))
             fi
         done < "$BREW_FORMULAE"
 
-        log_success "formulae: ${installed} installed, ${skipped} skipped, ${total} total"
+        log_success "formulae: ${total} total, ${failed} failed"
     else
         log_warn "brew_formulae.txt not found, skipping formulae"
     fi
@@ -406,29 +548,32 @@ install_brew_packages() {
     # --- Casks ---
     if [[ -f "$BREW_CASKS" ]]; then
         log_info "reading casks from brew_casks.txt..."
-        local ctotal=0 cskipped=0 cinstalled=0
+        local ctotal=0 cfailed=0
 
         while IFS= read -r pkg || [[ -n "$pkg" ]]; do
             pkg="$(echo "$pkg" | xargs)"
             [[ -z "$pkg" || "$pkg" == \#* ]] && continue
             ((ctotal++))
 
-            if echo "$installed_casks" | grep -qx "$pkg" 2>/dev/null; then
-                ((cskipped++))
-                continue
-            fi
-
             log_info "installing cask: ${pkg}"
-            if brew install --cask "$pkg" 2>/dev/null; then
-                ((cinstalled++))
-            else
+            if ! brew install "$pkg"; then
                 log_warn "failed to install cask: ${pkg}"
+                ((cfailed++))
             fi
         done < "$BREW_CASKS"
 
-        log_success "casks: ${cinstalled} installed, ${cskipped} skipped, ${ctotal} total"
+        log_success "casks: ${ctotal} total, ${cfailed} failed"
     else
         log_warn "brew_casks.txt not found, skipping casks"
+    fi
+
+    # All packages installed; now safe to source .zshenv under zsh
+    if [[ -f "$HOME/.zshenv" ]]; then
+        local zsh_bin
+        zsh_bin="$(command -v zsh || echo /bin/zsh)"
+        log_info "sourcing ~/.zshenv via ${zsh_bin}..."
+        "$zsh_bin" -c "source '$HOME/.zshenv'" 2>/dev/null || true
+        log_success ".zshenv sourced"
     fi
 }
 
@@ -439,38 +584,73 @@ install_brew_packages() {
 setup_zsh() {
     log_step "Checking Zsh"
 
-    # Ensure brew is in PATH
-    eval "$(/opt/homebrew/bin/brew shellenv)" 2>/dev/null || true
+    ensure_brew_env
 
-    local brew_zsh="/opt/homebrew/bin/zsh"
-
-    # Install zsh via brew if not present
-    if [[ ! -x "$brew_zsh" ]]; then
-        log_info "installing zsh via Homebrew..."
+    # Install zsh via brew if not already available
+    if ! command -v zsh &>/dev/null; then
+        log_info "zsh not found, installing via Homebrew..."
         brew install zsh
-    else
-        log_success "zsh already installed at ${brew_zsh}"
     fi
 
-    # Add brew zsh to /etc/shells if missing
-    if ! grep -qx "$brew_zsh" /etc/shells; then
-        log_info "adding ${brew_zsh} to /etc/shells (requires sudo)..."
-        echo "$brew_zsh" | sudo tee -a /etc/shells >/dev/null
+    # Resolve the actual zsh path (brew or system)
+    local target_zsh
+    target_zsh="$(command -v zsh)"
+    log_success "zsh available at ${target_zsh}"
+
+    # Add to /etc/shells if missing
+    if ! grep -qx "$target_zsh" /etc/shells; then
+        log_info "adding ${target_zsh} to /etc/shells (requires sudo)..."
+        echo "$target_zsh" | sudo tee -a /etc/shells >/dev/null
         log_success "added to /etc/shells"
     fi
 
     # Set default shell
     local current_shell
     current_shell="$(dscl . -read /Users/"$USER" UserShell | awk '{print $2}')"
-    if [[ "$current_shell" != "$brew_zsh" ]]; then
-        log_info "changing default shell to ${brew_zsh} (requires sudo)..."
-        sudo chsh -s "$brew_zsh" "$USER"
-        log_success "default shell set to ${brew_zsh}"
+    if [[ "$current_shell" != "$target_zsh" ]]; then
+        log_info "changing default shell to ${target_zsh} (requires sudo)..."
+        sudo chsh -s "$target_zsh" "$USER"
+        log_success "default shell set to ${target_zsh}"
     else
-        log_success "default shell is already ${brew_zsh}"
+        log_success "default shell is already ${target_zsh}"
     fi
 
     log_warn "shell change takes effect in a new terminal session"
+
+    # Source .zshenv via zsh to validate config
+    log_info "sourcing .zshenv via zsh..."
+    "$target_zsh" -c "source '$HOME/.zshenv'" 2>/dev/null || true
+    log_success ".zshenv sourced"
+}
+
+# =============================================================================
+# Step 6.5: Install zi (zsh plugin manager) and source .zshrc
+# =============================================================================
+
+install_zi() {
+    log_step "Checking zi (zsh plugin manager)"
+
+    local zi_home="${XDG_CONFIG_HOME:-$HOME/.config}/zi/bin"
+
+    if [[ -d "$zi_home" ]] && [[ -f "$zi_home/zi.zsh" ]]; then
+        log_success "zi already installed at ${zi_home}"
+    else
+        log_info "installing zi via official script..."
+        sh -c "$(curl -fsSL get.zshell.dev)" --
+        log_success "zi installed"
+    fi
+
+    # Source .zshrc via zsh to initialize zi and load plugins
+    local zshrc="$HOME/.config/zsh/.zshrc"
+    if [[ -f "$zshrc" ]]; then
+        local zsh_bin
+        zsh_bin="$(command -v zsh || echo /bin/zsh)"
+        log_info "sourcing .zshrc via zsh to initialize plugins..."
+        "$zsh_bin" -c "source '$HOME/.zshenv'; source '$zshrc'" 2>/dev/null || true
+        log_success ".zshrc sourced, plugins initialized"
+    else
+        log_warn "${zshrc} not found, skipping"
+    fi
 }
 
 # =============================================================================
@@ -521,6 +701,15 @@ install_rvm() {
     else
         log_warn ".rvminstall.sh not found in repo, skipping copy"
     fi
+
+    # Source .profile if it exists (rvm may have added entries there)
+    if [[ -f "$HOME/.profile" ]]; then
+        # shellcheck disable=SC1091
+        source "$HOME/.profile" 2>/dev/null || true
+        log_success "sourced ~/.profile"
+    else
+        log_warn "~/.profile not found, some rvm paths may not be loaded until next login"
+    fi
 }
 
 # =============================================================================
@@ -530,14 +719,19 @@ install_rvm() {
 source_shell_configs() {
     log_step "Sourcing shell configurations"
 
+    # Source rvm in the current bash session
     # shellcheck disable=SC1091
     [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" 2>/dev/null || true
+    log_success "rvm sourced"
 
+    # .zshrc contains zsh-specific syntax (zi, fpath, etc.) and cannot be
+    # sourced in bash. Use a zsh subshell to validate it instead.
     local zshrc="$HOME/.config/zsh/.zshrc"
     if [[ -f "$zshrc" ]]; then
-        # shellcheck disable=SC1090
-        source "$zshrc" 2>/dev/null || true
-        log_success "sourced ${zshrc}"
+        local zsh_bin
+        zsh_bin="$(command -v zsh || echo /bin/zsh)"
+        "$zsh_bin" -c "source '$HOME/.zshenv'; source '$zshrc'" 2>/dev/null || true
+        log_success "validated ${zshrc} via zsh"
     else
         log_warn "${zshrc} not found, skipping"
     fi
@@ -722,28 +916,40 @@ prompt_xcode() {
 
 main() {
     echo ""
-    echo -e "${BOLD}╔══════════════════════════════════════════════════╗${RESET}"
-    echo -e "${BOLD}║       Dotfiles Bootstrap — Apple Silicon Mac    ║${RESET}"
-    echo -e "${BOLD}╚══════════════════════════════════════════════════╝${RESET}"
+    echo -e "${BOLD}╔════════════════════════════════════════════════════╗${RESET}"
+    echo -e "${BOLD}║       Dotfiles Bootstrap — Apple Silicon Mac       ║${RESET}"
+    echo -e "${BOLD}╚════════════════════════════════════════════════════╝${RESET}"
     echo ""
 
-    check_iterm2
-    check_architecture
-    ensure_cli_essentials
-    preflight_check
+    # Detect previous run and let user choose: resume / restart / quit
+    check_previous_run
+
+    # Each step is tracked: completed steps are skipped, failures are recorded
+    run_step "check_iterm2"       check_iterm2
+    run_step "check_architecture" check_architecture
+    run_step "ensure_cli"         ensure_cli_essentials
+    run_step "preflight_check"    preflight_check
+
+    # sudo is always requested (credential cache expires)
     request_sudo
-    copy_dotfiles
-    setup_xdg
-    install_homebrew
-    ensure_git
-    install_brew_packages
-    setup_zsh
-    install_rvm
-    source_shell_configs
-    install_ruby
-    install_cocoapods
+
+    run_step "copy_dotfiles"      copy_dotfiles
+    run_step "setup_xdg"          setup_xdg
+    run_step "install_homebrew"   install_homebrew
+    run_step "ensure_git"         ensure_git
+    run_step "install_brew_pkgs"  install_brew_packages
+    run_step "setup_zsh"          setup_zsh
+    run_step "install_zi"         install_zi
+    run_step "install_rvm"        install_rvm
+    run_step "source_configs"     source_shell_configs
+    run_step "install_ruby"       install_ruby
+    run_step "install_cocoapods"  install_cocoapods
+
     verify_environment
     prompt_xcode
+
+    # Clean up state files after successful completion
+    clear_state
 
     echo ""
     log_step "Bootstrap complete"

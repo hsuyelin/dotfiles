@@ -1,6 +1,5 @@
 [init]
     defaultBranch = main
-
 # Include private user config (name, email, github user)
 # Create ~/.config/private/git.config with:
 # [user]
@@ -10,7 +9,6 @@
 #     user = your-github-username
 [include]
     path = ~/.config/private/git.config
-
 [commit]
     template = ~/.config/git/commit_template
 [alias]

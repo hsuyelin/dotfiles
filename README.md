@@ -59,11 +59,15 @@ This is the machine these configs are primarily tuned and iterated on:
 
 ## What’s included
 
-- **Shell**: Zsh + `zi` + Powerlevel10k
-- **Editor**: Neovim (Lua) with LSP/DAP and day-to-day plugins
-- **Multiplexer**: tmux workflow + session persistence
-- **Window management**: AeroSpace tiling + workspace routing
-- **Git UX**: aliases + `delta` diffs
+- **Shell**: Zsh + [`zi`](https://wiki.zshell.dev) + [Powerlevel10k](https://github.com/romkatv/powerlevel10k)
+- **Editor**: [Neovim](https://neovim.io) (Lua) with LSP/DAP and day-to-day plugins
+- **Multiplexer**: [tmux](https://github.com/tmux/tmux) workflow + session persistence (`tmux-resurrect` / `tmux-continuum`)
+- **Window management**: [AeroSpace](https://github.com/nikitabobko/AeroSpace) tiling + workspace routing
+- **Git UX**: aliases + [`delta`](https://github.com/dandavison/delta) diffs + [`lazygit`](https://github.com/jesseduffield/lazygit)
+- **File listing**: [`eza`](https://github.com/eza-community/eza) with icons and git status
+- **Fuzzy finder**: [`fzf`](https://github.com/junegunn/fzf) + `fzf-tab` for history, files, and completion
+- **Directory jump**: [`zoxide`](https://github.com/ajeetdsouza/zoxide) — frequency-based smart `cd`
+- **Ruby toolchain**: [RVM](https://rvm.io) + CocoaPods (for iOS / macOS development)
 
 ## Philosophy
 
@@ -79,12 +83,15 @@ This is the machine these configs are primarily tuned and iterated on:
 - `aerospace/` — AeroSpace config
 - `git/` — Git config + aliases
 - `alias/`, `bash/`, `bin/` — helpers and scripts
+- `brew/` — Homebrew formulae and cask lists
+- `docs/` — [structure](docs/STRUCTURE.md) and [quick start guide](docs/QuickStart.md)
+- `install.sh` — one-command bootstrap for fresh Apple Silicon Macs
 
 For the complete list of directories, see [`STRUCTURE.md`](docs/STRUCTURE.md).
 
 ## Compatibility
 
-Designed for macOS; other OSes should treat this repo as a reference.
+Designed for **macOS on Apple Silicon**. The bootstrap script (`install.sh`) targets `arm64` architecture exclusively. Other OSes or Intel Macs should treat this repo as a reference and adapt manually.
 
 ## Privacy
 
@@ -102,6 +109,20 @@ If you want a reference, see:
 1. Clone this repo into `~/.config`.
 2. Create any local-only files under `secrets/` and `private/`.
 3. Restart your shell (or source configs) and iterate.
+
+### Fresh machine setup
+
+For a brand-new Apple Silicon Mac, an automated bootstrap script is provided:
+
+```bash
+chmod +x install.sh && ./install.sh
+```
+
+The script walks through the full setup in order: architecture check, iTerm2 installation, dotfiles copy, XDG directory creation, Homebrew, packages, Zsh, zi, RVM, Ruby, and CocoaPods. It is **idempotent** — every step checks current state before acting, and a built-in resume mechanism lets you pick up where you left off if something fails. See [`install.sh`](install.sh) for details.
+
+### Quick start
+
+Once the environment is ready, refer to the **[Quick Start Guide](docs/QuickStart.md)** for a cheat-sheet of the most-used aliases, keymaps, and commands across the stack (Git, Neovim, tmux, fzf, Ruby, etc.).
 
 ## How to reference this repo
 
@@ -147,18 +168,20 @@ Benefits:
 - A cohesive, production-grade terminal workflow with minimal drift over time
 - Clear separation between shared configs and local secrets
 - Incremental adoption; copy only what you need
- - Easy to audit; everything is plain text and versioned
+- Easy to audit; everything is plain text and versioned
 
 Trade-offs:
 
 - Opinionated defaults; you will likely want to tune keybindings and plugins
 - macOS-first; other OSes should treat this as a reference
 - Existing configs can be overwritten if you merge without care
- - Some tools assume Homebrew, so expect minor adjustments elsewhere
+- Some tools assume Homebrew, so expect minor adjustments elsewhere
 
 ## Reference
 
 - Structure overview: [`STRUCTURE.md`](docs/STRUCTURE.md)
+- Quick start guide: [`QUICKSTART.md`](docs/QuickStart.md)
+- Bootstrap script: [`install.sh`](install.sh)
 
 ## License
 

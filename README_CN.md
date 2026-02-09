@@ -59,11 +59,15 @@
 
 ## 包含内容
 
-- **Shell**：Zsh + `zi` + Powerlevel10k
-- **编辑器**：Neovim（Lua）+ LSP/DAP 与常用增强插件
-- **复用会话**：tmux 工作流 + 会话持久化
-- **窗口管理**：AeroSpace 平铺 + 工作区分流
-- **Git 体验**：aliases + `delta` diff
+- **Shell**：Zsh + [`zi`](https://wiki.zshell.dev) + [Powerlevel10k](https://github.com/romkatv/powerlevel10k)
+- **编辑器**：[Neovim](https://neovim.io)（Lua）+ LSP/DAP 与常用增强插件
+- **复用会话**：[tmux](https://github.com/tmux/tmux) 工作流 + 会话持久化（`tmux-resurrect` / `tmux-continuum`）
+- **窗口管理**：[AeroSpace](https://github.com/nikitabobko/AeroSpace) 平铺 + 工作区分流
+- **Git 体验**：aliases + [`delta`](https://github.com/dandavison/delta) diff + [`lazygit`](https://github.com/jesseduffield/lazygit)
+- **文件列表**：[`eza`](https://github.com/eza-community/eza) 带图标和 Git 状态
+- **模糊搜索**：[`fzf`](https://github.com/junegunn/fzf) + `fzf-tab` 搜索历史、文件和补全
+- **目录跳转**：[`zoxide`](https://github.com/ajeetdsouza/zoxide) — 基于访问频率的智能 `cd`
+- **Ruby 工具链**：[RVM](https://rvm.io) + CocoaPods（面向 iOS / macOS 开发）
 
 ## 理念
 
@@ -79,12 +83,15 @@
 - `aerospace/`：AeroSpace 配置
 - `git/`：Git 配置与别名
 - `alias/`、`bash/`、`bin/`：常用别名与脚本
+- `brew/`：Homebrew 包和 cask 清单
+- `docs/`：[目录结构](docs/STRUCTURE.md) 与 [快速上手指南](docs/QuickStart.md)
+- `install.sh`：全新 Apple Silicon Mac 一键引导脚本
 
 完整目录清单见：[`STRUCTURE.md`](docs/STRUCTURE.md)。
 
 ## 兼容性
 
-面向 macOS；其他系统请仅作为参考。
+面向 **Apple Silicon 的 macOS**。引导脚本（`install.sh`）仅支持 `arm64` 架构。其他系统或 Intel Mac 请仅作为参考，自行适配。
 
 ## 隐私
 
@@ -102,6 +109,20 @@
 1. 将仓库克隆到 `~/.config`。
 2. 在 `secrets/`、`private/` 下创建你的本地文件。
 3. 重启 shell（或按需 source）并逐步微调。
+
+### 全新机器设置
+
+如果你使用的是全新 Apple Silicon Mac，可以使用自动化引导脚本：
+
+```bash
+chmod +x install.sh && ./install.sh
+```
+
+脚本按顺序执行完整的安装流程：架构检测、iTerm2 安装、dotfiles 复制、XDG 目录创建、Homebrew、软件包安装、Zsh、zi、RVM、Ruby、CocoaPods。脚本具有**幂等性** —— 每个步骤运行前都会检查当前状态，内置的断点恢复机制可以让你在失败后从上次中断处继续。详见 [`install.sh`](install.sh)。
+
+### 快速上手
+
+环境就绪后，参考 **[快速上手指南](docs/QuickStart.md)** 查看常用 alias、快捷键和命令速查表，覆盖 Git、Neovim、tmux、fzf、Ruby 等。
 
 ## 如何作为参考使用
 
@@ -159,6 +180,8 @@ export XDG_CACHE_HOME="$HOME/.cache"
 ## 参考
 
 - 目录结构说明：[`STRUCTURE.md`](docs/STRUCTURE.md)
+- 快速上手指南：[`QUICKSTART.md`](docs/QuickStart.md)
+- 引导安装脚本：[`install.sh`](install.sh)
 
 ## 许可说明
 
