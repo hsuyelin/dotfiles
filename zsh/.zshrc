@@ -10,6 +10,8 @@ fi
 # ============================================================
 # ZI Initialization
 # ============================================================
+setopt AUTO_CD
+
 typeset -A ZI
 ZI[HOME_DIR]="${XDG_CONFIG_HOME}/zi"
 ZI[BIN_DIR]="${ZI[HOME_DIR]}/bin"

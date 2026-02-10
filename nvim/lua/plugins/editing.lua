@@ -74,4 +74,22 @@ return {
 			require("nvim-autopairs").setup()
 		end,
 	},
+
+	-- Marks & Bookmarks
+	{
+		"chentoast/marks.nvim",
+		event = "VeryLazy",
+		opts = {
+			default_mappings = true, -- m + letter to set, ' + letter to jump, dm + letter to delete
+			signs = true,
+			mappings = {
+				set_next = "m,",      -- set next available lowercase mark
+				toggle = "m;",        -- toggle mark at current line
+				next = "m]",          -- jump to next mark
+				prev = "m[",          -- jump to previous mark
+				preview = "m:",       -- preview mark
+				delete_buf = "dm-",   -- delete all marks in buffer
+			},
+		},
+	},
 }

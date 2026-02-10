@@ -21,6 +21,7 @@ local options = {
 	timeoutlen = 800,
 	winblend = 6,
 	swapfile = false,
+	scrolloff = 20,
 	cmdheight = 0,
 	laststatus = 3,
 	title = true,

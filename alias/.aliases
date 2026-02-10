@@ -73,6 +73,12 @@ alias dns:flush='sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder'
 
 
 # -----------------------------
+# Applications
+# -----------------------------
+alias chrome="open -a \"Google Chrome\" --args --variations-override-country=us"
+
+
+# -----------------------------
 # Safer rm wrapper
 # - Keeps -f semantics: if -f provided, missing targets won't warn.
 # - Uses safe-trash if available; otherwise falls back to /bin/rm.

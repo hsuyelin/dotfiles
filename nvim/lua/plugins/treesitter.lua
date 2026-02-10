@@ -4,7 +4,22 @@ return {
 		lazy = false,
 		branch = "main",
 		build = ":TSUpdate",
-		opts = {},
+		config = function()
+			require("nvim-treesitter").setup()
+
+			-- Auto-install parsers on first open
+			vim.api.nvim_create_autocmd("FileType", {
+				group = vim.api.nvim_create_augroup("ts_auto_install", { clear = true }),
+				callback = function()
+					local ft = vim.bo.filetype
+					if ft == "" then return end
+					local lang = vim.treesitter.language.get_lang(ft)
+					if lang and not pcall(vim.treesitter.language.inspect, lang) then
+						pcall(function() vim.cmd("TSInstall " .. lang) end)
+					end
+				end,
+			})
+		end,
 	},
 	{
 		"nvim-treesitter/nvim-treesitter-textobjects",
