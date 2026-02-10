@@ -265,6 +265,7 @@ Trade-offs:
 
 - Structure overview: [`STRUCTURE.md`](docs/STRUCTURE.md)
 - Quick start guide: [`QUICKSTART.md`](docs/QuickStart.md)
+- Neovim configuration guide: [`Neovim.md`](docs/Neovim.md)
 - Bootstrap script: [`install.sh`](install.sh)
 
 ## License

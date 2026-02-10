@@ -2,6 +2,10 @@
 
 A quick reference for common commands and operations in this configuration.
 
+<p align="center">
+  <a href="QuickStart.md">English</a> · <a href="QuickStart_CN.md">中文</a>
+</p>
+
 ---
 
 ## 1. Proxy

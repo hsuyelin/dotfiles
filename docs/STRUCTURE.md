@@ -2,6 +2,10 @@
 
 This repository is a personal dotfiles collection for **macOS**.
 
+<p align="center">
+  <a href="STRUCTURE.md">English</a> · <a href="STRUCTURE_CN.md">中文</a>
+</p>
+
 ## Top-level directories
 
 - `aerospace/`: AeroSpace window manager configuration.

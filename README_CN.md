@@ -265,6 +265,7 @@ xdg-ninja
 
 - 目录结构说明：[`STRUCTURE.md`](docs/STRUCTURE.md)
 - 快速上手指南：[`QUICKSTART.md`](docs/QuickStart.md)
+- Neovim 配置指南：[`Neovim.md`](docs/Neovim.md)
 - 引导安装脚本：[`install.sh`](install.sh)
 
 ## 许可说明
