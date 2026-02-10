@@ -116,12 +116,15 @@ return {
 
 	"mrjones2014/smart-splits.nvim",
 
-	-- Todo List
+	-- Smooth & fast scrolling
 	{
-		"folke/todo-comments.nvim",
-		config = function()
-			require("todo-comments").setup()
-		end,
+		"karb94/neoscroll.nvim",
+		event = "VeryLazy",
+		opts = {
+			mappings = { "<C-u>", "<C-d>", "<C-b>", "<C-f>", "zt", "zz", "zb" },
+			easing = "quadratic",
+			duration_multiplier = 0.4, -- faster scrolling (default 1.0)
+		},
 	},
 
 	-- Todo List

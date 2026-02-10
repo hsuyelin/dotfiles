@@ -230,12 +230,17 @@ Leader key is `Space`.
 
 | Action | Key |
 |---|---|
+| Go to definition | `gd` |
+| Type definition | `gD` |
+| Go to references | `gr` |
+| Implementation | `gi` |
+| Hover documentation | `K` |
 | Rename | `<Space>rn` or `<Space>ln` |
 | Code action | `ca` or `<Space>la` |
-| Type definition | `gD` |
-| Implementation | `gi` |
 | Workspace symbols | `go` |
 | Document symbols | `gl` |
+
+Supported LSP servers: `lua_ls`, `sourcekit-lsp` (Swift/ObjC), `clangd` (C/C++/ObjC), `rust_analyzer`, `gopls`, `pyright`, `bashls`, `ts_ls`, `dartls`.
 
 **Debug (DAP)**
 
@@ -249,6 +254,28 @@ Leader key is `Space`.
 | Terminate | `<Space>dq` |
 | Toggle DAP UI | `<Space>du` |
 
+**Flash Jump (cursor movement)**
+
+| Action | Key |
+|---|---|
+| Flash jump | `r` then type target |
+| Treesitter search | `R` |
+| Treesitter select | `Ctrl+R` |
+
+**Marks & Bookmarks**
+
+| Action | Key |
+|---|---|
+| Set mark (a-z) | `m` + letter |
+| Jump to mark | `'` + letter |
+| Delete mark | `dm` + letter |
+| Set next available mark | `m,` |
+| Toggle mark on current line | `m;` |
+| Next mark | `m]` |
+| Previous mark | `m[` |
+| Preview mark | `m:` |
+| Delete all marks in buffer | `dm-` |
+
 **Other**
 
 | Action | Key |
@@ -260,6 +287,39 @@ Leader key is `Space`.
 | Package manager (Lazy) | `<Space>P` |
 | Switch project | `<Space>pp` |
 | Zoxide jump | `<Space>z` |
+
+**Todo Comments**
+
+Highlights `TODO`, `FIXME`, `HACK`, `WARN`, `NOTE`, `PERF` etc. in comments with distinct colors and icons. Powered by `todo-comments.nvim`.
+
+```
+-- TODO: refactor this function
+-- FIXME: crashes on nil input
+-- HACK: temporary workaround
+-- WARN: deprecated API
+-- NOTE: see RFC 1234
+-- PERF: O(n^2) — needs optimization
+```
+
+| Action | Key |
+|---|---|
+| Search all TODOs (Telescope) | `<Space>at` |
+| Diagnostics TODO list | `:TodoTrouble` |
+| Quick-fix TODO list | `:TodoQuickFix` |
+
+**Markdown**
+
+Two plugins work together for Markdown editing:
+
+- `render-markdown.nvim` — renders Markdown **inline** inside the editor (headings, bold, code blocks, tables, etc.)
+- `peek.nvim` — opens a **live browser preview** that updates in real-time as you type
+
+| Action | Key |
+|---|---|
+| Open browser preview | `<Space>mp` |
+| Close browser preview | `<Space>mc` |
+
+> **Note:** `peek.nvim` requires [Deno](https://deno.land/) installed (`brew install deno`). The preview opens in your default browser with a light theme by default.
 
 ## 7. tmux
 

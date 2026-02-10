@@ -7,20 +7,24 @@ return {
 
 			-- Shell
 			"shellcheck",
-			
-			-- SwiftUI
+
+			-- Swift / Objective-C (Xcode toolchain)
 			{
 				"sourcekit-lsp",
 				mason = false,
 			},
 
-			-- C++
+			-- C / C++ / Objective-C
 			"clangd",
 
 			-- Rust
 			"rust_analyzer",
 
-			-- Kotlin
+			-- Go
+			"gopls",
+
+			-- Python
+			"pyright",
 		},
 	},
 	icons = require("core.configs.icons"),

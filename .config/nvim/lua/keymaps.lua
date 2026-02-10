@@ -307,8 +307,11 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		local bufopts = { noremap = true, silent = true, buffer = buf }
 		vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, bufopts)
 		vim.keymap.set("n", "ca", vim.lsp.buf.code_action, bufopts)
+		vim.keymap.set("n", "gd", vim.lsp.buf.definition, bufopts)
 		vim.keymap.set("n", "gD", vim.lsp.buf.type_definition, bufopts)
+		vim.keymap.set("n", "gr", "<cmd>Telescope lsp_references<cr>", bufopts)
 		vim.keymap.set("n", "gi", vim.lsp.buf.implementation, bufopts)
+		vim.keymap.set("n", "K", vim.lsp.buf.hover, bufopts)
 		vim.api.nvim_buf_set_keymap(
 			0,
 			"n",
@@ -330,7 +333,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
 			{ "<leader>ln", vim.lsp.buf.rename, desc = "重命名 (Rename)", buffer = buf },
 			{ "<leader>la", vim.lsp.buf.code_action, desc = "代码操作 (Code Action)" },
 			{ "<leader>l", group = "跳转 (Goto)" },
+			{ "<leader>lgd", vim.lsp.buf.definition, desc = "跳转到定义 (Go to Definition)" },
 			{ "<leader>lgD", vim.lsp.buf.type_definition, desc = "类型定义 (Type Definition)" },
+			{ "<leader>lgr", "<cmd>Telescope lsp_references<cr>", desc = "查看引用 (References)" },
 			{ "<leader>lgi", vim.lsp.buf.implementation, desc = "实现 (Implementation)" },
 			{ "<leader>lgo", "<cmd>Telescope lsp_dynamic_workspace_symbols<cr>", desc = "工作区符号 (Workspace Symbols)" },
 			{ "<leader>lgl", "<cmd>Telescope lsp_document_symbols<cr>", desc = "文档符号 (Document Symbols)" },
