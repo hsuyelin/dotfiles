@@ -25,7 +25,7 @@ This repository is a personal dotfiles collection for **macOS**.
 - `swiftpm/`: SwiftPM configuration.
 - `tmux/`: tmux configuration.
 - `vim/`: Vim configuration.
-- `zsh/`: Zsh configuration.
+- `zsh/`: Zsh configuration. `.zshrc.no-fzf` is a variant without fzf/fzf-tab for users who prefer native completion.
 
 ## Ignored directories
 

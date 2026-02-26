@@ -1,8 +1,13 @@
 # ============================================================
+# Zsh config without fzf — for users who prefer native completion
+# ============================================================
+# Usage: cp .zshrc.no-fzf .zshrc  (or symlink)
+# ============================================================
+
+# ============================================================
 # Powerlevel10k Instant Prompt
 # ============================================================
-# Must stay near the top of ~/.zshrc. Any code that may require console input
-# (password prompts, [y/n] confirmations, etc.) must go above this block.
+# If input/output not visible, uncomment: typeset -g POWERLEVEL9K_INSTANT_PROMPT=off
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
@@ -43,37 +48,11 @@ source "${ZI[BIN_DIR]}/zi.zsh"
 autoload -Uz _zi
 (( ${+_comps} )) && _comps[zi]=_zi
 
-setopt NO_AUTO_MENU
-zstyle ':completion:*' menu select
+setopt AUTO_MENU
+zstyle ':completion:*' menu no
 zstyle ':completion:*' list-colors "${(@s.:.)LS_COLORS}"
 zstyle ':completion:*:*:cp:*' file-sort size
 zstyle ':completion:*' file-sort modification
-
-# ============================================================
-# FZF Core
-# ============================================================
-export FZF_ALT_C_OPTS=$'
---walker=dir,follow,hidden
---walker-skip=.git,node_modules,target
---height=40%
---layout=reverse
---border
---info=inline
---preview "
-  if command -v eza >/dev/null; then
-    eza -T --level=2 --color=always --group-directories-first --icons -- {}
-  else
-    tree -C -L 2 {}
-  fi
-"
---preview-window=right:60%
-'
-
-ZSH_AUTOSUGGEST_CLEAR_WIDGETS+=(
-  fzf-history-widget
-  fzf-file-widget
-  fzf-cd-widget
-)
 
 # ============================================================
 # ZI Theme
@@ -86,6 +65,7 @@ zi light "romkatv/powerlevel10k"
 zi ice wait lucid atinit='zpcompinit'
 zi light "zdharma-continuum/fast-syntax-highlighting"
 
+ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 zi ice lucid atload'_zsh_autosuggest_start'
 zi light "zsh-users/zsh-autosuggestions"
 
@@ -95,10 +75,14 @@ bindkey '^?' backward-delete-char
 zi ice lucid
 zi light "zsh-users/zsh-completions"
 
+zi ice lucid
+zi light "zsh-users/zsh-history-substring-search"
+
 # ============================================================
 # ZI Passive Plugins
 # ============================================================
 zi light "agkozak/zsh-z"
+
 zi light "z-shell/zsh-eza"
 zi light "DarrinTisdale/zsh-aliases-exa"
 
@@ -110,9 +94,22 @@ zi snippet OMZL::completion.zsh
 zi snippet OMZL::key-bindings.zsh
 
 # ============================================================
+# Keybindings / ZLE widgets
+# ============================================================
+#bindkey '^[^M' autosuggest-execute
+
+autoload -Uz history-substring-search-up history-substring-search-down
+zle -N history-substring-search-up
+zle -N history-substring-search-down
+
+for km in emacs viins vicmd; do
+  bindkey -M $km '^[[A' history-substring-search-up
+  bindkey -M $km '^[[B' history-substring-search-down
+done
+
+# ============================================================
 # Environment Setup
 # ============================================================
-
 # bash profile compatibility (if you keep bash config in XDG)
 [[ -f "${XDG_CONFIG_HOME}/bash/.bash_profile" ]] && source "${XDG_CONFIG_HOME}/bash/.bash_profile"
 
@@ -151,25 +148,3 @@ done
 
 # Cargo env (rustup/cargo may drop an env helper here)
 [[ -s "${CARGO_HOME}/env" ]] && source "${CARGO_HOME}/env"
-
-# ============================================================
-# Fzf Setup
-# ============================================================
-[[ -f "${XDG_CONFIG_HOME}/fzf/fzf.zsh" ]] && source "${XDG_CONFIG_HOME}/fzf/fzf.zsh"
-
-zi ice lucid
-zi light "Aloxaf/fzf-tab"
-
-zstyle ':fzf-tab:complete:cd:*' fzf-preview '
-  [[ -n "$realpath" && -e "$realpath" ]] && (command -v eza >/dev/null && eza -1 --color=always --group-directories-first -- "$realpath" || ls -1 -- "$realpath")
-'
-zstyle ':fzf-tab:complete:git-checkout:*' fzf-preview '
-  git log --oneline --graph --decorate --color=always -- "$word" 2>/dev/null | head -80
-'
-zstyle ':fzf-tab:complete:kill:*' fzf-preview '
-  pid="${word##*:}"
-  ps -p "$pid" -o pid,%cpu,%mem,comm -c 2>/dev/null
-'
-zstyle ':fzf-tab:*' switch-group ',' '.'
-zstyle ':fzf-tab:*' continuous-trigger '/'
-zstyle ':fzf-tab:*' fzf-flags '--bind=ctrl-d:preview-page-down,ctrl-u:preview-page-up'

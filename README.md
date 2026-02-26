@@ -203,6 +203,7 @@ If you want to borrow parts of this setup rather than adopt it wholesale:
 3. **Copy configs, not assumptions**: port the files you need, then adjust paths, fonts, and plugin lists for your system.
 4. **Keep secrets local**: anything machine-specific belongs in `secrets/` or `private/`.
 5. **Iterate in small steps**: apply a change, reload, and validate before moving on.
+6. **No fzf?** Use `.config/zsh/.zshrc.no-fzf` instead of `.zshrc` for native completion (no fzf/fzf-tab).
 
 ## Backup and XDG setup
 

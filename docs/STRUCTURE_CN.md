@@ -25,7 +25,7 @@
 - `swiftpm/`：SwiftPM 配置。
 - `tmux/`：tmux 配置。
 - `vim/`：Vim 配置。
-- `zsh/`：Zsh 配置。
+- `zsh/`：Zsh 配置。`.zshrc.no-fzf` 为无 fzf/fzf-tab 的变体，适合偏好原生补全的用户。
 
 ## 忽略的目录
 

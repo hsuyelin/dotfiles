@@ -203,6 +203,7 @@ chmod +x install.sh && ./install.sh
 3. **复制配置，不复制假设**：移植对应文件后再根据你的路径、字体、插件做调整。
 4. **本地化私密内容**：机器相关或敏感信息统一放在 `secrets/`、`private/`。
 5. **小步迭代**：每次改动后 reload 并验证，避免一次性大改。
+6. **不用 fzf？** 可使用 `.config/zsh/.zshrc.no-fzf` 替代 `.zshrc`，使用原生补全（无 fzf/fzf-tab）。
 
 ## 备份与 XDG 设置
 
