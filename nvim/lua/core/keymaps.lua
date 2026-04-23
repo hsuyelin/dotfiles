@@ -56,11 +56,6 @@ wk.add({
 	-- Config
 	{ "<leader>C", group = "配置 (Config)" },
 	{ "<leader>Cc", utils.config_files, desc = "编辑配置 (Edit Config)" },
-	{ "<leader>CC", "<cmd>Neoconf<cr>", desc = "选择配置 (Select Config)" },
-	{ "<leader>Cl", "<cmd>Neoconf local<cr>", desc = "编辑本地配置 (Edit Local Config)" },
-	{ "<leader>Cg", "<cmd>Neoconf global<cr>", desc = "编辑全局配置 (Edit Global Config)" },
-	{ "<leader>Cs", "<cmd>Neoconf show<cr>", desc = "显示配置 (Show Config)" },
-	{ "<leader>Cp", "<cmd>Neoconf lsp<cr>", desc = "显示 LSP 配置 (Show LSP Config)" },
 	-- Terminal
 	{ "<leader>!", utils.term.select, desc = "打开终端 (Open Terminal)" },
 	-- Tab
@@ -101,10 +96,6 @@ wk.add({
 	{ "<leader>fh", "<cmd>Neotree toggle<CR>", desc = "展开收起文件浏览器侧边栏 (Toggle File Explorer)" },
 	-- Window
 	{ "<leader>w", group = "窗口 (Window)" },
-	{ "<leader>wa", desc = "自动调整大小 (Auto Resize)" },
-	{ "<leader>wat", "<cmd>WindowsToggleAutowidth<cr>", desc = "切换自动宽度 (Toggle Auto Width)" },
-	{ "<leader>wae", "<cmd>WindowsEqualize<cr>", desc = "平均化宽度 (Equalize Width)" },
-	{ "<leader>wam", "<cmd>WindowsMaximize<cr>", desc = "最大化宽度 (Maximize Width)" },
 	-- Git
 	{
 		"<leader>g",
@@ -164,16 +155,9 @@ wk.add({
         desc = "Zoxide 跳转 (Zoxide)" 
     },
 	-- Package Management
-	{ "<leader>P", "<cmd>Lazy<cr>", desc = "包管理 (Package Management)" },
+	{ "<leader>P", function() vim.pack.update() end, desc = "包管理 (Package Management)" },
 	-- Debug
 	{ "<leader>d", group = "调试 (Debug)" },
-	{
-		"<leader>ds",
-		function()
-			require("osv").launch({ port = 8086 })
-		end,
-		desc = "启动调试服务器 (Start Debug Server)",
-	},
 	{ "<leader>db", require("dap").toggle_breakpoint, desc = "切换断点 (Toggle Breakpoint)" },
 	{ "<leader>du", require("dapui").toggle, desc = "切换 DAP UI (Toggle DAP UI)" },
 	{ "<leader>dc", require("dap").continue, desc = "启动或继续 (Start or Continue)" },
@@ -349,7 +333,3 @@ utils.map_on_filetype("lua", {
 	r = { "<cmd>LuaRun<cr>", "运行当前文件 (Run Current Buffer)" },
 })
 
--- Python Special Keymaps
-utils.map_on_filetype("python", {
-	["r"] = { "<cmd>RunCode<cr>", "运行代码 (Run)" },
-})

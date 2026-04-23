@@ -32,21 +32,16 @@ function M.sections.startup()
 	---@param opts utils.dashboard.Class
 	return function(opts)
 		opts = opts or {}
-		M.lazy_stats = M.lazy_stats and M.lazy_stats.startuptime > 0 and M.lazy_stats or require("lazy.stats").stats()
-		-- NOTE: don't know why the startuptime in my machine is always 0
-		M.lazy_stats.startuptime = M.lazy_stats.startuptime ~= 0 and M.lazy_stats.startuptime
-			or M.lazy_stats.times.LazyDone + M.lazy_stats.times.LazyStart
-		local ms = (math.floor(M.lazy_stats.startuptime * 100 + 0.5) / 100)
+		local elapsed_ns = vim.uv.hrtime() - (vim.g.nvim_start_time or vim.uv.hrtime())
+		local ms = math.floor(elapsed_ns / 1e6 * 10 + 0.5) / 10
+		local count = #vim.pack.get()
 		local icon = opts.icon or "⚡ "
 		return {
 			align = "center",
 			text = {
 				{ icon .. "Loaded ", hl = "footer" },
-				{
-					M.lazy_stats.loaded .. "/" .. M.lazy_stats.count,
-					hl = "special",
-				},
-				{ " plugins in ", hl = "footer" },
+				{ tostring(count), hl = "special" },
+				{ " packages in ", hl = "footer" },
 				{ ms .. "ms", hl = "special" },
 			},
 		}
@@ -202,7 +197,7 @@ local defaults = {
 			{ icon = " ", key = "s", desc = "Find Text", action = ":Telescope live_grep" },
 			{ icon = " ", key = "r", desc = "Recent Files", action = ":Telescope oldfiles" },
 			{ icon = " ", key = "c", desc = "Config", action = ":cd ~/.config/nvim" },
-			{ icon = "󰒲 ", key = "L", desc = "Lazy", action = ":Lazy" },
+			{ icon = "󰒲 ", key = "P", desc = "Packages", action = function() vim.pack.update() end },
 			{ icon = " ", key = "q", desc = "Quit", action = ":quitall" },
 		},
 	},
@@ -744,6 +739,24 @@ function M.open(opts)
 	self:init()
 	self:update()
 	return self
+end
+
+-- Open dashboard on startup (only when no file args given)
+if vim.fn.argc(-1) == 0 then
+	vim.api.nvim_create_autocmd("VimEnter", {
+		group = vim.api.nvim_create_augroup("dashboard_startup", { clear = true }),
+		callback = function()
+			M({
+				sections = {
+					{ section = "header", padding = 1 },
+					{ section = "keys", gap = 1, padding = 1 },
+					{ pane = 2, icon = " ", title = "Recent Files", section = "recent_files", indent = 2, padding = 1 },
+					{ pane = 2, icon = " ", title = "Projects", section = "projects", indent = 2, padding = 1 },
+					{ section = "startup" },
+				},
+			})
+		end,
+	})
 end
 
 return M

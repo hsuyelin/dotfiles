@@ -3,7 +3,8 @@
 # ============================================================
 # Must stay near the top of ~/.zshrc. Any code that may require console input
 # (password prompts, [y/n] confirmations, etc.) must go above this block.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+# Skipped in Ghostty — starship is used there instead (see bottom of file).
+if [[ "$TERM_PROGRAM" != "ghostty" && -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
@@ -16,10 +17,6 @@ typeset -A ZI
 ZI[HOME_DIR]="${XDG_CONFIG_HOME}/zi"
 ZI[BIN_DIR]="${ZI[HOME_DIR]}/bin"
 
-# ============================================================
-# z (agkozak/zsh-z) State (XDG)
-# ============================================================
-export _Z_DATA="$XDG_STATE_HOME/z/z"
 
 export HISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/zsh/history"
 export HISTSIZE=20000
@@ -73,12 +70,14 @@ ZSH_AUTOSUGGEST_CLEAR_WIDGETS+=(
   fzf-history-widget
   fzf-file-widget
   fzf-cd-widget
+  accept-line
 )
 
 # ============================================================
 # ZI Theme
 # ============================================================
-zi light "romkatv/powerlevel10k"
+# In Ghostty: skip p10k, use starship (initialized at bottom of file)
+[[ "$TERM_PROGRAM" != "ghostty" ]] && zi light "romkatv/powerlevel10k"
 
 # ============================================================
 # ZI Initiative Plugins
@@ -98,7 +97,6 @@ zi light "zsh-users/zsh-completions"
 # ============================================================
 # ZI Passive Plugins
 # ============================================================
-zi light "agkozak/zsh-z"
 zi light "z-shell/zsh-eza"
 zi light "DarrinTisdale/zsh-aliases-exa"
 
@@ -122,8 +120,8 @@ zi snippet OMZL::key-bindings.zsh
 # AI env (XDG)
 [[ -f "${XDG_CONFIG_HOME}/bash/.ai" ]] && source "${XDG_CONFIG_HOME}/bash/.ai"
 
-# Powerlevel10k config (XDG)
-[[ -f "${XDG_CONFIG_HOME}/zsh/.p10k.zsh" ]] && source "${XDG_CONFIG_HOME}/zsh/.p10k.zsh"
+# Powerlevel10k config (XDG) — skipped in Ghostty
+[[ "$TERM_PROGRAM" != "ghostty" ]] && [[ -f "${XDG_CONFIG_HOME}/zsh/.p10k.zsh" ]] && source "${XDG_CONFIG_HOME}/zsh/.p10k.zsh"
 
 # ============================================================
 # Antigravity / RVM
@@ -134,13 +132,6 @@ zi snippet OMZL::key-bindings.zsh
 
 # RVM (keep this near the end of the file; last PATH mutation)
 [[ -d "$HOME/.rvm/bin" ]] && path+=("$HOME/.rvm/bin")
-
-# ============================================================
-# Env modules
-# ============================================================
-for f in "$ZDOTDIR"/env/*.zsh; do
-  [[ -r "$f" ]] && source "$f"
-done
 
 # ============================================================
 # Bin modules
@@ -170,6 +161,31 @@ zstyle ':fzf-tab:complete:kill:*' fzf-preview '
   pid="${word##*:}"
   ps -p "$pid" -o pid,%cpu,%mem,comm -c 2>/dev/null
 '
+zstyle ':fzf-tab:complete:z:*' fzf-preview '
+  [[ -n "$realpath" && -d "$realpath" ]] && (command -v eza >/dev/null && eza -1 --color=always --group-directories-first -- "$realpath" || ls -1 -- "$realpath")
+'
 zstyle ':fzf-tab:*' switch-group ',' '.'
 zstyle ':fzf-tab:*' continuous-trigger '/'
 zstyle ':fzf-tab:*' fzf-flags '--bind=ctrl-d:preview-page-down,ctrl-u:preview-page-up'
+
+# ============================================================
+# Zoxide (replaces agkozak/zsh-z)
+# ============================================================
+if command -v zoxide >/dev/null; then
+  # compdef must be available before zoxide init, otherwise its completion guard fails
+  (( ${+functions[compdef]} )) || { autoload -Uz compinit && compinit -C }
+  eval "$(zoxide init zsh --cmd z)"
+  # 'zi' (zoxide interactive mode) conflicts with the zi plugin manager
+  # rename it to 'zf' (z + fzf)
+  functions[zf]=$functions[zi]
+  unfunction zi
+fi
+
+# ============================================================
+# Ghostty: starship prompt (replaces p10k when in Ghostty)
+# config: ~/.config/starship/starship.toml
+# ============================================================
+if [[ "$TERM_PROGRAM" == "ghostty" ]]; then
+  export STARSHIP_CONFIG="${XDG_CONFIG_HOME}/starship/starship.toml"
+  eval "$(starship init zsh)"
+fi

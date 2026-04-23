@@ -2,7 +2,7 @@ local utils = require("heirline.utils")
 
 local function setup_colors()
     local normal_bg = utils.get_highlight("Normal").bg or "NONE"
-    
+
     return {
         white = utils.get_highlight("Normal").fg,
         black = "NONE",

@@ -1,14 +1,19 @@
-return {
-	"rafcamlet/nvim-luapad",
-	{
-		"folke/lazydev.nvim",
-		ft = "lua", -- only load on lua files
-		opts = {
-			library = {
-				-- See the configuration section for more details
-				-- Load luvit types when the `vim.uv` word is found
-				{ path = "${3rd}/luv/library", words = { "vim%.uv" } },
-			},
-		},
-	},
-}
+local gh = function(r) return 'https://github.com/' .. r end
+
+vim.pack.add({
+  gh('rafcamlet/nvim-luapad'),
+  gh('folke/lazydev.nvim'),
+})
+
+-- lazydev: load only for Lua files
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "lua",
+  once = true,
+  callback = function()
+    require("lazydev").setup({
+      library = {
+        { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+      },
+    })
+  end,
+})

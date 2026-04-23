@@ -1,24 +1,18 @@
-return {
-	{
-		"folke/snacks.nvim",
-		opts = {
-			image = {
-				enabled = true,
-			},
-		},
-	},
-	{
-		"wojciech-kulik/xcodebuild.nvim",
-		opts = {
-			console_logs = {
-				enabled = false, -- enable console logs in dap-ui
-				format_line = function(line) -- format each line of logs
-					return line
-				end,
-				filter_line = function(line) -- filter each line of logs
-					return true
-				end,
-			},
-		},
-	},
-}
+local gh = function(r) return 'https://github.com/' .. r end
+
+vim.pack.add({
+  gh('folke/snacks.nvim'),
+  gh('wojciech-kulik/xcodebuild.nvim'),
+})
+
+require("snacks").setup({
+  image = { enabled = true },
+})
+
+require("xcodebuild").setup({
+  console_logs = {
+    enabled = false,
+    format_line = function(line) return line end,
+    filter_line = function(_) return true end,
+  },
+})

@@ -1,95 +1,50 @@
-return {
-	-- Surround
-	{
-		"kylechui/nvim-surround",
-		version = "*", -- Use for stability; omit to use `main` branch for the latest features
-		event = "VeryLazy",
-		config = function()
-			require("nvim-surround").setup({})
-		end,
-	},
+local gh = function(r) return 'https://github.com/' .. r end
 
-	-- Mouse Movement
-	{
-		"folke/flash.nvim",
-		event = "VeryLazy",
-		---@type Flash.Config
-		opts = {
-			modes = {
-				char = {
-					keys = { "f", "F", "t", "T", ";", [","] = "<C-;>" },
-					char_actions = function(motion)
-						return {
-							[";"] = "next", -- set to `right` to always go right
-							[","] = "prev", -- set to `left` to always go left
-							-- clever-f style
-							[motion:lower()] = "next",
-							[motion:upper()] = "prev",
-						}
-					end,
-				},
-			},
-		},
-		---@type Flash.Config
-		keys = {
-			{
-				"r",
-				mode = { "n", "x", "o" },
-				function()
-					require("flash").jump()
-				end,
-				desc = "Flash Jump",
-			},
-			{
-				"R",
-				mode = { "n", "x", "o" },
-				function()
-					require("flash").treesitter_search()
-				end,
-				desc = "Flash Jump",
-			},
-			{
-				"<C-r>",
-				mode = { "n", "x", "o" },
-				function()
-					require("flash").treesitter()
-				end,
-				desc = "Flash Treesitter",
-			},
-		},
-	},
+vim.pack.add({
+  gh('kylechui/nvim-surround'),
+  gh('folke/flash.nvim'),
+  gh('folke/ts-comments.nvim'),
+  gh('windwp/nvim-autopairs'),
+  gh('chentoast/marks.nvim'),
+})
 
-	-- Better Commenting
-	{
-		"folke/ts-comments.nvim",
-		opts = {},
-		event = "VeryLazy",
-		enabled = vim.fn.has("nvim-0.10.0") == 1,
-	},
+require("nvim-surround").setup({})
 
-	-- Auto Pairs
-	{
-		"windwp/nvim-autopairs",
-		config = function()
-			require("nvim-autopairs").setup()
-		end,
-	},
+require("flash").setup({
+  modes = {
+    char = {
+      keys = { "f", "F", "t", "T", ";", [","] = "<C-;>" },
+      char_actions = function(motion)
+        return {
+          [";"] = "next",
+          [","] = "prev",
+          [motion:lower()] = "next",
+          [motion:upper()] = "prev",
+        }
+      end,
+    },
+  },
+})
 
-	-- Marks & Bookmarks
-	{
-		"chentoast/marks.nvim",
-		event = "VeryLazy",
-		opts = {
-			default_mappings = true, -- m + letter to set, ' + letter to jump, dm + letter to delete
-			signs = true,
-			mappings = {
-				set_next = "m,",      -- set next available lowercase mark
-				toggle = "m;",        -- toggle mark at current line
-				next = "m]",          -- jump to next mark
-				prev = "m[",          -- jump to previous mark
-				preview = "m:",       -- preview mark
-				delete_buf = "dm-",   -- delete all marks in buffer
-			},
-		},
-	},
-}
+vim.keymap.set({ "n", "x", "o" }, "r", function() require("flash").jump() end, { desc = "Flash Jump" })
+vim.keymap.set({ "n", "x", "o" }, "R", function() require("flash").treesitter_search() end, { desc = "Flash Treesitter Search" })
+vim.keymap.set({ "n", "x", "o" }, "<C-r>", function() require("flash").treesitter() end, { desc = "Flash Treesitter" })
+
+if vim.fn.has("nvim-0.10.0") == 1 then
+  require("ts-comments").setup({})
+end
+
+require("nvim-autopairs").setup()
+
+require("marks").setup({
+  default_mappings = true,
+  signs = true,
+  mappings = {
+    set_next = "m,",
+    toggle = "m;",
+    next = "m]",
+    prev = "m[",
+    preview = "m:",
+    delete_buf = "dm-",
+  },
+})

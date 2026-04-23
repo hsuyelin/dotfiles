@@ -36,8 +36,8 @@ alias xcode='"$HOME/.config/bin/xcode.sh"'
 alias rubyfmt='rubocop -A'
 
 # Xcode launchers (keep your naming, but make them consistent)
-alias xed16='open -a /Applications/Xcode-16.4.0.app'
-alias xed26='open -a /Applications/Xcode-26.1.0.app'
+#alias xed16='open -a /Applications/Xcode-16.4.0.app'
+#alias xed26='open -a /Applications/Xcode-26.1.0.app'
 
 
 # -----------------------------
@@ -318,3 +318,10 @@ alias gba='git branch -a | fzf --height=40% --border --preview "git log --onelin
 mrrss() {
    "$HOME/.config/bin/mrrss_update.sh" "$@"
 }
+
+# -----------------------------
+# AI
+# -----------------------------
+alias cc='claude'
+alias cx='codex'
+

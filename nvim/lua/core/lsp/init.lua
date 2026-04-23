@@ -10,7 +10,9 @@ for _, server in ipairs(enabled_servers) do
 	---@type vim.lsp.Config
 	local settings = {
 		on_attach = function(client, _)
-			vim.cmd.cd(client.root_dir)
+			if client.root_dir then
+				vim.cmd.cd(client.root_dir)
+			end
 		end,
 		root_markers = core.configs.root_markers,
 	}

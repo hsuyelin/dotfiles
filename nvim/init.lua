@@ -1,10 +1,7 @@
+-- Track startup time (replaces lazy.stats)
+vim.g.nvim_start_time = vim.uv.hrtime()
+
 require("core")
 require("utils")
-require("installer")
-require("keymaps")
-
-vim.api.nvim_command([[colorscheme catppuccin]])
--- vim.cmd("colorscheme catppuccin-frappe")
-
--- loading configs
-require("configs")
+require("plugins")
+require("core.keymaps")

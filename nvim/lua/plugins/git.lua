@@ -1,28 +1,18 @@
-return {
-	-- Git Signs
-	{
-		"lewis6991/gitsigns.nvim",
-		config = function()
-			require("gitsigns").setup({
-				linehl = false,
-				numhl = true,
-			})
-		end,
-	},
+local gh = function(r) return 'https://github.com/' .. r end
 
-	-- Git Client
-	{
-		"TimUntersberger/neogit",
-		dependencies = {
-			"nvim-lua/plenary.nvim",
-			"sindrets/diffview.nvim",
-		},
-		config = function()
-			require("neogit").setup({
-				integrations = {
-					diffview = true,
-				},
-			})
-		end,
-	},
-}
+vim.pack.add({
+  gh('lewis6991/gitsigns.nvim'),
+  gh('sindrets/diffview.nvim'),
+  gh('TimUntersberger/neogit'),
+})
+
+require("gitsigns").setup({
+  linehl = false,
+  numhl = true,
+})
+
+require("neogit").setup({
+  integrations = {
+    diffview = true,
+  },
+})

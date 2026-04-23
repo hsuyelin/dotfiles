@@ -50,6 +50,9 @@ alt-j = 'focus down'
 alt-k = 'focus up'
 alt-l = 'focus right'
 
+alt-n = 'focus dfs-next'
+alt-p = 'focus dfs-prev'
+
 # Move window commands (alt + shift + h-j-k-l)
 alt-shift-h = 'move left'
 alt-shift-j = 'move down'
@@ -61,7 +64,7 @@ alt-shift-minus = 'resize smart -100'
 alt-shift-equal = 'resize smart +100'
 
 # Quick application launch examples
-alt-enter = 'exec-and-forget open -a iTerm2' # Launch Terminal (iTerm2)
+alt-enter = 'exec-and-forget open -a Ghostty' # Launch Terminal (Ghostty)
 alt-g = 'exec-and-forget open -a "Google Chrome"' # Launch Web Browser
 
 # Workspace switching (based on suggested categories)
@@ -165,7 +168,7 @@ run = 'move-node-to-workspace D'
 
 ## 2. Terminal (T)
 [[on-window-detected]]
-if.app-id = 'com.googlecode.iterm2'
+if.app-id = 'com.mitchellh.ghostty'
 run = 'move-node-to-workspace T'
 
 [[on-window-detected]]
