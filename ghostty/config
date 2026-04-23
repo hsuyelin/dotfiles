@@ -7,6 +7,8 @@
 # Keep explicit zsh (not "detect") since entire config is zsh-specific
 shell-integration = zsh
 shell-integration-features = cursor,sudo,title
+working-directory = home
+tab-inherit-working-directory = false
 
 # ── Font ──────────────────────────────────────────────────────────────────────
 # English / code: FiraCode Nerd Font Mono Retina (matches iTerm2's FiraCodeNFM-Ret)
@@ -40,6 +42,7 @@ theme = Catppuccin Mocha
 
 # ── Cursor ────────────────────────────────────────────────────────────────────
 cursor-style = bar
+adjust-cursor-thickness = 1
 cursor-style-blink = true
 cursor-opacity = 0.6
 
@@ -55,10 +58,14 @@ window-theme = auto
 # ── macOS ─────────────────────────────────────────────────────────────────────
 # iTerm2: Option Key Sends=2 (Meta/Escape+)
 macos-option-as-alt = true
-# native: tab bar stays inside macOS titlebar chrome → content area never changes
-# size when adding/switching tabs → AeroSpace won't retile/shrink the window.
-# (transparent/hidden both cause content-area resize events that confuse AeroSpace)
-macos-titlebar-style = native
+# tabs: integrates tab bar into titlebar — tabs always top-aligned, no separate
+# title text area. Better than native for AeroSpace: titlebar height is constant
+# regardless of tab count (native would grow/shrink content area when tabs appear).
+# transparent/hidden cause content-area resize events that confuse AeroSpace.
+macos-titlebar-style = tabs
+macos-titlebar-proxy-icon = hidden
+macos-icon = custom
+macos-custom-icon = ~/.config/ghostty/icons/catppuccin-mocha.icns
 
 # ── Security / Clipboard ──────────────────────────────────────────────────────
 clipboard-paste-protection = true

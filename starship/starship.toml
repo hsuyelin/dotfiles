@@ -5,27 +5,15 @@ format = """
 $os\
 $username\
 [](bg:peach fg:red)\
-$directory\
+${custom.smart_directory}\
 [](bg:yellow fg:peach)\
 $git_branch\
-$git_status\
-[](fg:yellow bg:green)\
-$c\
-$rust\
-$golang\
-$nodejs\
-$php\
-$java\
-$kotlin\
-$haskell\
-$python\
-$swift\
-[](fg:green bg:sapphire)\
+${custom.git_meta}\
+[](fg:yellow bg:sapphire)\
 $conda\
 [](fg:sapphire bg:lavender)\
 $time\
 [ ](fg:lavender)\
-$cmd_duration\
 $line_break\
 $character"""
 
@@ -58,6 +46,7 @@ Redhat = "󱄛"
 RedHatEnterprise = "󱄛"
 
 [username]
+disabled = true
 show_always = true
 style_user = "bg:red fg:crust"
 style_root = "bg:red fg:crust"
@@ -76,62 +65,191 @@ truncation_symbol = "…/"
 "Pictures" = " "
 "Developer" = "󰲋 "
 
+[custom.smart_directory]
+description = "Width-aware path segment"
+when = true
+shell = ["zsh", "-f"]
+style = "bg:peach fg:crust"
+format = "[ $output ]($style)"
+command = '''
+path="${PWD:A}"
+home="${HOME:A}"
+cols="${COLUMNS:-120}"
+reserve=60
+
+if [[ "$path" == "$home" ]]; then
+  display="~"
+elif [[ "$path" == "$home/"* ]]; then
+  display="~/${path#$home/}"
+else
+  display="$path"
+fi
+
+shorten_path() {
+  local input="$1"
+  local -a parts out
+  local absolute=0
+  local idx last part
+
+  [[ "$input" == /* ]] && absolute=1
+  parts=("${(@s:/:)input}")
+  last=${#parts[@]}
+
+  for (( idx = 1; idx <= last; idx++ )); do
+    part="${parts[idx]}"
+    [[ -z "$part" ]] && continue
+
+    if (( idx == 1 )) && [[ "$part" == "~" ]]; then
+      out+=("~")
+      continue
+    fi
+
+    if (( idx == last )); then
+      out+=("$part")
+      continue
+    fi
+
+    case "$part" in
+      Documents) out+=("Doc") ;;
+      Downloads) out+=("Dl") ;;
+      Developer) out+=("Dev") ;;
+      Pictures) out+=("Pic") ;;
+      Music) out+=("Mus") ;;
+      *) out+=("${part[1,1]}") ;;
+    esac
+  done
+
+  if (( absolute )); then
+    print -r -- "/${(j:/:)out}"
+  else
+    print -r -- "${(j:/:)out}"
+  fi
+}
+
+full_path="$display"
+short_path="$(shorten_path "$display")"
+
+if (( ${#full_path} <= cols - reserve )); then
+  print -r -- " $full_path"
+else
+  print -r -- " $short_path"
+fi
+'''
+
 [git_branch]
 symbol = ""
 style = "bg:yellow"
-format = '[[ $symbol $branch ](fg:crust bg:yellow)]($style)'
+format = '[[ git $symbol $branch ](fg:crust bg:yellow)]($style)'
 
 [git_status]
 style = "bg:yellow"
 format = '[[($all_status$ahead_behind )](fg:crust bg:yellow)]($style)'
 
+[custom.git_meta]
+description = "Counted git state"
+when = 'git rev-parse --is-inside-work-tree >/dev/null 2>&1'
+require_repo = true
+shell = ["zsh", "-f"]
+style = "bg:yellow fg:crust"
+format = "[$output]($style)"
+command = '''
+typeset -i ahead=0 behind=0 staged=0 modified=0 untracked=0 conflicted=0 stashed=0
+
+while IFS= read -r line; do
+  case "$line" in
+    "# branch.ab "*)
+      ab="${line#\# branch.ab }"
+      ahead="${ab%% *}"
+      ahead="${ahead#+}"
+      behind="${ab##* }"
+      behind="${behind#-}"
+      ;;
+    "1 "*|"2 "*)
+      x="${line[3,3]}"
+      y="${line[4,4]}"
+      [[ "$x" != "." ]] && (( staged++ ))
+      [[ "$y" != "." ]] && (( modified++ ))
+      ;;
+    "u "*)
+      (( conflicted++ ))
+      ;;
+    "? "*)
+      (( untracked++ ))
+      ;;
+  esac
+done < <(git status --porcelain=2 --branch 2>/dev/null)
+
+stashed=$(git rev-list --walk-reflogs --count refs/stash 2>/dev/null || print 0)
+
+parts=()
+(( ahead > 0 )) && parts+=("⇡${ahead}")
+(( behind > 0 )) && parts+=("⇣${behind}")
+(( stashed > 0 )) && parts+=("*${stashed}")
+(( staged > 0 )) && parts+=("+${staged}")
+(( modified > 0 )) && parts+=("!${modified}")
+(( untracked > 0 )) && parts+=("?${untracked}")
+(( conflicted > 0 )) && parts+=("=${conflicted}")
+
+(( ${#parts[@]} > 0 )) && print -r -- " ${${(j: :)parts}} "
+'''
+
 [nodejs]
+disabled = true
 symbol = ""
 style = "bg:green"
 format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
 
 [c]
+disabled = true
 symbol = " "
 style = "bg:green"
 format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
 
 [rust]
+disabled = true
 symbol = ""
 style = "bg:green"
 format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
 
 [golang]
+disabled = true
 symbol = ""
 style = "bg:green"
 format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
 
 [php]
+disabled = true
 symbol = ""
 style = "bg:green"
 format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
 
 [java]
+disabled = true
 symbol = " "
 style = "bg:green"
 format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
 
 [kotlin]
+disabled = true
 symbol = ""
 style = "bg:green"
 format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
 
 [haskell]
+disabled = true
 symbol = ""
 style = "bg:green"
 format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
 
 [python]
+disabled = true
 symbol = ""
 style = "bg:green"
 format = '[[ $symbol( $version)(\(#$virtualenv\)) ](fg:crust bg:green)]($style)'
 
 
 [swift]
+disabled = true
 symbol = ""
 style = "bg:green"
 format = '[[ $symbol( $version) ](fg:crust bg:green)]($style)'
@@ -169,7 +287,7 @@ vimcmd_visual_symbol = '[❮](bold fg:yellow)'
 show_milliseconds = true
 format = " in $duration "
 style = "bg:lavender"
-disabled = false
+disabled = true
 show_notifications = true
 min_time_to_notify = 45000
 

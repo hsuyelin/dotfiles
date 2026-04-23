@@ -1,0 +1,96 @@
+#!/bin/bash
+set -euo pipefail
+
+type_mode=""
+hidden=0
+follow=0
+pattern=""
+exclude=()
+paths=()
+
+while (($#)); do
+  case "$1" in
+    --version|-V)
+      echo "fd 8.7.0 (nvim wrapper)"
+      exit 0
+      ;;
+    --type|-t)
+      shift
+      [[ $# -gt 0 ]] || exit 1
+      case "$1" in
+        d)
+          type_mode="d"
+          ;;
+        f)
+          type_mode="f"
+          ;;
+        l)
+          [[ -n "$type_mode" ]] || type_mode="f"
+          ;;
+      esac
+      ;;
+    --color)
+      shift
+      ;;
+    --hidden)
+      hidden=1
+      ;;
+    --follow|-L)
+      follow=1
+      ;;
+    -E|--exclude)
+      shift
+      [[ $# -gt 0 ]] || exit 1
+      exclude+=("$1")
+      ;;
+    .)
+      paths+=("$1")
+      ;;
+    -*)
+      ;;
+    *)
+      if [[ -z "$pattern" ]]; then
+        pattern="$1"
+      else
+        paths+=("$1")
+      fi
+      ;;
+  esac
+  shift
+done
+
+if ((${#paths[@]} == 0)); then
+  paths=(.)
+fi
+
+find_args=()
+if ((follow)); then
+  find_args+=(-L)
+fi
+find_args+=("${paths[@]}")
+
+if [[ "$type_mode" == "d" ]]; then
+  find_args+=(-type d)
+else
+  find_args+=(\( -type f -o -type l \))
+fi
+
+if ((hidden == 0)); then
+  find_args+=(-not -path "*/.*")
+fi
+
+if ((${#exclude[@]} > 0)); then
+  for item in "${exclude[@]}"; do
+    find_args+=(-not -name "$item" -not -path "*/$item/*")
+  done
+fi
+
+if [[ -n "$pattern" ]]; then
+  if [[ "$pattern" == *"*"* || "$pattern" == *"?"* || "$pattern" == *"["* ]]; then
+    find_args+=(-name "$pattern")
+  else
+    find_args+=(-name "*$pattern*")
+  fi
+fi
+
+command find "${find_args[@]}" 2>/dev/null | sed -e 's#^\./##' | LC_ALL=C sort

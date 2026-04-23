@@ -7,7 +7,11 @@ vim.pack.add({
   gh('toppair/peek.nvim'),
 })
 
-require("render-markdown").setup({})
+require("render-markdown").setup({
+  html = { enabled = false },
+  latex = { enabled = false },
+  yaml = { enabled = false },
+})
 
 -- peek.nvim: load only when editing markdown
 vim.api.nvim_create_autocmd("FileType", {

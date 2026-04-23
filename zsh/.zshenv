@@ -26,8 +26,8 @@ export ZDOTDIR="${ZDOTDIR:-$XDG_CONFIG_HOME/zsh}"
 
 mkdir -p "$XDG_STATE_HOME/zsh"
 export HISTFILE="$XDG_STATE_HOME/zsh/history"
-export HISTSIZE=10000
-export SAVEHIST=10000
+# HISTSIZE/SAVEHIST are set in .zshrc (interactive shells only) where
+# history opts (INC_APPEND, SHARE, IGNORE_DUPS…) are also configured.
 
 # ============================================================
 # Dotfiles
@@ -41,7 +41,7 @@ export DOTFILES="${DOTFILES:-${0:A:h:h:h}}"
 
 export DATADIR="$XDG_DATA_HOME"
 export VIM_TMPDIR="$XDG_CACHE_HOME/vim"
-mkdir -p "$DATADIR" "$VIM_TMPDIR"
+mkdir -p "$DATADIR" "$VIM_TMPDIR" "$XDG_STATE_HOME/vim"
 
 # ============================================================
 # Editors

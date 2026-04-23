@@ -33,3 +33,4 @@ tmux/plugins/*
 vim/.vim/plugged/*
 !vim/.vim/plugged/.gitkeep
 bundle/cache
+.zcompdump

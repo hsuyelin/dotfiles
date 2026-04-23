@@ -169,7 +169,10 @@ run = 'move-node-to-workspace D'
 ## 2. Terminal (T)
 [[on-window-detected]]
 if.app-id = 'com.mitchellh.ghostty'
-run = 'move-node-to-workspace T'
+run = [
+    'move-node-to-workspace T',
+    'layout floating',
+]
 
 [[on-window-detected]]
 if.app-id = 'com.termius-dmg.mac'

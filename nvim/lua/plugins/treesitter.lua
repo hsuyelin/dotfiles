@@ -2,25 +2,53 @@
 local gh = function(r) return 'https://github.com/' .. r end
 
 vim.pack.add({
-  { src = gh('nvim-treesitter/nvim-treesitter'), version = 'main' },
-  { src = gh('nvim-treesitter/nvim-treesitter-textobjects'), version = 'main' },
+  { src = gh('nvim-treesitter/nvim-treesitter'), version = 'master' },
+  { src = gh('nvim-treesitter/nvim-treesitter-textobjects'), version = 'master' },
   gh('HiPhish/rainbow-delimiters.nvim'),
 })
 
-require("nvim-treesitter").setup()
-
--- Auto-install parsers on first open
-vim.api.nvim_create_autocmd("FileType", {
-  group = vim.api.nvim_create_augroup("ts_auto_install", { clear = true }),
-  callback = function()
-    local ft = vim.bo.filetype
-    if ft == "" then return end
-    local lang = vim.treesitter.language.get_lang(ft)
-    if lang and not pcall(vim.treesitter.language.inspect, lang) then
-      pcall(function() vim.cmd("TSInstall " .. lang) end)
-    end
-  end,
-})
+local legacy_ok, legacy_configs = pcall(require, "nvim-treesitter.configs")
+if legacy_ok then
+  legacy_configs.setup({
+    ensure_installed = {
+      "bash",
+      "c",
+      "cpp",
+      "diff",
+      "go",
+      "gomod",
+      "gosum",
+      "gowork",
+      "html",
+      "javascript",
+      "json",
+      "lua",
+      "markdown",
+      "markdown_inline",
+      "python",
+      "query",
+      "regex",
+      "swift",
+      "vim",
+      "vimdoc",
+      "yaml",
+    },
+    auto_install = false,
+    highlight = {
+      enable = true,
+      additional_vim_regex_highlighting = false,
+    },
+    indent = {
+      enable = true,
+      disable = { "swift" },
+    },
+  })
+else
+  local modern_ok, modern_treesitter = pcall(require, "nvim-treesitter")
+  if modern_ok and type(modern_treesitter.setup) == "function" then
+    modern_treesitter.setup()
+  end
+end
 
 -- Treesitter textobjects: select
 vim.keymap.set({ "x", "o" }, "af", function()
@@ -82,14 +110,6 @@ vim.keymap.set({ "n", "x", "o" }, ",", ts_repeat.repeat_last_move_previous)
 
 -- Rainbow delimiters
 require("rainbow-delimiters.setup").setup({
-  strategy = {
-    [""] = "rainbow-delimiters.strategy.global",
-    commonlisp = "rainbow-delimiters.strategy.local",
-  },
-  query = {
-    [""] = "rainbow-delimiters",
-    latex = "rainbow-blocks",
-  },
   highlight = {
     "RainbowDelimiterRed", "RainbowDelimiterYellow", "RainbowDelimiterBlue",
     "RainbowDelimiterOrange", "RainbowDelimiterGreen", "RainbowDelimiterViolet",

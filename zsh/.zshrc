@@ -98,7 +98,6 @@ zi light "zsh-users/zsh-completions"
 # ZI Passive Plugins
 # ============================================================
 zi light "z-shell/zsh-eza"
-zi light "DarrinTisdale/zsh-aliases-exa"
 
 # ============================================================
 # ZI Snippets
