@@ -40,8 +40,7 @@ export DOTFILES="${DOTFILES:-${0:A:h:h:h}}"
 # ============================================================
 
 export DATADIR="$XDG_DATA_HOME"
-export VIM_TMPDIR="$XDG_CACHE_HOME/vim"
-mkdir -p "$DATADIR" "$VIM_TMPDIR" "$XDG_STATE_HOME/vim"
+mkdir -p "$DATADIR"
 
 # ============================================================
 # Editors

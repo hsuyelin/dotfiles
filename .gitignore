@@ -7,6 +7,14 @@ private/
 # Brew package
 brew/*.txt
 
+# Docker / OrbStack runtime state
+docker/.token_seed
+docker/.token_seed.lock
+docker/buildx/
+docker/cli-plugins/
+docker/config.json
+docker/contexts/
+
 # Zsh session history
 zsh/.zsh_history
 zsh/.zsh_sessions/

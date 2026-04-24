@@ -1,5 +1,7 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
+command_timeout = 10000
+
 format = """
 [](red)\
 $os\
@@ -8,7 +10,7 @@ $username\
 ${custom.smart_directory}\
 [](bg:yellow fg:peach)\
 $git_branch\
-${custom.git_meta}\
+$git_status\
 [](fg:yellow bg:sapphire)\
 $conda\
 [](fg:sapphire bg:lavender)\
@@ -144,54 +146,6 @@ format = '[[ git $symbol $branch ](fg:crust bg:yellow)]($style)'
 [git_status]
 style = "bg:yellow"
 format = '[[($all_status$ahead_behind )](fg:crust bg:yellow)]($style)'
-
-[custom.git_meta]
-description = "Counted git state"
-when = 'git rev-parse --is-inside-work-tree >/dev/null 2>&1'
-require_repo = true
-shell = ["zsh", "-f"]
-style = "bg:yellow fg:crust"
-format = "[$output]($style)"
-command = '''
-typeset -i ahead=0 behind=0 staged=0 modified=0 untracked=0 conflicted=0 stashed=0
-
-while IFS= read -r line; do
-  case "$line" in
-    "# branch.ab "*)
-      ab="${line#\# branch.ab }"
-      ahead="${ab%% *}"
-      ahead="${ahead#+}"
-      behind="${ab##* }"
-      behind="${behind#-}"
-      ;;
-    "1 "*|"2 "*)
-      x="${line[3,3]}"
-      y="${line[4,4]}"
-      [[ "$x" != "." ]] && (( staged++ ))
-      [[ "$y" != "." ]] && (( modified++ ))
-      ;;
-    "u "*)
-      (( conflicted++ ))
-      ;;
-    "? "*)
-      (( untracked++ ))
-      ;;
-  esac
-done < <(git status --porcelain=2 --branch 2>/dev/null)
-
-stashed=$(git rev-list --walk-reflogs --count refs/stash 2>/dev/null || print 0)
-
-parts=()
-(( ahead > 0 )) && parts+=("⇡${ahead}")
-(( behind > 0 )) && parts+=("⇣${behind}")
-(( stashed > 0 )) && parts+=("*${stashed}")
-(( staged > 0 )) && parts+=("+${staged}")
-(( modified > 0 )) && parts+=("!${modified}")
-(( untracked > 0 )) && parts+=("?${untracked}")
-(( conflicted > 0 )) && parts+=("=${conflicted}")
-
-(( ${#parts[@]} > 0 )) && print -r -- " ${${(j: :)parts}} "
-'''
 
 [nodejs]
 disabled = true
