@@ -13,7 +13,6 @@ proxy_on() {
   echo "Proxy enabled."
 }
 
-# Optional: quick check
 proxy_status() {
   echo "http_proxy=${http_proxy:-<unset>}"
   echo "https_proxy=${https_proxy:-<unset>}"
@@ -23,21 +22,17 @@ proxy_status() {
 # -----------------------------
 # Bash profile shortcuts
 # -----------------------------
-alias bash-reload='source "$HOME/.config/bash/.bash_profile"'
-alias bash-edit='subl "$HOME/.config/bash/.bash_profile"'
+alias bash-reload='source "${XDG_CONFIG_HOME}/bash/.bash_profile"'
+alias bash-edit='subl "${XDG_CONFIG_HOME}/bash/.bash_profile"'
 
 # -----------------------------
 # Tool shortcuts
 # -----------------------------
 alias rvminstall='"$HOME/.rvm/.rvminstall.sh"'
-alias carthage_build='"$HOME/.config/bin/carthage_build.sh"'
-alias brew_export='"$HOME/.config/bin/brew_export.sh"'
-alias xcode='"$HOME/.config/bin/xcode.sh"'
+alias carthage_build='"${XDG_CONFIG_HOME}/bin/carthage_build.sh"'
+alias brew_export='"${XDG_CONFIG_HOME}/bin/brew_export.sh"'
+alias xcode='"${XDG_CONFIG_HOME}/bin/xcode.sh"'
 alias rubyfmt='rubocop -A'
-
-# Xcode launchers (keep your naming, but make them consistent)
-#alias xed16='open -a /Applications/Xcode-16.4.0.app'
-#alias xed26='open -a /Applications/Xcode-26.1.0.app'
 
 
 # -----------------------------
@@ -54,7 +49,6 @@ if command -v eza >/dev/null 2>&1; then
   alias lt='eza --tree --level=2 --icons --group-directories-first'
   alias lta='eza --tree -a --level=2 --icons --group-directories-first'
 else
-  # Minimal fallbacks if eza isn't installed
   alias l='ls -lh'
   alias ll='ls -lah'
   alias la='ls -A'
@@ -62,7 +56,6 @@ fi
 
 command -v lazygit >/dev/null 2>&1 && alias lg='lazygit'
 
-# Keep a literal rm available
 alias real-rm='\rm'
 
 
@@ -98,7 +91,6 @@ rm() {
     esac
   done
 
-  # No targets: behave like rm (show usage-ish)
   if [ ${#targets[@]} -eq 0 ]; then
     /bin/rm "$@"
     return $?
@@ -109,7 +101,6 @@ rm() {
       if command -v safe-trash >/dev/null 2>&1; then
         safe-trash "$target"
       else
-        # Fallback to real rm if safe-trash isn't installed
         /bin/rm -rf -- "$target"
       fi
     else
@@ -140,7 +131,7 @@ fix() {
 # -----------------------------
 rd() {
   local RATATUI_BETTER_CD="rd-better-cd"
-  local TEMP_FILE="/tmp/rd_selected_dir"
+  local TEMP_FILE="${TMPDIR:-/tmp}/rd_selected_dir"
   local SELECTED_DIR
 
   if ! command -v "$RATATUI_BETTER_CD" >/dev/null 2>&1; then
@@ -151,7 +142,6 @@ rd() {
   real-rm -rf "$TEMP_FILE"
   "$RATATUI_BETTER_CD"
 
-  # If user cancelled, temp file won't exist
   [ -f "$TEMP_FILE" ] || return 0
 
   read -r SELECTED_DIR < "$TEMP_FILE"
@@ -223,7 +213,6 @@ _parse_xcode_args() {
   return 0
 }
 
-# xcode clean
 xclean() {
   unset workspace scheme configuration
 
@@ -243,7 +232,6 @@ xclean() {
     clean | xcbeautify
 }
 
-# xcode build
 xbuild() {
   unset workspace scheme configuration
 
@@ -263,11 +251,9 @@ xbuild() {
     build | xcbeautify
 }
 
-# xcode archive
 xarchive() {
   unset workspace scheme configuration archive_path
 
-  # parse args (reuse same style, with an extra flag)
   while [ $# -gt 0 ]; do
     case "$1" in
       --workspace)
@@ -307,16 +293,14 @@ xarchive() {
 # -----------------------------
 # git & fzf
 # -----------------------------
-
 alias gba='git branch -a | fzf --height=40% --border --preview "git log --oneline --color=always -- {} | head -80" | sed "s/.* //" | xargs git checkout'
 
 
 # -----------------------------
 # Other
 # -----------------------------
-
 mrrss() {
-   "$HOME/.config/bin/mrrss_update.sh" "$@"
+   "${XDG_CONFIG_HOME}/bin/mrrss_update.sh" "$@"
 }
 
 # -----------------------------
@@ -324,4 +308,3 @@ mrrss() {
 # -----------------------------
 alias cc='claude'
 alias cx='codex'
-

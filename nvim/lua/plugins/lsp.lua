@@ -29,7 +29,7 @@ require("conform").setup({
       command = "swiftformat",
       args = {
         "--config",
-        vim.fn.expand("$HOME/.config/swiftformat/.swiftformat"),
+        (os.getenv("XDG_CONFIG_HOME") or os.getenv("HOME") .. "/.config") .. "/swiftformat/.swiftformat",
         "--stdinpath",
         "$FILENAME",
       },

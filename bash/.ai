@@ -1,3 +1,0 @@
-# AI API Configuration
-# Secrets are stored in ~/.config/secrets/.ai.secrets
-[[ -f "$HOME/.config/secrets/.ai.secrets" ]] && source "$HOME/.config/secrets/.ai.secrets"

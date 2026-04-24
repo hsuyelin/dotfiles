@@ -1,6 +1,5 @@
 # ══════════════════════════════════════════════════════════════════════════════
 # Ghostty Configuration
-# Translated from iTerm2 preferences
 # ══════════════════════════════════════════════════════════════════════════════
 
 # ── Shell ─────────────────────────────────────────────────────────────────────
@@ -11,7 +10,7 @@ working-directory = home
 tab-inherit-working-directory = false
 
 # ── Font ──────────────────────────────────────────────────────────────────────
-# English / code: FiraCode Nerd Font Mono Retina (matches iTerm2's FiraCodeNFM-Ret)
+# English / code: FiraCode Nerd Font Mono Retina
 font-family = FiraCode Nerd Font Mono Ret
 # Chinese fallback (also covers glyphs missing from FiraCode)
 font-family = LXGW WenKai Mono
@@ -47,7 +46,6 @@ cursor-style-blink = true
 cursor-opacity = 0.6
 
 # ── Window ────────────────────────────────────────────────────────────────────
-# iTerm2: Columns=110, Rows=35
 window-width = 110
 window-height = 35
 window-padding-x = 8
@@ -56,7 +54,6 @@ window-save-state = always
 window-theme = auto
 
 # ── macOS ─────────────────────────────────────────────────────────────────────
-# iTerm2: Option Key Sends=2 (Meta/Escape+)
 macos-option-as-alt = true
 # tabs: integrates tab bar into titlebar — tabs always top-aligned, no separate
 # title text area. Better than native for AeroSpace: titlebar height is constant
