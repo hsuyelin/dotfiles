@@ -42,7 +42,14 @@ require("neo-tree").setup({
         ["A"] = "add",
         ["Ctrl+A"] = "add_directory",
         ["R"] = "rename",
-        ["c"] = "set_root",
+        ["c"] = function(state)
+          local node = state.tree:get_node()
+          if node.type ~= "directory" then return end
+          local path = node:get_id()
+          require("neo-tree.sources.filesystem.commands").set_root(state)
+          vim.cmd("cd " .. vim.fn.fnameescape(path))
+          vim.notify("cwd → " .. path, vim.log.levels.INFO)
+        end,
         ["H"] = "navigate_up",
         ["l"] = "open",
         ["h"] = "close_node",
@@ -50,7 +57,9 @@ require("neo-tree").setup({
         ["."] = "toggle_hidden",
       },
     },
-    bind_to_cwd = true,
+    -- Decouple tree root from cwd: follow_current_file can freely move the
+    -- tree view without reverting the cwd set by the custom "c" mapping above.
+    bind_to_cwd = false,
     use_libuv_file_watcher = true,
     follow_current_file = {
       enabled = true,
