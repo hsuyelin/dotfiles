@@ -119,14 +119,35 @@ check_platform() {
 }
 
 # ── Step 2: Prerequisites ─────────────────────────────────────────────────────
+# Required: script cannot proceed without these.
+# Optional: dotfiles will work but some features will be degraded; logged as warnings.
 check_prerequisites() {
     log_step "Checking" "required tools"
 
-    if ! command -v git &>/dev/null; then
-        die "git not found. Install Xcode Command Line Tools: xcode-select --install"
+    local missing_required=false
+
+    # ── Required commands ────────────────────────────────────────────────────
+    local req
+    for req in git zsh curl; do
+        if command -v "${req}" &>/dev/null; then
+            log_info "${req} $(${req} --version 2>&1 | head -1)"
+        else
+            log_error "required command not found: ${req}"
+            missing_required=true
+        fi
+    done
+
+    if [[ "${missing_required}" == "true" ]]; then
+        die "Missing required commands. Install Xcode CLT: xcode-select --install"
     fi
 
-    log_info "git $(git --version | awk '{print $3}')"
+    # ── Optional commands (warn but do not abort) ────────────────────────────
+    local opt
+    for opt in brew starship fzf eza zoxide tmux nvim; do
+        if ! command -v "${opt}" &>/dev/null; then
+            log_warn "optional command not found: ${opt} (some features will be unavailable)"
+        fi
+    done
 }
 
 # ── Step 3: Back up conflicting files ────────────────────────────────────────

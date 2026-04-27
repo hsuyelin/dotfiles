@@ -94,7 +94,30 @@ check_platform() {
     log_info "macOS $(sw_vers -productVersion) on ${arch}"
 }
 
-# ── Step 2: Xcode Command Line Tools ─────────────────────────────────────────
+# ── Step 2: Bootstrap prerequisites ──────────────────────────────────────────
+# These are the bare-minimum commands macOS ships with that bootstrap.sh needs
+# before it can install anything else. If any are missing the machine is in an
+# unusual state and the user should investigate manually.
+check_prerequisites() {
+    log_step "Checking" "bootstrap prerequisites"
+
+    local missing=false
+    local req
+    for req in curl git; do
+        if command -v "${req}" &>/dev/null; then
+            log_info "${req} available: $(command -v "${req}")"
+        else
+            log_error "required command not found: ${req}"
+            missing=true
+        fi
+    done
+
+    if [[ "${missing}" == "true" ]]; then
+        die "Missing required commands. Ensure Xcode CLT is installed first."
+    fi
+}
+
+# ── Step 3: Xcode Command Line Tools ─────────────────────────────────────────
 install_xcode_clt() {
     log_step "Checking" "Xcode Command Line Tools"
 
@@ -260,6 +283,7 @@ main() {
     printf '\n'
 
     check_platform
+    check_prerequisites
     install_xcode_clt
     install_homebrew
     clone_dotfiles
