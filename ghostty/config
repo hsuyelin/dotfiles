@@ -44,6 +44,8 @@ cursor-style = bar
 adjust-cursor-thickness = 1
 cursor-style-blink = true
 cursor-opacity = 0.6
+custom-shader = shaders/cursor_warp.glsl
+custom-shader-animation = always
 
 # ── Window ────────────────────────────────────────────────────────────────────
 window-width = 110
@@ -83,6 +85,10 @@ keybind = cmd+t=new_tab
 keybind = cmd+shift+left=previous_tab
 keybind = cmd+shift+right=next_tab
 keybind = cmd+w=close_surface
+# Unbind built-in alt+n/p tab switching so AeroSpace can handle them globally.
+# Use cmd+shift+left/right for tab navigation instead.
+keybind = alt+n=unbind
+keybind = alt+p=unbind
 
 # Splits
 keybind = cmd+d=new_split:right
@@ -91,6 +97,10 @@ keybind = cmd+alt+left=goto_split:left
 keybind = cmd+alt+right=goto_split:right
 keybind = cmd+alt+up=goto_split:top
 keybind = cmd+alt+down=goto_split:bottom
+keybind = ctrl+shift+h=goto_split:left
+keybind = ctrl+shift+l=goto_split:right
+keybind = ctrl+shift+k=goto_split:top
+keybind = ctrl+shift+j=goto_split:bottom
 keybind = cmd+shift+e=equalize_splits
 keybind = cmd+shift+f=toggle_split_zoom
 

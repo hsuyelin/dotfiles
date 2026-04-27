@@ -42,7 +42,7 @@ outer.right =      [ { monitor."Built-in Retina Display" = 20 }, 25 ]
 # Layout commands
 alt-slash = 'layout tiles horizontal vertical' # Toggle tile orientation
 alt-comma = 'layout accordion horizontal vertical' # Toggle accordion orientation
-alt-f = 'fullscreen' # Toggle fullscreen mode
+alt-shift-f = 'fullscreen' # Toggle fullscreen mode
 
 # Focus commands (Vim style: h-j-k-l)
 alt-h = 'focus left'

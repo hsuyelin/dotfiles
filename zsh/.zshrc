@@ -153,6 +153,11 @@ zstyle ':fzf-tab:*' fzf-flags '--bind=ctrl-d:preview-page-down,ctrl-u:preview-pa
 [[ -f "${XDG_CONFIG_HOME}/zsh/zoxide-completion.zsh" ]] && source "${XDG_CONFIG_HOME}/zsh/zoxide-completion.zsh"
 
 # ============================================================
+# Ghostty
+# ============================================================
+[[ -f "${XDG_CONFIG_HOME}/ghostty/ghostty.zsh" ]] && source "${XDG_CONFIG_HOME}/ghostty/ghostty.zsh"
+
+# ============================================================
 # Starship Prompt
 # ============================================================
 export STARSHIP_CONFIG="${XDG_CONFIG_HOME}/starship/starship.toml"
