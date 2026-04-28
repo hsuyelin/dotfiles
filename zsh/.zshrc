@@ -158,6 +158,11 @@ zstyle ':fzf-tab:*' fzf-flags '--bind=ctrl-d:preview-page-down,ctrl-u:preview-pa
 [[ -f "${XDG_CONFIG_HOME}/ghostty/ghostty.zsh" ]] && source "${XDG_CONFIG_HOME}/ghostty/ghostty.zsh"
 
 # ============================================================
+# RTK (Rust Token Killer)
+# ============================================================
+[[ -f "${XDG_CONFIG_HOME}/rtk/rtk.zsh" ]] && source "${XDG_CONFIG_HOME}/rtk/rtk.zsh"
+
+# ============================================================
 # Starship Prompt
 # ============================================================
 export STARSHIP_CONFIG="${XDG_CONFIG_HOME}/starship/starship.toml"

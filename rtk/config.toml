@@ -1,0 +1,7 @@
+[hooks]
+# Commands to skip auto-rewriting (add per-project overrides here)
+# exclude_commands = ["curl", "playwright"]
+
+[tee]
+enabled = true
+mode = "failures"

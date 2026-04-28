@@ -86,10 +86,21 @@ log_error() {   printf "${BOLD}${RED}%12s${NC} %s\n"    "Error" "$1" >&2; }
 log_success() { printf "${BOLD}${GREEN}%12s${NC} %s\n"  "Finished" "$1"; }
 die() {         log_error "$1"; exit 1; }
 
-# ── Dry-run support ───────────────────────────────────────────────────────────
+# ── Flag parsing ──────────────────────────────────────────────────────────────
 DRY_RUN=false
-[[ "${1:-}" == "--dry-run" ]] && DRY_RUN=true
-readonly DRY_RUN
+INSTALL_RTK=true
+UNINSTALL_RTK=false
+
+for _arg in "$@"; do
+    case "${_arg}" in
+        --dry-run)      DRY_RUN=true ;;
+        --skip-rtk)     INSTALL_RTK=false ;;
+        --uninstall-rtk) UNINSTALL_RTK=true ;;
+    esac
+done
+unset _arg
+
+readonly DRY_RUN INSTALL_RTK UNINSTALL_RTK
 
 # Runs a command, or prints it when in dry-run mode.
 run() {
@@ -350,6 +361,71 @@ set_permissions() {
     [[ -f "${DOTFILES_DIR}/bootstrap.sh" ]] && chmod +x "${DOTFILES_DIR}/bootstrap.sh"
 }
 
+# ── Step: RTK (Rust Token Killer) ────────────────────────────────────────────
+# Installs RTK via Homebrew, runs `rtk init -g` (Claude Code hook), and
+# symlinks ~/Library/Application Support/rtk → $XDG_CONFIG_HOME/rtk so the
+# macOS config path is satisfied without duplicating files.
+install_rtk() {
+    log_step "Checking" "RTK (Rust Token Killer)"
+
+    if [[ "${DRY_RUN}" == "true" ]]; then
+        log_info "[dry-run] would brew install rtk && rtk init -g"
+        return 0
+    fi
+
+    if ! command -v brew &>/dev/null; then
+        log_warn "brew not found — skipping RTK install"
+        return 0
+    fi
+
+    if ! brew list rtk &>/dev/null 2>&1; then
+        log_step "Installing" "rtk via Homebrew"
+        brew install rtk
+    else
+        log_info "rtk already installed"
+    fi
+
+    # Symlink macOS app-support path → XDG config so config.toml is found.
+    local mac_support="${HOME}/Library/Application Support/rtk"
+    local xdg_rtk="${XDG_CONFIG_HOME:-${HOME}/.config}/rtk"
+    if [[ ! -e "${mac_support}" ]]; then
+        mkdir -p "$(dirname "${mac_support}")"
+        ln -sf "${xdg_rtk}" "${mac_support}"
+        log_step "Linked" "~/Library/Application Support/rtk → ${xdg_rtk}"
+    else
+        log_info "~/Library/Application Support/rtk already exists (skipped symlink)"
+    fi
+
+    # Install Claude Code hook (idempotent).
+    if command -v rtk &>/dev/null; then
+        log_step "Init" "rtk Claude Code hook (rtk init -g --auto-patch)"
+        rtk init -g --auto-patch
+    fi
+}
+
+uninstall_rtk() {
+    log_step "Uninstalling" "RTK"
+
+    if command -v rtk &>/dev/null; then
+        log_step "Removing" "Claude Code hook"
+        rtk init -g --uninstall || true
+    fi
+
+    local mac_support="${HOME}/Library/Application Support/rtk"
+    if [[ -L "${mac_support}" ]]; then
+        unlink "${mac_support}"
+        log_step "Removed" "symlink ~/Library/Application Support/rtk"
+    fi
+
+    if brew list rtk &>/dev/null 2>&1; then
+        log_step "Uninstalling" "rtk via Homebrew"
+        brew uninstall rtk
+    fi
+
+    log_success "RTK uninstalled. XDG config kept at: ${XDG_CONFIG_HOME:-${HOME}/.config}/rtk"
+    log_info "To also remove the config: rm -rf \"\${XDG_CONFIG_HOME}/rtk\""
+}
+
 # ── Step 10: Post-install checklist ──────────────────────────────────────────
 print_checklist() {
     printf '\n'
@@ -371,9 +447,16 @@ print_checklist() {
 
 # ── Main ─────────────────────────────────────────────────────────────────────
 main() {
+    # Fast path: uninstall RTK only.
+    if [[ "${UNINSTALL_RTK}" == "true" ]]; then
+        uninstall_rtk
+        return 0
+    fi
+
     printf '\n'
     log_step "Starting" "dotfiles installer (DOTFILES_DIR=${DOTFILES_DIR})"
     [[ "${DRY_RUN}" == "true" ]] && log_warn "Dry-run mode enabled — no changes will be made"
+    [[ "${INSTALL_RTK}" == "false" ]] && log_info "RTK install skipped (--skip-rtk)"
     printf '\n'
 
     check_platform
@@ -385,6 +468,7 @@ main() {
     init_tpm
     clone_ghostty_shaders
     set_permissions
+    [[ "${INSTALL_RTK}" == "true" ]] && install_rtk
     print_checklist
 }
 
