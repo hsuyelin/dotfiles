@@ -198,6 +198,8 @@ modified = "󰐏 "
 staged = "󰐕 "
 renamed = "󰓅 "
 deleted = "󰆴 "
+ignore_submodules = true
+scan_timeout = 1000
 
 [nodejs]
 disabled = true
