@@ -3,7 +3,7 @@
 # bootstrap.sh — Full system setup for macOS (Apple Silicon)
 # ============================================================
 # Usage:
-#   bash bootstrap.sh [--dry-run]
+#   bash bootstrap.sh [--dry-run] [--skip-rvm]
 #
 # On a brand-new machine:
 #   curl -fsSL <raw-url>/bootstrap.sh | bash
@@ -17,13 +17,15 @@
 #
 # Steps:
 #   1.  Verify platform is macOS on Apple Silicon (ARM64)
-#   2.  Install Xcode Command Line Tools
-#   3.  Install Homebrew
-#   4.  Clone dotfiles repository to ~/.config (if not present)
-#   5.  Run install.sh (XDG dirs, zshenv, placeholders, plugins)
-#   6.  Install Homebrew formulae from brew/brew_formulae.txt
-#   7.  Install Homebrew casks from brew/brew_casks.txt
-#   8.  Print next steps
+#   2.  Check bootstrap prerequisites (curl, git)
+#   3.  Install Xcode Command Line Tools
+#   4.  Install Homebrew
+#   5.  Clone dotfiles repository to ~/.config (if not present)
+#   6.  Run install.sh (XDG dirs, zshenv, placeholders, plugins)
+#   7.  Install Homebrew formulae from brew/brew_formulae.txt
+#   8.  Install Homebrew casks from brew/brew_casks.txt
+#   9.  Install RVM (Ruby Version Manager)
+#   10. Print next steps
 
 set -euo pipefail
 
@@ -66,8 +68,29 @@ die() {         log_error "$1"; exit 1; }
 
 # ── Dry-run support ───────────────────────────────────────────────────────────
 DRY_RUN=false
-[[ "${1:-}" == "--dry-run" ]] && DRY_RUN=true
-readonly DRY_RUN
+SKIP_RVM=false
+
+for _arg in "$@"; do
+    case "${_arg}" in
+        --dry-run)  DRY_RUN=true ;;
+        --skip-rvm) SKIP_RVM=true ;;
+        -h|--help)
+            printf 'Usage: %s [--dry-run] [--skip-rvm]\n\n' "$(basename "$0")"
+            printf 'Full system setup for macOS (Apple Silicon).\n\n'
+            printf 'Options:\n'
+            printf '  --dry-run   Print what would happen without executing.\n'
+            printf '  --skip-rvm  Skip the RVM installation step.\n'
+            printf '  -h, --help  Show this help message.\n'
+            exit 0
+            ;;
+        *)
+            printf '%s: unknown argument: %s\n' "$(basename "$0")" "${_arg}" >&2
+            exit 1
+            ;;
+    esac
+done
+unset _arg
+readonly DRY_RUN SKIP_RVM
 
 run() {
     if [[ "${DRY_RUN}" == "true" ]]; then
@@ -147,7 +170,7 @@ install_xcode_clt() {
     log_step "Installed" "Xcode CLT at $(xcode-select -p)"
 }
 
-# ── Step 3: Homebrew ──────────────────────────────────────────────────────────
+# ── Step 4: Homebrew ──────────────────────────────────────────────────────────
 install_homebrew() {
     log_step "Checking" "Homebrew"
 
@@ -211,7 +234,7 @@ run_install_sh() {
     bash "${INSTALL_SCRIPT}" "${args[@]}"
 }
 
-# ── Step 6 & 7: Homebrew packages ────────────────────────────────────────────
+# ── Step 7 & 8: Homebrew packages ────────────────────────────────────────────
 # Reads line-by-line from a text file, skipping blank lines and # comments.
 _brew_install_list() {
     local kind="$1"   # formula | cask
@@ -256,7 +279,28 @@ install_brew_packages() {
     _brew_install_list "cask"    "${DOTFILES_DIR}/brew/brew_casks.txt"
 }
 
-# ── Step 8: Next steps ────────────────────────────────────────────────────────
+# ── Step 9: RVM ───────────────────────────────────────────────────────────────
+install_rvm() {
+    log_step "Checking" "RVM"
+
+    if [[ "${SKIP_RVM}" == "true" ]]; then
+        log_info "Skipped (--skip-rvm)"
+        return 0
+    fi
+
+    local rvm_install="${DOTFILES_DIR}/rvm/install_rvm.sh"
+    if [[ ! -f "${rvm_install}" ]]; then
+        log_warn "rvm/install_rvm.sh not found — skipping RVM setup"
+        return 0
+    fi
+
+    log_step "Running" "rvm/install_rvm.sh"
+    local args=()
+    [[ "${DRY_RUN}" == "true" ]] && args+=("--dry-run")
+    bash "${rvm_install}" "${args[@]}"
+}
+
+# ── Step 10: Next steps ───────────────────────────────────────────────────────
 print_next_steps() {
     printf '\n'
     log_success "bootstrap complete — restart your terminal to load the new shell"
@@ -269,6 +313,8 @@ print_next_steps() {
     printf '%s\n' "  ☐  Fill in ~/.config/private/git.config   (name, email)"
     printf '%s\n' "  ☐  Fill in ~/.config/secrets/.env.secrets (env secrets)"
     printf '%s\n' "  ☐  Fill in ~/.config/secrets/.ai.secrets  (AI keys)"
+    printf '%s\n' "  ☐  Install a Ruby version: rvminstall <version>"
+    printf '%s\n' "       Example: rvminstall 3.3.7"
     printf '%s\n' "  ☐  Open tmux and press <prefix>+I to install plugins"
     printf '%s\n' "  ☐  Open Neovim — plugins install automatically on first run"
     printf '%s\n' "  ☐  Sign in to Homebrew services (e.g. mas, 1Password)"
@@ -280,6 +326,7 @@ main() {
     printf '\n'
     log_step "Starting" "bootstrap (macOS Apple Silicon)"
     [[ "${DRY_RUN}" == "true" ]] && log_warn "Dry-run mode — no changes will be made"
+    [[ "${SKIP_RVM}" == "true" ]] && log_info "RVM install skipped (--skip-rvm)"
     printf '\n'
 
     check_platform
@@ -289,6 +336,7 @@ main() {
     clone_dotfiles
     run_install_sh
     install_brew_packages
+    install_rvm
     print_next_steps
 }
 

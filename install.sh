@@ -353,9 +353,12 @@ set_permissions() {
     fi
 
     local script
-    while IFS= read -r -d '' script; do
-        chmod +x "${script}"
-    done < <(find "${DOTFILES_DIR}/bin" -type f -name "*.sh" -print0 2>/dev/null)
+    local dir
+    for dir in bin rvm; do
+        while IFS= read -r -d '' script; do
+            chmod +x "${script}"
+        done < <(find "${DOTFILES_DIR}/${dir}" -type f -name "*.sh" -print0 2>/dev/null)
+    done
 
     [[ -f "${DOTFILES_DIR}/install.sh" ]]   && chmod +x "${DOTFILES_DIR}/install.sh"
     [[ -f "${DOTFILES_DIR}/bootstrap.sh" ]] && chmod +x "${DOTFILES_DIR}/bootstrap.sh"
@@ -439,6 +442,8 @@ print_checklist() {
     printf '%s\n' "  ☐  Open tmux and press <prefix>+I to install plugins"
     printf '%s\n' "  ☐  Open Neovim — plugins install automatically on first run"
     printf '%s\n' "  ☐  Open Ghostty — cursor shaders load from ghostty/shaders/"
+    printf '%s\n' "  ☐  Install a Ruby version: rvminstall <version>"
+    printf '%s\n' "       Example: rvminstall 3.3.7"
     printf '\n'
     printf '%s\n' "  Backup location (if any files were moved):"
     printf '%s\n' "    ${BACKUP_DIR}"
