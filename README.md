@@ -61,13 +61,13 @@ Intel Macs are **not** supported.
   <tbody>
     <tr>
       <td align="center" width="50%">
-        <video src="assets/screenshots/ghostty.mp4" controls width="100%"></video>
+        <video src="https://raw.githubusercontent.com/hsuyelin/dotfiles/refs/heads/main/assets/screenshots/ghostty.mp4" controls width="100%"></video>
         <br/>
         <strong>Ghostty — Terminal</strong><br/>
         <sub>Catppuccin Mocha · background blur · cursor warp shader</sub>
       </td>
       <td align="center" width="50%">
-        <video src="assets/screenshots/kitty.mp4" controls width="100%"></video>
+        <video src="https://raw.githubusercontent.com/hsuyelin/dotfiles/refs/heads/main/assets/screenshots/kitty.mp4" controls width="100%"></video>
         <br/>
         <strong>kitty — Terminal (alt)</strong><br/>
         <sub>Catppuccin Mocha · same font + keybinds as Ghostty</sub>
@@ -75,13 +75,13 @@ Intel Macs are **not** supported.
     </tr>
     <tr>
       <td align="center" width="50%">
-        <img src="assets/screenshots/starship.png" width="100%" alt="Starship prompt" />
+        <img src="https://raw.githubusercontent.com/hsuyelin/dotfiles/refs/heads/main/assets/screenshots/starship.png" width="100%" alt="Starship prompt" />
         <br/>
         <strong>Starship — Prompt</strong><br/>
         <sub>Catppuccin Mocha palette · git status · clock</sub>
       </td>
       <td align="center" width="50%">
-        <video src="assets/screenshots/neovim.mp4" controls width="100%"></video>
+        <video src="https://raw.githubusercontent.com/hsuyelin/dotfiles/refs/heads/main/assets/screenshots/neovim.mp4" controls width="100%"></video>
         <br/>
         <strong>Neovim — Editor</strong><br/>
         <sub>Lazy.nvim · LSP · Treesitter</sub>
@@ -89,13 +89,13 @@ Intel Macs are **not** supported.
     </tr>
     <tr>
       <td align="center" width="50%">
-        <video src="assets/screenshots/aerospace.mp4" controls width="100%"></video>
+        <video src="https://raw.githubusercontent.com/hsuyelin/dotfiles/refs/heads/main/assets/screenshots/aerospace.mp4" controls width="100%"></video>
         <br/>
         <strong>AeroSpace — Window Manager</strong><br/>
         <sub>Tiling · JankyBorders · vim-style workspace navigation</sub>
       </td>
       <td align="center" width="50%">
-        <img src="assets/screenshots/btop.png" width="100%" alt="btop system monitor" />
+        <img src="https://raw.githubusercontent.com/hsuyelin/dotfiles/refs/heads/main/assets/screenshots/btop.png" width="100%" alt="btop system monitor" />
         <br/>
         <strong>btop — System Monitor</strong><br/>
         <sub>Catppuccin Mocha theme</sub>
@@ -103,7 +103,7 @@ Intel Macs are **not** supported.
     </tr>
     <tr>
       <td align="center" width="50%">
-        <video src="assets/screenshots/lazygit.mp4" controls width="100%"></video>
+        <video src="https://raw.githubusercontent.com/hsuyelin/dotfiles/refs/heads/main/assets/screenshots/lazygit.mp4" controls width="100%"></video>
         <br/>
         <strong>lazygit — Git TUI</strong><br/>
         <sub>Delta diff pager · full keyboard workflow</sub>
