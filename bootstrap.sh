@@ -192,24 +192,37 @@ install_homebrew() {
 }
 
 # ── Step 5: Clone dotfiles ────────────────────────────────────────────────────
+# Detection strategy: a .dotfiles-marker file in the repo root is the canonical
+# signal that ~/.config is already this dotfiles installation. Any ~/.config
+# directory without that marker is treated as the user's pre-existing config
+# and is renamed to ~/.config.bak before cloning.
 clone_dotfiles() {
     log_step "Checking" "dotfiles at ${DOTFILES_TARGET}"
 
-    if [[ -d "${DOTFILES_TARGET}/.git" ]]; then
-        log_info "Already present — skipping clone"
+    # Case 1: marker present → already installed, nothing to do.
+    if [[ -f "${DOTFILES_TARGET}/.dotfiles-marker" ]]; then
+        log_info "Dotfiles already installed (marker found) — skipping clone"
         return 0
     fi
 
+    # Case 2: ~/.config exists but belongs to someone else → back it up.
+    if [[ -d "${DOTFILES_TARGET}" ]]; then
+        local backup="${HOME}/.config.bak"
+        if [[ -e "${backup}" ]]; then
+            die "${backup} already exists. Remove it manually, then re-run."
+        fi
+        log_warn "~/.config exists but is not this dotfiles install."
+        log_step "Backing up" "~/.config → ~/.config.bak"
+        run mv "${DOTFILES_TARGET}" "${backup}"
+    fi
+
+    # Case 3: ~/.config does not exist → clone fresh.
     local repo="${DOTFILES_REPO:-}"
     if [[ -z "${repo}" ]]; then
         log_warn "DOTFILES_REPO is not set — cannot clone automatically."
         log_warn "Clone your dotfiles to ~/.config manually, then re-run."
         log_warn "  git clone <your-repo-url> ~/.config"
         return 0
-    fi
-
-    if [[ -d "${DOTFILES_TARGET}" ]]; then
-        die "${DOTFILES_TARGET} exists but is not a git repo. Remove or back it up first."
     fi
 
     log_step "Cloning" "${repo} → ${DOTFILES_TARGET}"
