@@ -1,5 +1,19 @@
 # Place a copy of this config to ~/.aerospace.toml
 # After that, you can edit ~/.aerospace.toml to your liking
+#
+# ── Terminal Emulator ─────────────────────────────────────────────────────────
+# Default terminal is Ghostty. To switch to kitty:
+#
+#   Step 1 — Change the launch keybind (search "Launch Terminal" below):
+#     Comment out:   alt-enter = 'exec-and-forget open -a Ghostty'
+#     Uncomment:     # alt-enter = 'exec-and-forget open -a kitty'
+#
+#   Step 2 — Change the on-window-detected rule (search "## 2. Terminal" below):
+#     Comment out the Ghostty rule (app-id = 'com.mitchellh.ghostty')
+#     Uncomment the kitty rule   (app-id = 'net.kovidgoyal.kitty')
+#
+# Everything else in this config is terminal-agnostic.
+# ─────────────────────────────────────────────────────────────────────────────
 
 # --- Core Configuration ---
 # Start AeroSpace at login
@@ -67,7 +81,9 @@ alt-shift-minus = 'resize smart -100'
 alt-shift-equal = 'resize smart +100'
 
 # Quick application launch examples
-alt-enter = 'exec-and-forget open -a Ghostty' # Launch Terminal (Ghostty)
+# Launch Terminal — default: Ghostty. To use kitty instead, swap the two lines.
+alt-enter = 'exec-and-forget open -a Ghostty'
+# alt-enter = 'exec-and-forget open -a kitty'
 alt-g = 'exec-and-forget open -a "Google Chrome"' # Launch Web Browser
 
 # Workspace switching (based on suggested categories)
@@ -170,12 +186,21 @@ if.app-id = 'com.todesktop.230313mzl4w4u92' # Cursor.app
 run = 'move-node-to-workspace D'
 
 ## 2. Terminal (T)
+# Terminal workspace rules — only one should be active at a time.
+# Default: Ghostty. To use kitty, comment the Ghostty block and uncomment kitty.
 [[on-window-detected]]
 if.app-id = 'com.mitchellh.ghostty'
 run = [
     'move-node-to-workspace T',
     'layout floating',
 ]
+
+# [[on-window-detected]]
+# if.app-id = 'net.kovidgoyal.kitty'
+# run = [
+#     'move-node-to-workspace T',
+#     'layout floating',
+# ]
 
 [[on-window-detected]]
 if.app-id = 'com.termius-dmg.mac'

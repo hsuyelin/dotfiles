@@ -153,9 +153,12 @@ zstyle ':fzf-tab:*' fzf-flags '--bind=ctrl-d:preview-page-down,ctrl-u:preview-pa
 [[ -f "${XDG_CONFIG_HOME}/zsh/zoxide-completion.zsh" ]] && source "${XDG_CONFIG_HOME}/zsh/zoxide-completion.zsh"
 
 # ============================================================
-# Ghostty
+# Terminal Integration
 # ============================================================
-[[ -f "${XDG_CONFIG_HOME}/ghostty/ghostty.zsh" ]] && source "${XDG_CONFIG_HOME}/ghostty/ghostty.zsh"
+[[ -f "${XDG_CONFIG_HOME}/ghostty/ghostty.zsh" ]] \
+    && source "${XDG_CONFIG_HOME}/ghostty/ghostty.zsh"
+[[ -n "$KITTY_WINDOW_ID" && -f "${XDG_CONFIG_HOME}/kitty/kitty.zsh" ]] \
+    && source "${XDG_CONFIG_HOME}/kitty/kitty.zsh"
 
 # ============================================================
 # RTK (Rust Token Killer)

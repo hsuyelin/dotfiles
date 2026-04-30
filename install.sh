@@ -90,12 +90,15 @@ die() {         log_error "$1"; exit 1; }
 DRY_RUN=false
 INSTALL_RTK=true
 UNINSTALL_RTK=false
+TERMINAL_CHOICE=""   # empty = prompt at runtime; set via --terminal=ghostty|kitty
 
 for _arg in "$@"; do
     case "${_arg}" in
-        --dry-run)      DRY_RUN=true ;;
-        --skip-rtk)     INSTALL_RTK=false ;;
-        --uninstall-rtk) UNINSTALL_RTK=true ;;
+        --dry-run)           DRY_RUN=true ;;
+        --skip-rtk)          INSTALL_RTK=false ;;
+        --uninstall-rtk)     UNINSTALL_RTK=true ;;
+        --terminal=ghostty)  TERMINAL_CHOICE="ghostty" ;;
+        --terminal=kitty)    TERMINAL_CHOICE="kitty" ;;
     esac
 done
 unset _arg
@@ -329,8 +332,92 @@ init_tpm() {
     log_info "Run <prefix>+I inside tmux to install plugins"
 }
 
+# ── Terminal selection ────────────────────────────────────────────────────────
+# Prompts the user to choose Ghostty or kitty. Auto-selects Ghostty when:
+#   - stdin is not a TTY (piped install)
+#   - the 30-second timeout expires
+#   - the user presses Enter with no input
+#   - --terminal=ghostty|kitty was passed on the command line
+select_terminal() {
+    log_step "Selecting" "terminal emulator"
+
+    # Already decided via flag
+    if [[ -n "${TERMINAL_CHOICE}" ]]; then
+        log_info "Terminal pre-selected: ${TERMINAL_CHOICE}"
+        return 0
+    fi
+
+    # Skip prompt if a terminal is already installed
+    if [[ -d "/Applications/Ghostty.app" ]]; then
+        log_info "Ghostty already installed — skipping selection"
+        TERMINAL_CHOICE="ghostty"; return 0
+    fi
+    if [[ -d "/Applications/kitty.app" ]]; then
+        log_info "kitty already installed — skipping selection"
+        TERMINAL_CHOICE="kitty"; return 0
+    fi
+
+    # Skip prompt when stdin is not a TTY (e.g. piped from curl)
+    if [[ ! -t 0 ]]; then
+        log_info "Non-interactive session — defaulting to Ghostty"
+        TERMINAL_CHOICE="ghostty"; return 0
+    fi
+
+    printf '\n'
+    printf '    %s\n' "Select a terminal emulator:"
+    printf '    %s\n' "  [1] Ghostty  (default — cursor shaders, quick terminal, full feature set)"
+    printf '    %s\n' "  [2] kitty    (alternative — same theme, compatible keybinds)"
+    printf '\n'
+    printf '    %s' "Choice [1/2] (auto-selects Ghostty in 30 s): "
+
+    local choice=""
+    if read -t 30 -r choice 2>/dev/null; then
+        :
+    else
+        printf '\n'
+        log_info "Timeout — defaulting to Ghostty"
+    fi
+
+    case "${choice}" in
+        2) TERMINAL_CHOICE="kitty"   ; log_step "Selected" "kitty" ;;
+        *) TERMINAL_CHOICE="ghostty" ; log_step "Selected" "Ghostty (default)" ;;
+    esac
+}
+
+# Installs the selected terminal via Homebrew if not already present.
+install_terminal_app() {
+    log_step "Checking" "terminal: ${TERMINAL_CHOICE}"
+
+    if ! command -v brew &>/dev/null; then
+        log_warn "brew not found — skipping terminal installation"
+        return 0
+    fi
+
+    case "${TERMINAL_CHOICE}" in
+        kitty)
+            if [[ -d "/Applications/kitty.app" ]]; then
+                log_info "kitty already installed (skipped)"
+            else
+                log_step "Installing" "kitty"
+                run brew install --cask kitty
+            fi
+            ;;
+        ghostty | *)
+            if [[ -d "/Applications/Ghostty.app" ]]; then
+                log_info "Ghostty already installed (skipped)"
+            else
+                log_step "Installing" "Ghostty"
+                run brew install --cask ghostty
+            fi
+            ;;
+    esac
+}
+
 # ── Step 8: Ghostty cursor shaders ───────────────────────────────────────────
 clone_ghostty_shaders() {
+    # Shaders are only relevant for Ghostty
+    [[ "${TERMINAL_CHOICE}" != "ghostty" ]] && return 0
+
     log_step "Checking" "Ghostty cursor shaders"
 
     if [[ -d "${GHOSTTY_SHADERS_DIR}" ]]; then
@@ -441,7 +528,13 @@ print_checklist() {
     printf '%s\n' "  ☐  Fill in secrets/.ai.secrets  (AI API keys)"
     printf '%s\n' "  ☐  Open tmux and press <prefix>+I to install plugins"
     printf '%s\n' "  ☐  Open Neovim — plugins install automatically on first run"
-    printf '%s\n' "  ☐  Open Ghostty — cursor shaders load from ghostty/shaders/"
+    if [[ "${TERMINAL_CHOICE}" == "kitty" ]]; then
+        printf '%s\n' "  ☐  Open kitty — config lives in ~/.config/kitty/"
+        printf '%s\n' "       To switch to Ghostty later: bash install.sh --terminal=ghostty"
+    else
+        printf '%s\n' "  ☐  Open Ghostty — cursor shaders load from ghostty/shaders/"
+        printf '%s\n' "       To switch to kitty later:   bash install.sh --terminal=kitty"
+    fi
     printf '%s\n' "  ☐  Install a Ruby version: rvminstall <version>"
     printf '%s\n' "       Example: rvminstall 3.3.7"
     printf '\n'
@@ -471,6 +564,8 @@ main() {
     write_zshenv
     create_placeholder_secrets
     init_tpm
+    select_terminal
+    install_terminal_app
     clone_ghostty_shaders
     set_permissions
     [[ "${INSTALL_RTK}" == "true" ]] && install_rtk

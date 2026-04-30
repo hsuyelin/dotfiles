@@ -69,18 +69,24 @@ die() {         log_error "$1"; exit 1; }
 # ── Dry-run support ───────────────────────────────────────────────────────────
 DRY_RUN=false
 SKIP_RVM=false
+TERMINAL_CHOICE=""   # empty = prompt at runtime; set via --terminal=ghostty|kitty
 
 for _arg in "$@"; do
     case "${_arg}" in
-        --dry-run)  DRY_RUN=true ;;
-        --skip-rvm) SKIP_RVM=true ;;
+        --dry-run)           DRY_RUN=true ;;
+        --skip-rvm)          SKIP_RVM=true ;;
+        --terminal=ghostty)  TERMINAL_CHOICE="ghostty" ;;
+        --terminal=kitty)    TERMINAL_CHOICE="kitty" ;;
         -h|--help)
-            printf 'Usage: %s [--dry-run] [--skip-rvm]\n\n' "$(basename "$0")"
+            printf 'Usage: %s [--dry-run] [--skip-rvm] [--terminal=ghostty|kitty]\n\n' \
+                "$(basename "$0")"
             printf 'Full system setup for macOS (Apple Silicon).\n\n'
             printf 'Options:\n'
-            printf '  --dry-run   Print what would happen without executing.\n'
-            printf '  --skip-rvm  Skip the RVM installation step.\n'
-            printf '  -h, --help  Show this help message.\n'
+            printf '  --dry-run              Print what would happen without executing.\n'
+            printf '  --skip-rvm             Skip the RVM installation step.\n'
+            printf '  --terminal=ghostty     Install Ghostty (default).\n'
+            printf '  --terminal=kitty       Install kitty instead of Ghostty.\n'
+            printf '  -h, --help             Show this help message.\n'
             exit 0
             ;;
         *)
@@ -210,6 +216,51 @@ clone_dotfiles() {
     run git clone --quiet "${repo}" "${DOTFILES_TARGET}"
 }
 
+# ── Terminal selection ────────────────────────────────────────────────────────
+# Runs before install.sh and brew cask installation so both can use the result.
+select_terminal() {
+    log_step "Selecting" "terminal emulator"
+
+    if [[ -n "${TERMINAL_CHOICE}" ]]; then
+        log_info "Terminal pre-selected via flag: ${TERMINAL_CHOICE}"
+        return 0
+    fi
+
+    if [[ -d "/Applications/Ghostty.app" ]]; then
+        log_info "Ghostty already installed — skipping selection"
+        TERMINAL_CHOICE="ghostty"; return 0
+    fi
+    if [[ -d "/Applications/kitty.app" ]]; then
+        log_info "kitty already installed — skipping selection"
+        TERMINAL_CHOICE="kitty"; return 0
+    fi
+
+    if [[ ! -t 0 ]]; then
+        log_info "Non-interactive session — defaulting to Ghostty"
+        TERMINAL_CHOICE="ghostty"; return 0
+    fi
+
+    printf '\n'
+    printf '    %s\n' "Select a terminal emulator:"
+    printf '    %s\n' "  [1] Ghostty  (default — cursor shaders, quick terminal, full feature set)"
+    printf '    %s\n' "  [2] kitty    (alternative — same Catppuccin Mocha theme, compatible keybinds)"
+    printf '\n'
+    printf '    %s' "Choice [1/2] (auto-selects Ghostty in 30 s): "
+
+    local choice=""
+    if read -t 30 -r choice 2>/dev/null; then
+        :
+    else
+        printf '\n'
+        log_info "Timeout — defaulting to Ghostty"
+    fi
+
+    case "${choice}" in
+        2) TERMINAL_CHOICE="kitty"   ; log_step "Selected" "kitty" ;;
+        *) TERMINAL_CHOICE="ghostty" ; log_step "Selected" "Ghostty (default)" ;;
+    esac
+}
+
 # ── Step 5: Run install.sh ────────────────────────────────────────────────────
 run_install_sh() {
     if [[ ! -f "${INSTALL_SCRIPT}" ]]; then
@@ -221,6 +272,8 @@ run_install_sh() {
 
     local args=()
     [[ "${DRY_RUN}" == "true" ]] && args+=("--dry-run")
+    # Pass the terminal choice so install.sh skips its own prompt
+    [[ -n "${TERMINAL_CHOICE}" ]] && args+=("--terminal=${TERMINAL_CHOICE}")
 
     bash "${INSTALL_SCRIPT}" "${args[@]}"
 }
@@ -238,10 +291,24 @@ _brew_install_list() {
 
     log_step "Installing" "Homebrew ${kind}s from $(basename "${list}")"
 
+    # When installing casks, skip the terminal that was not selected.
+    # ghostty and kitty are mutually exclusive; install.sh handles the install.
+    local _skip_cask=""
+    if [[ "${kind}" == "cask" ]]; then
+        [[ "${TERMINAL_CHOICE}" == "kitty"   ]] && _skip_cask="ghostty"
+        [[ "${TERMINAL_CHOICE}" == "ghostty" ]] && _skip_cask="kitty"
+    fi
+
     local pkg
     while IFS= read -r pkg; do
         # Skip blank lines and comment lines
         [[ -z "${pkg}" || "${pkg}" == \#* ]] && continue
+
+        # Skip the non-selected terminal (handled by install.sh)
+        if [[ -n "${_skip_cask}" && "${pkg}" == "${_skip_cask}" ]]; then
+            log_info "skipped (not selected terminal): ${pkg}"
+            continue
+        fi
 
         if brew list "${pkg}" &>/dev/null 2>&1; then
             log_info "already installed: ${pkg}"
@@ -308,6 +375,11 @@ print_next_steps() {
     printf '%s\n' "       Example: rvminstall 3.3.7"
     printf '%s\n' "  ☐  Open tmux and press <prefix>+I to install plugins"
     printf '%s\n' "  ☐  Open Neovim — plugins install automatically on first run"
+    if [[ "${TERMINAL_CHOICE}" == "kitty" ]]; then
+        printf '%s\n' "  ☐  Open kitty — config lives in ~/.config/kitty/"
+    else
+        printf '%s\n' "  ☐  Open Ghostty — cursor shaders load from ghostty/shaders/"
+    fi
     printf '%s\n' "  ☐  Sign in to Homebrew services (e.g. mas, 1Password)"
     printf '\n'
 }
@@ -325,6 +397,7 @@ main() {
     check_prerequisites
     install_homebrew
     clone_dotfiles
+    select_terminal
     run_install_sh
     install_brew_packages
     install_rvm

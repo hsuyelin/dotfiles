@@ -7,7 +7,10 @@ db-browser-for-sqlite
 font-fira-code
 font-fira-code-nerd-font
 font-lxgw-wenkai
+# Terminal emulators — only one is installed based on your selection at install time.
+# bootstrap.sh / install.sh prompt you to choose; default is Ghostty.
 ghostty
+kitty
 lyricsx
 oracle-jdk@25
 orbstack

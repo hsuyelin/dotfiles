@@ -42,3 +42,9 @@ vim/.vim/plugged/*
 !vim/.vim/plugged/.gitkeep
 bundle/cache
 .zcompdump
+
+# CUPS — contains local printer names and network addresses
+cups/
+
+# Swift Package Manager — machine-specific package trust fingerprints and cache
+swiftpm/
