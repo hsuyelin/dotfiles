@@ -61,13 +61,13 @@ Intel Macs are **not** supported.
   <tbody>
     <tr>
       <td align="center" width="50%">
-        <video src="https://raw.githubusercontent.com/hsuyelin/dotfiles/refs/heads/main/assets/screenshots/ghostty.mp4" controls width="100%"></video>
+        <video src="https://github.com/user-attachments/assets/1a1e6e53-c6d6-4536-a2a9-12e7e285cf34" controls width="100%"></video>
         <br/>
         <strong>Ghostty — Terminal</strong><br/>
         <sub>Catppuccin Mocha · background blur · cursor warp shader</sub>
       </td>
       <td align="center" width="50%">
-        <video src="https://raw.githubusercontent.com/hsuyelin/dotfiles/refs/heads/main/assets/screenshots/kitty.mp4" controls width="100%"></video>
+        <video src="https://github.com/user-attachments/assets/5dd613dc-d6b5-471e-8efa-d0f6a799a6de" controls width="100%"></video>
         <br/>
         <strong>kitty — Terminal (alt)</strong><br/>
         <sub>Catppuccin Mocha · same font + keybinds as Ghostty</sub>
@@ -81,7 +81,7 @@ Intel Macs are **not** supported.
         <sub>Catppuccin Mocha palette · git status · clock</sub>
       </td>
       <td align="center" width="50%">
-        <video src="https://raw.githubusercontent.com/hsuyelin/dotfiles/refs/heads/main/assets/screenshots/neovim.mp4" controls width="100%"></video>
+        <video src="https://github.com/user-attachments/assets/2d5f83ed-4d26-426b-b02d-a6641253369a" controls width="100%"></video>
         <br/>
         <strong>Neovim — Editor</strong><br/>
         <sub>Lazy.nvim · LSP · Treesitter</sub>
@@ -89,7 +89,7 @@ Intel Macs are **not** supported.
     </tr>
     <tr>
       <td align="center" width="50%">
-        <video src="https://raw.githubusercontent.com/hsuyelin/dotfiles/refs/heads/main/assets/screenshots/aerospace.mp4" controls width="100%"></video>
+        <video src="https://github.com/user-attachments/assets/991d2c8c-5c27-4be9-beda-8240b82d6379" controls width="100%"></video>
         <br/>
         <strong>AeroSpace — Window Manager</strong><br/>
         <sub>Tiling · JankyBorders · vim-style workspace navigation</sub>
@@ -103,7 +103,7 @@ Intel Macs are **not** supported.
     </tr>
     <tr>
       <td align="center" width="50%">
-        <video src="https://raw.githubusercontent.com/hsuyelin/dotfiles/refs/heads/main/assets/screenshots/lazygit.mp4" controls width="100%"></video>
+        <video src="https://github.com/user-attachments/assets/5811ce6d-8731-4ec0-b319-ad223cf49e1b" controls width="100%"></video>
         <br/>
         <strong>lazygit — Git TUI</strong><br/>
         <sub>Delta diff pager · full keyboard workflow</sub>
