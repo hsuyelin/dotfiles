@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================
-# install.sh — Dotfiles installer for macOS (Apple Silicon)
+# install.sh — Dotfiles installer for macOS
 # ============================================================
 # Usage:
 #   bash install.sh [--dry-run]
@@ -8,8 +8,13 @@
 # Idempotent: safe to run multiple times. Existing secrets and
 # private configs are never overwritten.
 #
+# Architectures:
+#   Apple Silicon (arm64) — fully tested, recommended.
+#   Intel (x86_64)        — allowed, but untested; a confirmation
+#                           prompt is shown before proceeding.
+#
 # Steps:
-#   1.  Verify platform (macOS, ARM64)
+#   1.  Verify platform (macOS; arm64 recommended, x86_64 allowed)
 #   2.  Verify git is available
 #   3.  Back up conflicting shell config files
 #   4.  Create XDG base directory tree
@@ -124,9 +129,31 @@ check_platform() {
 
     local arch
     arch="$(uname -m)"
+
     if [[ "${arch}" != "arm64" ]]; then
-        log_warn "Expected Apple Silicon (arm64), detected: ${arch}"
-        log_warn "Homebrew prefix /opt/homebrew may not exist on this arch."
+        printf '\n'
+        log_warn "Detected Intel architecture (${arch})."
+        log_warn "This installer was designed for Apple Silicon and has NOT been"
+        log_warn "tested on Intel Macs. Some steps may fail or produce an incomplete"
+        log_warn "setup (e.g. Homebrew on Intel uses /usr/local, not /opt/homebrew)."
+        printf '\n'
+
+        if [[ ! -t 0 ]]; then
+            die "Non-interactive session on untested architecture (${arch}) — aborting."
+        fi
+
+        printf '    \033[0;33m%s\033[0m' "Intel arch is untested. Continue anyway? [y/N]: "
+        local answer=""
+        read -r answer
+        printf '\n'
+        case "${answer}" in
+            [Yy] | [Yy][Ee][Ss])
+                log_warn "Proceeding on Intel — expect possible failures."
+                ;;
+            *)
+                die "Installation cancelled by user."
+                ;;
+        esac
     fi
 
     log_info "macOS $(sw_vers -productVersion) on ${arch}"
