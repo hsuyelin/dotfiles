@@ -1,5 +1,6 @@
 # style name or JSON path (default "auto")
-style: "auto"
+# Catppuccin Mocha: dark background matches the rest of the terminal theme
+style: "dark"
 # mouse support (TUI-mode only)
 mouse: false
 # use pager to display markdown

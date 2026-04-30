@@ -32,6 +32,9 @@ spicetify/CustomApps/marketplace-dist.zip
 # Zsh compiled bytecode cache
 **/*.zwc
 
+# Matplotlib font/style cache (contains machine-specific absolute paths)
+matplotlib/
+
 # Third-party plugins (keep folders, ignore contents)
 # These are installed by plugin managers at runtime
 zi/plugins/*

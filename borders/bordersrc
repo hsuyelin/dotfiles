@@ -3,8 +3,8 @@
 options=(
   style=round
   width=6
-  inactive_color=0xff494d64
-  active_color="glow(0xFFFF10F0)"
+  inactive_color=0xff494d64   # Catppuccin Mocha surface2
+  active_color="glow(0xFFcba6f7)"  # Catppuccin Mocha mauve
   hidpi=on
 )
 

@@ -118,25 +118,16 @@ check_platform() {
 }
 
 # ── Step 2: Bootstrap prerequisites ──────────────────────────────────────────
-# These are the bare-minimum commands macOS ships with that bootstrap.sh needs
-# before it can install anything else. If any are missing the machine is in an
-# unusual state and the user should investigate manually.
+# Only curl is required before Xcode CLT is installed — it ships with every
+# macOS release at /usr/bin/curl. git is provided by Xcode CLT, which is
+# installed in the next step, so we must not require it here.
 check_prerequisites() {
     log_step "Checking" "bootstrap prerequisites"
 
-    local missing=false
-    local req
-    for req in curl git; do
-        if command -v "${req}" &>/dev/null; then
-            log_info "${req} available: $(command -v "${req}")"
-        else
-            log_error "required command not found: ${req}"
-            missing=true
-        fi
-    done
-
-    if [[ "${missing}" == "true" ]]; then
-        die "Missing required commands. Ensure Xcode CLT is installed first."
+    if command -v curl &>/dev/null; then
+        log_info "curl available: $(command -v curl)"
+    else
+        die "curl not found — this is unexpected on macOS. Investigate manually."
     fi
 }
 
@@ -194,7 +185,7 @@ install_homebrew() {
     log_step "Installed" "Homebrew $(brew --version | head -1)"
 }
 
-# ── Step 4: Clone dotfiles ────────────────────────────────────────────────────
+# ── Step 5: Clone dotfiles ────────────────────────────────────────────────────
 clone_dotfiles() {
     log_step "Checking" "dotfiles at ${DOTFILES_TARGET}"
 
@@ -330,8 +321,8 @@ main() {
     printf '\n'
 
     check_platform
+    install_xcode_clt   # must run before check_prerequisites: git lives in CLT
     check_prerequisites
-    install_xcode_clt
     install_homebrew
     clone_dotfiles
     run_install_sh

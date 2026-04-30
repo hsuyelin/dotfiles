@@ -47,7 +47,7 @@ if command -v zoxide >/dev/null; then
       query="${query## }"
 
       # Load all zoxide entries, then OR-filter by keywords (case-insensitive).
-      # fzf's --query uses AND logic so "zepp github" only matches paths that
+      # fzf's --query uses AND logic so "work github" only matches paths that
       # contain both words; pre-filtering with OR gives the expected behaviour.
       local _z_raw
       _z_raw=$(zoxide query --list 2>/dev/null)

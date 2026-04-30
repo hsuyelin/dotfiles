@@ -20,16 +20,16 @@ font-feature = +calt
 font-thicken = true
 adjust-cell-height = 2
 
-# ── CJK codepoint mapping → 霞鹜文楷等宽 ────────────────────────────────────
-# CJK Unified Ideographs (主区)
+# ── CJK codepoint mapping → LXGW WenKai Mono ────────────────────────────────
+# CJK Unified Ideographs (main block)
 font-codepoint-map = U+4E00-U+9FFF=LXGW WenKai Mono
 # CJK Extension A
 font-codepoint-map = U+3400-U+4DBF=LXGW WenKai Mono
 # CJK Compatibility Ideographs
 font-codepoint-map = U+F900-U+FAFF=LXGW WenKai Mono
-# CJK Symbols and Punctuation (。，、…「」等)
+# CJK Symbols and Punctuation (e.g. ideographic comma, fullwidth period)
 font-codepoint-map = U+3000-U+303F=LXGW WenKai Mono
-# Fullwidth Forms (全角字母、全角标点)
+# Fullwidth Forms (fullwidth Latin letters and punctuation)
 font-codepoint-map = U+FF00-U+FFEF=LXGW WenKai Mono
 # CJK Radicals Supplement
 font-codepoint-map = U+2E80-U+2EFF=LXGW WenKai Mono
