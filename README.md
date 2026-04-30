@@ -61,13 +61,13 @@ Intel Macs are **not** supported.
   <tbody>
     <tr>
       <td align="center" width="50%">
-        <video src="assets/screenshots/ghostty.mov" controls width="100%"></video>
+        <video src="assets/screenshots/ghostty.mp4" controls width="100%"></video>
         <br/>
         <strong>Ghostty — Terminal</strong><br/>
         <sub>Catppuccin Mocha · background blur · cursor warp shader</sub>
       </td>
       <td align="center" width="50%">
-        <video src="assets/screenshots/kitty.mov" controls width="100%"></video>
+        <video src="assets/screenshots/kitty.mp4" controls width="100%"></video>
         <br/>
         <strong>kitty — Terminal (alt)</strong><br/>
         <sub>Catppuccin Mocha · same font + keybinds as Ghostty</sub>
@@ -81,7 +81,7 @@ Intel Macs are **not** supported.
         <sub>Catppuccin Mocha palette · git status · clock</sub>
       </td>
       <td align="center" width="50%">
-        <video src="assets/screenshots/neovim.mov" controls width="100%"></video>
+        <video src="assets/screenshots/neovim.mp4" controls width="100%"></video>
         <br/>
         <strong>Neovim — Editor</strong><br/>
         <sub>Lazy.nvim · LSP · Treesitter</sub>
@@ -89,7 +89,7 @@ Intel Macs are **not** supported.
     </tr>
     <tr>
       <td align="center" width="50%">
-        <video src="assets/screenshots/aerospace.mov" controls width="100%"></video>
+        <video src="assets/screenshots/aerospace.mp4" controls width="100%"></video>
         <br/>
         <strong>AeroSpace — Window Manager</strong><br/>
         <sub>Tiling · JankyBorders · vim-style workspace navigation</sub>
@@ -103,7 +103,7 @@ Intel Macs are **not** supported.
     </tr>
     <tr>
       <td align="center" width="50%">
-        <video src="assets/screenshots/lazygit.mov" controls width="100%"></video>
+        <video src="assets/screenshots/lazygit.mp4" controls width="100%"></video>
         <br/>
         <strong>lazygit — Git TUI</strong><br/>
         <sub>Delta diff pager · full keyboard workflow</sub>
