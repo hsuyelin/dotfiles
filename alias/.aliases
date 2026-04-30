@@ -297,13 +297,6 @@ alias gba='git branch -a | fzf --height=40% --border --preview "git log --onelin
 
 
 # -----------------------------
-# Other
-# -----------------------------
-mrrss() {
-   "${XDG_CONFIG_HOME}/bin/mrrss_update.sh" "$@"
-}
-
-# -----------------------------
 # AI
 # -----------------------------
 alias cc='claude'
