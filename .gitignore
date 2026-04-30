@@ -4,9 +4,6 @@ secrets/
 # Private - Personal/company information, machine-specific paths
 private/
 
-# Brew package
-brew/*.txt
-
 # Docker / OrbStack runtime state
 docker/.token_seed
 docker/.token_seed.lock

@@ -1,0 +1,16 @@
+aerospace
+applite
+cc-switch
+claude-code
+codex
+db-browser-for-sqlite
+font-fira-code
+font-fira-code-nerd-font
+font-lxgw-wenkai
+ghostty
+lyricsx
+oracle-jdk@25
+orbstack
+pearcleaner
+swiftformat-for-xcode
+xcodes-app
