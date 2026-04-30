@@ -57,86 +57,58 @@ Intel Macs are **not** supported.
 
 ## Previews
 
-<!-- Drop images into screenshots/ and uncomment the img tags below. -->
-<!-- Thumbnail naming convention: NAME-thumb.png (≤800px wide), NAME-full.png (original). -->
-
 <table>
-  <thead>
-    <tr>
-      <th width="220">Configuration</th>
-      <th>Preview <sub>(click to enlarge)</sub></th>
-    </tr>
-  </thead>
   <tbody>
     <tr>
-      <td>
+      <td align="center" width="50%">
+        <video src="assets/screenshots/ghostty.mov" controls width="100%"></video>
+        <br/>
         <strong>Ghostty — Terminal</strong><br/>
         <sub>Catppuccin Mocha · background blur · cursor warp shader</sub>
       </td>
-      <td>
-        <!-- <a href="screenshots/ghostty-full.png"><img src="screenshots/ghostty-thumb.png" width="520" alt="Ghostty terminal"></a> -->
-        <em>screenshot pending</em>
-      </td>
-    </tr>
-    <tr>
-      <td>
+      <td align="center" width="50%">
+        <video src="assets/screenshots/kitty.mov" controls width="100%"></video>
+        <br/>
         <strong>kitty — Terminal (alt)</strong><br/>
         <sub>Catppuccin Mocha · same font + keybinds as Ghostty</sub>
       </td>
-      <td>
-        <!-- <a href="screenshots/kitty-full.png"><img src="screenshots/kitty-thumb.png" width="520" alt="kitty terminal"></a> -->
-        <em>screenshot pending</em>
-      </td>
     </tr>
     <tr>
-      <td>
+      <td align="center" width="50%">
+        <img src="assets/screenshots/starship.png" width="100%" alt="Starship prompt" />
+        <br/>
         <strong>Starship — Prompt</strong><br/>
         <sub>Catppuccin Mocha palette · git status · clock</sub>
       </td>
-      <td>
-        <!-- <a href="screenshots/starship-full.png"><img src="screenshots/starship-thumb.png" width="520" alt="Starship prompt"></a> -->
-        <em>screenshot pending</em>
-      </td>
-    </tr>
-    <tr>
-      <td>
+      <td align="center" width="50%">
+        <video src="assets/screenshots/neovim.mov" controls width="100%"></video>
+        <br/>
         <strong>Neovim — Editor</strong><br/>
         <sub>Lazy.nvim · LSP · Treesitter</sub>
       </td>
-      <td>
-        <!-- <a href="screenshots/nvim-full.png"><img src="screenshots/nvim-thumb.png" width="520" alt="Neovim"></a> -->
-        <em>screenshot pending</em>
-      </td>
     </tr>
     <tr>
-      <td>
+      <td align="center" width="50%">
+        <video src="assets/screenshots/aerospace.mov" controls width="100%"></video>
+        <br/>
         <strong>AeroSpace — Window Manager</strong><br/>
         <sub>Tiling · JankyBorders · vim-style workspace navigation</sub>
       </td>
-      <td>
-        <!-- <a href="screenshots/aerospace-full.png"><img src="screenshots/aerospace-thumb.png" width="520" alt="AeroSpace"></a> -->
-        <em>screenshot pending</em>
-      </td>
-    </tr>
-    <tr>
-      <td>
+      <td align="center" width="50%">
+        <img src="assets/screenshots/btop.png" width="100%" alt="btop system monitor" />
+        <br/>
         <strong>btop — System Monitor</strong><br/>
         <sub>Catppuccin Mocha theme</sub>
       </td>
-      <td>
-        <!-- <a href="screenshots/btop-full.png"><img src="screenshots/btop-thumb.png" width="520" alt="btop"></a> -->
-        <em>screenshot pending</em>
-      </td>
     </tr>
     <tr>
-      <td>
+      <td align="center" width="50%">
+        <video src="assets/screenshots/lazygit.mov" controls width="100%"></video>
+        <br/>
         <strong>lazygit — Git TUI</strong><br/>
         <sub>Delta diff pager · full keyboard workflow</sub>
       </td>
-      <td>
-        <!-- <a href="screenshots/lazygit-full.png"><img src="screenshots/lazygit-thumb.png" width="520" alt="lazygit"></a> -->
-        <em>screenshot pending</em>
-      </td>
+      <td width="50%"></td>
     </tr>
   </tbody>
 </table>
