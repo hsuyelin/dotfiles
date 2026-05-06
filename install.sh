@@ -225,11 +225,12 @@ backup_conflicts() {
             mkdir -p "${BACKUP_DIR}"
         fi
         run cp -P "${ZSHENV_HOME}" "${BACKUP_DIR}/zshenv"
-        log_step "Backed up" "${ZSHENV_HOME} → ${BACKUP_DIR}/zshenv"
+        run rm -f "${ZSHENV_HOME}"
+        log_step "Backed up" "${ZSHENV_HOME} → ${BACKUP_DIR}/zshenv (removed original)"
         backed_up=true
     fi
 
-    # Back up any remaining conflicting files that exist
+    # Back up conflicting files and remove the originals
     local file
     for file in "${CONFLICT_FILES[@]}"; do
         if [[ -f "${file}" || -L "${file}" ]]; then
@@ -239,12 +240,13 @@ backup_conflicts() {
             local name
             name="$(basename "${file}")"
             run cp -P "${file}" "${BACKUP_DIR}/${name}"
-            log_step "Backed up" "${file} → ${BACKUP_DIR}/${name}"
+            run rm -f "${file}"
+            log_step "Backed up" "${file} → ${BACKUP_DIR}/${name} (removed original)"
             backed_up=true
         fi
     done
 
-    # Back up conflicting directories that exist
+    # Back up conflicting directories and remove the originals
     local dir
     for dir in "${CONFLICT_DIRS[@]}"; do
         if [[ -d "${dir}" && ! -L "${dir}" ]]; then
@@ -254,7 +256,8 @@ backup_conflicts() {
             local name
             name="$(basename "${dir}")"
             run cp -r "${dir}" "${BACKUP_DIR}/${name}"
-            log_step "Backed up" "${dir} → ${BACKUP_DIR}/${name}"
+            run rm -rf "${dir}"
+            log_step "Backed up" "${dir} → ${BACKUP_DIR}/${name} (removed original)"
             backed_up=true
         fi
     done
