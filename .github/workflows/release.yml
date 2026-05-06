@@ -1,0 +1,91 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Publish release
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── Checkout ───────────────────────────────────────────────────────────
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Cache git pack objects so re-runs on the same runner skip re-fetching.
+      - name: Restore git pack cache
+        uses: actions/cache@v4
+        with:
+          path: .git/objects/pack
+          key: git-pack-${{ github.sha }}
+          restore-keys: |
+            git-pack-
+
+      # ── Version metadata ───────────────────────────────────────────────────
+      - name: Resolve version metadata
+        id: meta
+        run: |
+          current="${GITHUB_REF_NAME}"
+          prev=$(git tag --sort=-version:refname \
+                   | grep -vxF "${current}" | head -1 || true)
+          echo "current=${current}"          >> "$GITHUB_OUTPUT"
+          echo "previous=${prev}"            >> "$GITHUB_OUTPUT"
+          echo "date=$(date -u +%Y-%m-%d)"  >> "$GITHUB_OUTPUT"
+
+      # ── Patch file ─────────────────────────────────────────────────────────
+      - name: Generate patch file
+        id: patch
+        run: |
+          current="${{ steps.meta.outputs.current }}"
+          prev="${{ steps.meta.outputs.previous }}"
+          if [[ -n "${prev}" ]]; then
+            name="${prev}-to-${current}.patch"
+            git diff "${prev}" "${current}" > "${name}"
+            echo "name=${name}" >> "$GITHUB_OUTPUT"
+          else
+            echo "name="        >> "$GITHUB_OUTPUT"
+          fi
+
+      # ── Release notes & README ─────────────────────────────────────────────
+      - name: Generate release notes and README
+        env:
+          CURRENT:    ${{ steps.meta.outputs.current }}
+          PREVIOUS:   ${{ steps.meta.outputs.previous }}
+          DATE:       ${{ steps.meta.outputs.date }}
+          REPO:       ${{ github.repository }}
+          PATCH_FILE: ${{ steps.patch.outputs.name }}
+        run: python3 .github/scripts/gen_release.py
+
+      # ── Checksums ──────────────────────────────────────────────────────────
+      - name: Compute sha512 checksums
+        run: |
+          files=(README.txt)
+          pf="${{ steps.patch.outputs.name }}"
+          [[ -n "${pf}" && -f "${pf}" ]] && files+=("${pf}")
+          sha512sum "${files[@]}" > sha512sum.txt
+
+      # ── Stage assets ───────────────────────────────────────────────────────
+      # Collect everything into _dist/ so we can use a single glob in the
+      # release step rather than conditional per-file logic.
+      - name: Stage release assets
+        run: |
+          mkdir -p _dist
+          cp README.txt sha512sum.txt _dist/
+          pf="${{ steps.patch.outputs.name }}"
+          [[ -n "${pf}" && -f "${pf}" ]] && cp "${pf}" _dist/
+
+      # ── Publish ────────────────────────────────────────────────────────────
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "${{ steps.meta.outputs.current }} (${{ steps.meta.outputs.date }})"
+          body_path: release_notes.md
+          files: _dist/*

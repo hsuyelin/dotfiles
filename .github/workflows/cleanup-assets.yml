@@ -1,0 +1,74 @@
+name: Cleanup old release assets
+
+# Deletes uploaded assets (README.txt, sha512sum.txt, patch files) from
+# releases published more than 60 days ago.  The latest release is always
+# preserved in full.  Auto-generated Source Code archives (zip / tar.gz)
+# are managed by GitHub and cannot be deleted via the API.
+on:
+  schedule:
+    - cron: '0 3 * * 1'   # every Monday at 03:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    name: Prune assets older than 60 days
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Delete old release assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO:     ${{ github.repository }}
+        run: |
+          KEEP_DAYS=60
+          cutoff=$(date -u -d "${KEEP_DAYS} days ago" +%s)
+
+          # The single latest release is always preserved.
+          latest_tag=$(
+            gh release list --repo "${REPO}" --limit 1 \
+              --json tagName --jq '.[0].tagName' 2>/dev/null || true
+          )
+
+          if [[ -z "${latest_tag}" ]]; then
+            echo "No releases found — nothing to do."
+            exit 0
+          fi
+          echo "Latest release: ${latest_tag} (all assets preserved)"
+
+          deleted=0
+          skipped=0
+
+          gh release list --repo "${REPO}" --limit 200 \
+            --json tagName,publishedAt \
+            --jq '.[] | "\(.tagName)\t\(.publishedAt)"' |
+          while IFS=$'\t' read -r tag published; do
+            # Always keep the latest release.
+            if [[ "${tag}" == "${latest_tag}" ]]; then
+              echo "  keep   ${tag}  (latest)"
+              continue
+            fi
+
+            pub_epoch=$(date -u -d "${published}" +%s 2>/dev/null || echo 0)
+
+            if (( pub_epoch >= cutoff )); then
+              echo "  keep   ${tag}  (published ${published} — within ${KEEP_DAYS} days)"
+              continue
+            fi
+
+            echo "  prune  ${tag}  (published ${published})"
+
+            gh release view "${tag}" --repo "${REPO}" \
+              --json assets --jq '.assets[] | "\(.id)\t\(.name)"' |
+            while IFS=$'\t' read -r asset_id asset_name; do
+              if gh api --method DELETE \
+                   "repos/${REPO}/releases/assets/${asset_id}" \
+                   --silent 2>/dev/null; then
+                echo "    deleted  ${asset_name}"
+              else
+                echo "    failed   ${asset_name} (id=${asset_id})"
+              fi
+            done
+          done
