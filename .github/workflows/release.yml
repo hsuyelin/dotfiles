@@ -67,25 +67,35 @@ jobs:
           echo "--- workspace after gen_release ---"
           ls -la release_notes.md README.txt
 
-      # ── Checksums + stage assets ───────────────────────────────────────────
-      # Merged into one step so file visibility across step boundaries cannot
-      # be a factor.  All files are created and verified in a single shell.
+      # ── Source archive checksums ───────────────────────────────────────────
+      # GitHub makes the tag archives available immediately after the tag push,
+      # before a release object exists.  Download both and hash them so
+      # sha512sum.txt can ship alongside the release in one step.
+      - name: Compute sha512 checksums for source archives
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG:      ${{ steps.meta.outputs.current }}
+          REPO:     ${{ github.repository }}
+        run: |
+          base="https://github.com/${REPO}/archive/refs/tags"
+          curl -fsSL -H "Authorization: token ${GH_TOKEN}" \
+            "${base}/${TAG}.tar.gz" -o "${TAG}.tar.gz"
+          curl -fsSL -H "Authorization: token ${GH_TOKEN}" \
+            "${base}/${TAG}.zip"    -o "${TAG}.zip"
+          sha512sum "${TAG}.tar.gz" "${TAG}.zip" > sha512sum.txt
+          echo "--- sha512sum.txt ---"
+          cat sha512sum.txt
+
+      # ── Stage assets ───────────────────────────────────────────────────────
       - name: Assemble release assets
         run: |
           pf="${{ steps.patch.outputs.name }}"
 
-          # Verify gen_release.py output
-          for f in release_notes.md README.txt; do
+          for f in release_notes.md README.txt sha512sum.txt; do
             [[ -f "${f}" ]] \
-              || { echo "::error::${f} not found — gen_release.py may have failed"; exit 1; }
+              || { echo "::error::${f} not found"; exit 1; }
           done
 
-          # Checksums
-          files=(README.txt)
-          [[ -n "${pf}" && -f "${pf}" ]] && files+=("${pf}")
-          sha512sum "${files[@]}" > sha512sum.txt
-
-          # Stage
           mkdir -p _dist
           cp README.txt sha512sum.txt _dist/
           [[ -n "${pf}" && -f "${pf}" ]] && cp "${pf}" _dist/

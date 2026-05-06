@@ -214,12 +214,12 @@ def build_readme(
             "",
         ]
 
-    checksum_note = "README.txt" + (f", {patch_file}" if patch_file else "")
     lines += [
         "CHECKSUMS",
         "---------",
-        "  sha512sum -c sha512sum.txt",
-        f"  Covers: {checksum_note}",
+        "  Verify the downloaded source archives against sha512sum.txt:",
+        "    sha512sum -c sha512sum.txt",
+        f"  Covers: {current}.tar.gz, {current}.zip",
         "",
         "VERSION",
         "-------",
