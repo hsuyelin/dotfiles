@@ -106,6 +106,25 @@ run() {
     fi
 }
 
+# ── Early XDG environment ─────────────────────────────────────────────────────
+# Export XDG vars now so any tool invoked later (rustup, cargo, go, pip…)
+# writes to the correct XDG locations rather than $HOME dot-directories.
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-${HOME}/.config}"
+export XDG_DATA_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}"
+export XDG_CACHE_HOME="${XDG_CACHE_HOME:-${HOME}/.cache}"
+export XDG_STATE_HOME="${XDG_STATE_HOME:-${HOME}/.local/state}"
+export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-${HOME}/.local/xdg-runtime}"
+
+# Rust — point cargo/rustup at XDG before any rustup invocation
+export CARGO_HOME="${XDG_DATA_HOME}/cargo"
+export RUSTUP_HOME="${XDG_DATA_HOME}/rustup"
+
+# Go — point workspace at XDG
+export GOPATH="${XDG_DATA_HOME}/go"
+
+# CocoaPods — XDG home
+export CP_HOME_DIR="${XDG_DATA_HOME}/cocoapods"
+
 # ── Step 1: Platform check ────────────────────────────────────────────────────
 check_platform() {
     log_step "Checking" "platform"
@@ -256,9 +275,10 @@ select_terminal() {
     printf '\n'
     printf '    %s\n' "Select a terminal emulator:"
     printf '    %s\n' "  [1] Ghostty  (default — cursor shaders, quick terminal, full feature set)"
-    printf '    %s\n' "  [2] kitty    (alternative — same Catppuccin Mocha theme, compatible keybinds)"
+    printf '    %s\n' "  [2] kitty    (alternative — Catppuccin Mocha, compatible keybinds)"
+    printf '    %s\n' "  [3] iTerm2   (classic — import iterm2/Catppuccin-Mocha.itermcolors)"
     printf '\n'
-    printf '    %s' "Choice [1/2] (auto-selects Ghostty in 30 s): "
+    printf '    %s' "Choice [1/2/3] (auto-selects Ghostty in 30 s): "
 
     local choice=""
     if read -t 30 -r choice 2>/dev/null; then
@@ -270,6 +290,7 @@ select_terminal() {
 
     case "${choice}" in
         2) TERMINAL_CHOICE="kitty"   ; log_step "Selected" "kitty" ;;
+        3) TERMINAL_CHOICE="iterm2"  ; log_step "Selected" "iTerm2" ;;
         *) TERMINAL_CHOICE="ghostty" ; log_step "Selected" "Ghostty (default)" ;;
     esac
 }
@@ -304,12 +325,15 @@ _brew_install_list() {
 
     log_step "Installing" "Homebrew ${kind}s from $(basename "${list}")"
 
-    # When installing casks, skip the terminal that was not selected.
-    # ghostty and kitty are mutually exclusive; install.sh handles the install.
-    local _skip_cask=""
+    # When installing casks, only install the selected terminal emulator.
+    # Collect the set of skipped terminals so the loop can skip them.
+    local -a _skip_casks=()
     if [[ "${kind}" == "cask" ]]; then
-        [[ "${TERMINAL_CHOICE}" == "kitty"   ]] && _skip_cask="ghostty"
-        [[ "${TERMINAL_CHOICE}" == "ghostty" ]] && _skip_cask="kitty"
+        local _all_terminals=("ghostty" "kitty" "iterm2")
+        local _t
+        for _t in "${_all_terminals[@]}"; do
+            [[ "${_t}" != "${TERMINAL_CHOICE}" ]] && _skip_casks+=("${_t}")
+        done
     fi
 
     local pkg
@@ -317,8 +341,13 @@ _brew_install_list() {
         # Skip blank lines and comment lines
         [[ -z "${pkg}" || "${pkg}" == \#* ]] && continue
 
-        # Skip the non-selected terminal (handled by install.sh)
-        if [[ -n "${_skip_cask}" && "${pkg}" == "${_skip_cask}" ]]; then
+        # Skip terminals that were not selected (install.sh handles the chosen one)
+        local _skip=false
+        local _s
+        for _s in "${_skip_casks[@]}"; do
+            [[ "${pkg}" == "${_s}" ]] && _skip=true && break
+        done
+        if [[ "${_skip}" == "true" ]]; then
             log_info "skipped (not selected terminal): ${pkg}"
             continue
         fi
@@ -327,10 +356,14 @@ _brew_install_list() {
             log_info "already installed: ${pkg}"
         else
             log_step "brew" "install ${kind:+--${kind} }${pkg}"
-            if [[ "${kind}" == "cask" ]]; then
-                run brew install --cask "${pkg}"
+            if [[ "${DRY_RUN}" == "true" ]]; then
+                log_info "[dry-run] brew install ${kind:+--${kind} }${pkg}"
+            elif [[ "${kind}" == "cask" ]]; then
+                brew install --cask "${pkg}" \
+                    || log_warn "failed to install cask: ${pkg} (skipping)"
             else
-                run brew install "${pkg}"
+                brew install "${pkg}" \
+                    || log_warn "failed to install formula: ${pkg} (skipping)"
             fi
         fi
     done < "${list}"
@@ -345,6 +378,12 @@ install_brew_packages() {
     fi
 
     run brew update --quiet
+
+    # aerospace (tiling WM) lives in a third-party tap
+    if ! brew tap | grep -q "nikitabobko/tap"; then
+        log_step "brew" "tap nikitabobko/tap (required for aerospace)"
+        run brew tap nikitabobko/tap || log_warn "tap nikitabobko/tap failed (skipping)"
+    fi
 
     _brew_install_list "formula" "${DOTFILES_DIR}/brew/brew_formulae.txt"
     _brew_install_list "cask"    "${DOTFILES_DIR}/brew/brew_casks.txt"
@@ -388,8 +427,13 @@ print_next_steps() {
     printf '%s\n' "       Example: rvminstall 3.3.7"
     printf '%s\n' "  ☐  Open tmux and press <prefix>+I to install plugins"
     printf '%s\n' "  ☐  Open Neovim — plugins install automatically on first run"
+    printf '%s\n' "       (vim.pack built-in manager; Neovim ≥ 0.11)"
+    printf '%s\n' "       Force resync: nvim -c 'lua vim.pack.update()'"
     if [[ "${TERMINAL_CHOICE}" == "kitty" ]]; then
         printf '%s\n' "  ☐  Open kitty — config lives in ~/.config/kitty/"
+    elif [[ "${TERMINAL_CHOICE}" == "iterm2" ]]; then
+        printf '%s\n' "  ☐  Open iTerm2 → Preferences → Profiles → Colors → Color Presets…"
+        printf '%s\n' "       Import: ~/.config/iterm2/Catppuccin-Mocha.itermcolors"
     else
         printf '%s\n' "  ☐  Open Ghostty — cursor shaders load from ghostty/shaders/"
     fi

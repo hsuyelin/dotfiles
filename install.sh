@@ -53,6 +53,20 @@ readonly CONFLICT_FILES=(
     "${HOME}/.zprofile"
     "${HOME}/.bash_profile"
     "${HOME}/.bashrc"
+    "${HOME}/.p10k.zsh"
+    "${HOME}/.z"
+    "${HOME}/.zsh_history"
+    "${HOME}/.viminfo"
+    "${HOME}/.vimrc"
+    "${HOME}/.swiftformat"
+    "${HOME}/.rvminstall.sh"
+)
+
+# Directories that may conflict (backed up via cp -r, not cp -P)
+readonly CONFLICT_DIRS=(
+    "${HOME}/.zsh_sessions"
+    "${HOME}/.zi"
+    "${HOME}/.swiftpm"
 )
 
 # Placeholder files: path (relative to DOTFILES_DIR) and content marker
@@ -230,6 +244,21 @@ backup_conflicts() {
         fi
     done
 
+    # Back up conflicting directories that exist
+    local dir
+    for dir in "${CONFLICT_DIRS[@]}"; do
+        if [[ -d "${dir}" && ! -L "${dir}" ]]; then
+            if [[ "${backed_up}" == "false" && "${DRY_RUN}" != "true" ]]; then
+                mkdir -p "${BACKUP_DIR}"
+            fi
+            local name
+            name="$(basename "${dir}")"
+            run cp -r "${dir}" "${BACKUP_DIR}/${name}"
+            log_step "Backed up" "${dir} → ${BACKUP_DIR}/${name}"
+            backed_up=true
+        fi
+    done
+
     if [[ "${backed_up}" == "true" ]]; then
         log_info "Backup directory: ${BACKUP_DIR}"
     else
@@ -393,9 +422,10 @@ select_terminal() {
     printf '\n'
     printf '    %s\n' "Select a terminal emulator:"
     printf '    %s\n' "  [1] Ghostty  (default — cursor shaders, quick terminal, full feature set)"
-    printf '    %s\n' "  [2] kitty    (alternative — same theme, compatible keybinds)"
+    printf '    %s\n' "  [2] kitty    (alternative — Catppuccin Mocha, compatible keybinds)"
+    printf '    %s\n' "  [3] iTerm2   (classic — import iterm2/Catppuccin-Mocha.itermcolors)"
     printf '\n'
-    printf '    %s' "Choice [1/2] (auto-selects Ghostty in 30 s): "
+    printf '    %s' "Choice [1/2/3] (auto-selects Ghostty in 30 s): "
 
     local choice=""
     if read -t 30 -r choice 2>/dev/null; then
@@ -407,6 +437,7 @@ select_terminal() {
 
     case "${choice}" in
         2) TERMINAL_CHOICE="kitty"   ; log_step "Selected" "kitty" ;;
+        3) TERMINAL_CHOICE="iterm2"  ; log_step "Selected" "iTerm2" ;;
         *) TERMINAL_CHOICE="ghostty" ; log_step "Selected" "Ghostty (default)" ;;
     esac
 }
@@ -427,6 +458,14 @@ install_terminal_app() {
             else
                 log_step "Installing" "kitty"
                 run brew install --cask kitty
+            fi
+            ;;
+        iterm2)
+            if [[ -d "/Applications/iTerm.app" ]]; then
+                log_info "iTerm2 already installed (skipped)"
+            else
+                log_step "Installing" "iTerm2"
+                run brew install --cask iterm2
             fi
             ;;
         ghostty | *)
@@ -513,10 +552,60 @@ install_rtk() {
         log_info "~/Library/Application Support/rtk already exists (skipped symlink)"
     fi
 
-    # Install Claude Code hook (idempotent).
+    # Patch Claude Code / Codex hook only when at least one is installed.
+    # rtk init writes to ~/.claude/RTK.md, so the directory must exist first.
     if command -v rtk &>/dev/null; then
-        log_step "Init" "rtk Claude Code hook (rtk init -g --auto-patch)"
-        rtk init -g --auto-patch
+        if command -v claude &>/dev/null || command -v codex &>/dev/null; then
+            mkdir -p "${HOME}/.claude"
+            log_step "Init" "rtk Claude Code hook (rtk init -g --auto-patch)"
+            rtk init -g --auto-patch
+        else
+            log_warn "claude / codex not found — skipping RTK hook init"
+            log_info "Run 'rtk init -g --auto-patch' after installing claude or codex"
+        fi
+    fi
+}
+
+# ── Step: XDG home migration ──────────────────────────────────────────────────
+# Moves legacy tool directories from $HOME into their XDG-compliant locations.
+# Safe to re-run: skips migration when the XDG target already exists.
+migrate_xdg_homes() {
+    log_step "Checking" "XDG home migration (Rust / Go / CocoaPods)"
+
+    if [[ "${DRY_RUN}" == "true" ]]; then
+        log_info "[dry-run] would migrate ~/.cargo, ~/.rustup, ~/go, ~/.cocoapods"
+        return 0
+    fi
+
+    local data_home="${XDG_DATA_HOME:-${HOME}/.local/share}"
+
+    # ── Rust ────────────────────────────────────────────────────────────────
+    _migrate_dir "${HOME}/.cargo"   "${data_home}/cargo"
+    _migrate_dir "${HOME}/.rustup"  "${data_home}/rustup"
+
+    # ── Go ──────────────────────────────────────────────────────────────────
+    _migrate_dir "${HOME}/go"       "${data_home}/go"
+    # Tell the go tool itself so go env is consistent (requires go in PATH).
+    if command -v go &>/dev/null && [[ -d "${data_home}/go" ]]; then
+        go env -w GOPATH="${data_home}/go" 2>/dev/null \
+            && log_info "go env GOPATH → ${data_home}/go" \
+            || log_warn "go env -w failed (go env will still reflect GOPATH from shell)"
+    fi
+
+    # ── CocoaPods ───────────────────────────────────────────────────────────
+    _migrate_dir "${HOME}/.cocoapods" "${data_home}/cocoapods"
+}
+
+# Move $1 → $2 only when $1 exists and $2 does not.
+_migrate_dir() {
+    local src="$1"
+    local dst="$2"
+    if [[ -d "${src}" && ! -e "${dst}" ]]; then
+        mkdir -p "$(dirname "${dst}")"
+        mv "${src}" "${dst}"
+        log_step "Migrated" "${src} → ${dst}"
+    elif [[ -d "${src}" && -e "${dst}" ]]; then
+        log_warn "${src} and ${dst} both exist — manual merge needed; skipping"
     fi
 }
 
@@ -555,12 +644,19 @@ print_checklist() {
     printf '%s\n' "  ☐  Fill in secrets/.ai.secrets  (AI API keys)"
     printf '%s\n' "  ☐  Open tmux and press <prefix>+I to install plugins"
     printf '%s\n' "  ☐  Open Neovim — plugins install automatically on first run"
+    printf '%s\n' "       (vim.pack is the built-in plugin manager; Neovim ≥ 0.11)"
+    printf '%s\n' "       To force resync: nvim -c 'lua vim.pack.update()'"
+    printf '%s\n' "       Or press <leader>P inside Neovim"
     if [[ "${TERMINAL_CHOICE}" == "kitty" ]]; then
         printf '%s\n' "  ☐  Open kitty — config lives in ~/.config/kitty/"
-        printf '%s\n' "       To switch to Ghostty later: bash install.sh --terminal=ghostty"
+        printf '%s\n' "       To switch later: bash install.sh --terminal=ghostty|iterm2"
+    elif [[ "${TERMINAL_CHOICE}" == "iterm2" ]]; then
+        printf '%s\n' "  ☐  Open iTerm2 → Preferences → Profiles → Colors → Color Presets…"
+        printf '%s\n' "       Import: ~/.config/iterm2/Catppuccin-Mocha.itermcolors"
+        printf '%s\n' "       To switch later: bash install.sh --terminal=ghostty|kitty"
     else
         printf '%s\n' "  ☐  Open Ghostty — cursor shaders load from ghostty/shaders/"
-        printf '%s\n' "       To switch to kitty later:   bash install.sh --terminal=kitty"
+        printf '%s\n' "       To switch later: bash install.sh --terminal=kitty|iterm2"
     fi
     printf '%s\n' "  ☐  Install a Ruby version: rvminstall <version>"
     printf '%s\n' "       Example: rvminstall 3.3.7"
@@ -595,6 +691,7 @@ main() {
     install_terminal_app
     clone_ghostty_shaders
     set_permissions
+    migrate_xdg_homes
     [[ "${INSTALL_RTK}" == "true" ]] && install_rtk
     print_checklist
 }
