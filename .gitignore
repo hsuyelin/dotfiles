@@ -34,6 +34,7 @@ matplotlib/
 
 # Third-party plugins / runtime cache (keep folders, ignore contents)
 # These are installed or compiled by plugin managers at runtime
+zi/bin
 zi/plugins/*
 !zi/plugins/.gitkeep
 zi/completions/
