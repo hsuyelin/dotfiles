@@ -635,6 +635,51 @@ uninstall_rtk() {
     log_info "To also remove the config: rm -rf \"\${XDG_CONFIG_HOME}/rtk\""
 }
 
+# ── Step: Claude Code themes ──────────────────────────────────────────────────
+# Copies Catppuccin theme JSON files from the dotfiles repo into ~/.claude/themes/.
+# Skips any file that already exists so user-customized themes are preserved.
+install_claude_themes() {
+    local themes_src="${DOTFILES_DIR}/.claude/themes"
+    local themes_dst="${HOME}/.claude/themes"
+
+    if ! command -v claude &>/dev/null; then
+        log_info "claude not found — skipping theme install"
+        log_info "Re-run install.sh after installing Claude Code to apply themes"
+        return 0
+    fi
+
+    log_step "Checking" "Claude Code themes"
+
+    if [[ "${DRY_RUN}" == "true" ]]; then
+        log_info "[dry-run] would copy themes: ${themes_src} → ${themes_dst}"
+        return 0
+    fi
+
+    mkdir -p "${themes_dst}"
+
+    local copied=0 skipped=0
+    for src_file in "${themes_src}"/*.json; do
+        [[ -e "${src_file}" ]] || continue
+        local filename
+        filename="$(basename "${src_file}")"
+        local dst_file="${themes_dst}/${filename}"
+        if [[ -e "${dst_file}" ]]; then
+            log_info "theme already exists, skipping: ${filename}"
+            (( skipped++ )) || true
+        else
+            cp "${src_file}" "${dst_file}"
+            log_step "Installed" "theme: ${filename}"
+            (( copied++ )) || true
+        fi
+    done
+
+    if (( copied > 0 )); then
+        log_success "themes installed — select with /theme in Claude Code"
+    else
+        log_info "all themes already present (skipped ${skipped} file(s))"
+    fi
+}
+
 # ── Step 10: Post-install checklist ──────────────────────────────────────────
 print_checklist() {
     printf '\n'
@@ -696,6 +741,7 @@ main() {
     set_permissions
     migrate_xdg_homes
     [[ "${INSTALL_RTK}" == "true" ]] && install_rtk
+    install_claude_themes
     print_checklist
 }
 
