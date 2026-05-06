@@ -192,3 +192,5 @@
     required = true
 [safe]
 	directory = *
+[advice]
+	skippedCherryPicks = false
