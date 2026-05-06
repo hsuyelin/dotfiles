@@ -175,8 +175,9 @@ During install, you will see:
 Select a terminal emulator:
   [1] Ghostty  (default — cursor shaders, quick terminal, full feature set)
   [2] kitty    (alternative — same Catppuccin Mocha theme, compatible keybinds)
+  [3] iTerm2   (classic — import iterm2/Catppuccin-Mocha.itermcolors)
 
-Choice [1/2] (auto-selects Ghostty in 30 s):
+Choice [1/2/3] (auto-selects Ghostty in 30 s):
 ```
 
 Press `Enter` or wait 30 seconds to accept Ghostty. To skip the prompt entirely:
@@ -187,7 +188,12 @@ bash bootstrap.sh --terminal=ghostty
 
 # Force kitty
 bash bootstrap.sh --terminal=kitty
+
+# Force iTerm2
+bash bootstrap.sh --terminal=iterm2
 ```
+
+The `--terminal` flag is case-insensitive (`--terminal=iTerm2` also works).
 
 To switch terminals after install, re-run with the desired flag — then follow the two-line swap in `aerospace/aerospace.toml` (instructions are in the file header).
 
@@ -196,8 +202,9 @@ To switch terminals after install, re-run with the desired flag — then follow 
 | Flag | Applies to | Effect |
 |---|---|---|
 | `--dry-run` | both | Print what would happen, make no changes |
-| `--terminal=ghostty` | both | Install Ghostty, skip kitty |
-| `--terminal=kitty` | both | Install kitty, skip Ghostty |
+| `--terminal=ghostty` | both | Install Ghostty, skip other terminals |
+| `--terminal=kitty` | both | Install kitty, skip other terminals |
+| `--terminal=iterm2` | both | Install iTerm2, skip other terminals |
 | `--skip-rvm` | `bootstrap.sh` | Skip RVM installation |
 | `--skip-rtk` | `install.sh` | Skip RTK (Rust Token Killer) |
 

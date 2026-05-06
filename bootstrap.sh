@@ -69,16 +69,22 @@ die() {         log_error "$1"; exit 1; }
 # ── Dry-run support ───────────────────────────────────────────────────────────
 DRY_RUN=false
 SKIP_RVM=false
-TERMINAL_CHOICE=""   # empty = prompt at runtime; set via --terminal=ghostty|kitty
+TERMINAL_CHOICE=""   # empty = prompt at runtime; set via --terminal=ghostty|kitty|iterm2
 
 for _arg in "$@"; do
     case "${_arg}" in
         --dry-run)           DRY_RUN=true ;;
         --skip-rvm)          SKIP_RVM=true ;;
-        --terminal=ghostty)  TERMINAL_CHOICE="ghostty" ;;
-        --terminal=kitty)    TERMINAL_CHOICE="kitty" ;;
+        --terminal=*)
+            _term="$(echo "${_arg#--terminal=}" | tr '[:upper:]' '[:lower:]')"
+            case "${_term}" in
+                ghostty)      TERMINAL_CHOICE="ghostty" ;;
+                kitty)        TERMINAL_CHOICE="kitty" ;;
+                iterm2|iterm) TERMINAL_CHOICE="iterm2" ;;
+            esac
+            ;;
         -h|--help)
-            printf 'Usage: %s [--dry-run] [--skip-rvm] [--terminal=ghostty|kitty]\n\n' \
+            printf 'Usage: %s [--dry-run] [--skip-rvm] [--terminal=ghostty|kitty|iterm2]\n\n' \
                 "$(basename "$0")"
             printf 'Full system setup for macOS (Apple Silicon).\n\n'
             printf 'Options:\n'
@@ -86,6 +92,7 @@ for _arg in "$@"; do
             printf '  --skip-rvm             Skip the RVM installation step.\n'
             printf '  --terminal=ghostty     Install Ghostty (default).\n'
             printf '  --terminal=kitty       Install kitty instead of Ghostty.\n'
+            printf '  --terminal=iterm2      Install iTerm2 instead of Ghostty.\n'
             printf '  -h, --help             Show this help message.\n'
             exit 0
             ;;
@@ -95,7 +102,7 @@ for _arg in "$@"; do
             ;;
     esac
 done
-unset _arg
+unset _arg _term
 readonly DRY_RUN SKIP_RVM
 
 run() {
@@ -265,6 +272,10 @@ select_terminal() {
     if [[ -d "/Applications/kitty.app" ]]; then
         log_info "kitty already installed — skipping selection"
         TERMINAL_CHOICE="kitty"; return 0
+    fi
+    if [[ -d "/Applications/iTerm.app" ]]; then
+        log_info "iTerm2 already installed — skipping selection"
+        TERMINAL_CHOICE="iterm2"; return 0
     fi
 
     if [[ ! -t 0 ]]; then

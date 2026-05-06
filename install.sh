@@ -109,18 +109,24 @@ die() {         log_error "$1"; exit 1; }
 DRY_RUN=false
 INSTALL_RTK=true
 UNINSTALL_RTK=false
-TERMINAL_CHOICE=""   # empty = prompt at runtime; set via --terminal=ghostty|kitty
+TERMINAL_CHOICE=""   # empty = prompt at runtime; set via --terminal=ghostty|kitty|iterm2
 
 for _arg in "$@"; do
     case "${_arg}" in
-        --dry-run)           DRY_RUN=true ;;
-        --skip-rtk)          INSTALL_RTK=false ;;
-        --uninstall-rtk)     UNINSTALL_RTK=true ;;
-        --terminal=ghostty)  TERMINAL_CHOICE="ghostty" ;;
-        --terminal=kitty)    TERMINAL_CHOICE="kitty" ;;
+        --dry-run)       DRY_RUN=true ;;
+        --skip-rtk)      INSTALL_RTK=false ;;
+        --uninstall-rtk) UNINSTALL_RTK=true ;;
+        --terminal=*)
+            _term="$(echo "${_arg#--terminal=}" | tr '[:upper:]' '[:lower:]')"
+            case "${_term}" in
+                ghostty)      TERMINAL_CHOICE="ghostty" ;;
+                kitty)        TERMINAL_CHOICE="kitty" ;;
+                iterm2|iterm) TERMINAL_CHOICE="iterm2" ;;
+            esac
+            ;;
     esac
 done
-unset _arg
+unset _arg _term
 
 readonly DRY_RUN INSTALL_RTK UNINSTALL_RTK
 
@@ -414,6 +420,10 @@ select_terminal() {
     if [[ -d "/Applications/kitty.app" ]]; then
         log_info "kitty already installed — skipping selection"
         TERMINAL_CHOICE="kitty"; return 0
+    fi
+    if [[ -d "/Applications/iTerm.app" ]]; then
+        log_info "iTerm2 already installed — skipping selection"
+        TERMINAL_CHOICE="iterm2"; return 0
     fi
 
     # Skip prompt when stdin is not a TTY (e.g. piped from curl)
