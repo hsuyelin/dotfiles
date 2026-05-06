@@ -62,25 +62,36 @@ jobs:
           DATE:       ${{ steps.meta.outputs.date }}
           REPO:       ${{ github.repository }}
           PATCH_FILE: ${{ steps.patch.outputs.name }}
-        run: python3 .github/scripts/gen_release.py
-
-      # ── Checksums ──────────────────────────────────────────────────────────
-      - name: Compute sha512 checksums
         run: |
-          files=(README.txt)
+          python3 .github/scripts/gen_release.py
+          echo "--- workspace after gen_release ---"
+          ls -la release_notes.md README.txt
+
+      # ── Checksums + stage assets ───────────────────────────────────────────
+      # Merged into one step so file visibility across step boundaries cannot
+      # be a factor.  All files are created and verified in a single shell.
+      - name: Assemble release assets
+        run: |
           pf="${{ steps.patch.outputs.name }}"
+
+          # Verify gen_release.py output
+          for f in release_notes.md README.txt; do
+            [[ -f "${f}" ]] \
+              || { echo "::error::${f} not found — gen_release.py may have failed"; exit 1; }
+          done
+
+          # Checksums
+          files=(README.txt)
           [[ -n "${pf}" && -f "${pf}" ]] && files+=("${pf}")
           sha512sum "${files[@]}" > sha512sum.txt
 
-      # ── Stage assets ───────────────────────────────────────────────────────
-      # Collect everything into _dist/ so we can use a single glob in the
-      # release step rather than conditional per-file logic.
-      - name: Stage release assets
-        run: |
+          # Stage
           mkdir -p _dist
           cp README.txt sha512sum.txt _dist/
-          pf="${{ steps.patch.outputs.name }}"
           [[ -n "${pf}" && -f "${pf}" ]] && cp "${pf}" _dist/
+
+          echo "--- _dist ---"
+          ls -la _dist/
 
       # ── Publish ────────────────────────────────────────────────────────────
       - name: Create GitHub release
