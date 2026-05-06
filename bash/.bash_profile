@@ -1,5 +1,6 @@
 # PATH environment
 export PATH="$PATH:\
+${XDG_CONFIG_HOME:-$HOME/.config}/bin:\
 /opt/homebrew/bin:\
 /usr/local/sbin:/usr/local/bin:\
 /sbin:/bin:/usr/sbin:/usr/bin:\
