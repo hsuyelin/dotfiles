@@ -33,7 +33,7 @@ Developed and tested exclusively on:
 | **Hardware** | Apple M4 (arm64) |
 | **Architecture** | ARM64 — any Apple Silicon Mac (M1 and later) should work |
 
-Intel Macs are **not** supported.
+Intel Macs are **allowed but untested** — the installer prompts for confirmation before proceeding on x86_64.
 
 ### Tool Versions
 
@@ -135,6 +135,7 @@ Intel Macs are **not** supported.
 | System monitor | [btop](https://github.com/aristocratos/btop) | Catppuccin Mocha theme |
 | Markdown reader | [glow](https://github.com/charmbracelet/glow) | Terminal markdown renderer |
 | Package manager | [Homebrew](https://brew.sh) | Formulae + casks declared in `brew/` |
+| AI assistant | [Claude Code](https://claude.ai/code) + RTK | Catppuccin Mocha/Latte custom themes · RTK token-optimizer hook |
 
 ---
 
@@ -225,23 +226,29 @@ Then:
 
 ```
 ~/.config/
+├── .claude/         # Claude Code — Catppuccin Mocha + Latte custom themes
+├── .github/         # CI/CD — tag-based release workflow + asset cleanup
 ├── aerospace/       # AeroSpace tiling WM
 ├── alias/           # Shell aliases
-├── assets/          # Repository assets (logo, etc.)
+├── assets/          # Repository assets (logo, screenshots)
 ├── bash/            # bash_profile, AI shell helpers
 ├── bat/             # bat config + Catppuccin Mocha theme
+├── bin/             # Utility scripts (brew export, Carthage, Xcode helpers)
 ├── borders/         # JankyBorders config
 ├── brew/            # Homebrew formulae + casks lists
 ├── btop/            # btop config + Catppuccin Mocha theme
 ├── bundle/          # Bundler config
 ├── fzf/             # fzf shell integration
 ├── ghostty/         # Ghostty terminal config + cursor shaders (default)
+├── iterm2/          # iTerm2 Catppuccin Mocha color preset
 ├── kitty/           # kitty terminal config (alternative, mirrors Ghostty)
 ├── git/             # Global git config + commit template
 ├── glow/            # Glow markdown renderer config
 ├── lazygit/         # lazygit UI config
 ├── npm/             # npm XDG config
 ├── nvim/            # Neovim (Lazy.nvim)
+├── rtk/             # RTK config — Claude Code token-optimizer hook
+├── rvm/             # RVM install helper
 ├── starship/        # Starship prompt config
 ├── swiftformat/     # SwiftFormat rules
 ├── tmux/            # tmux config + TPM
@@ -260,7 +267,7 @@ Then:
 
 **Private by default** — `private/git.config` holds identity; `secrets/` holds credentials. Both are gitignored and stubbed by `install.sh`. The repo contains zero personal data.
 
-**Theme consistency** — [Catppuccin Mocha](https://github.com/catppuccin/catppuccin) is the single theme applied uniformly across every tool: Ghostty, Starship, bat, btop, Neovim, and lazygit. Colors, contrast, and accent palette are identical everywhere — no visual context-switching between tools.
+**Theme consistency** — [Catppuccin](https://github.com/catppuccin/catppuccin) is the single theme family applied uniformly across every tool: Ghostty, Starship, bat, btop, Neovim, and lazygit all use **Mocha** (dark). Claude Code ships two custom themes — **Mocha** (dark) and **Latte** (light) — selectable via `/theme`. Colors, contrast, and accent palette are identical everywhere — no visual context-switching between tools.
 
 **Idempotency** — Every script is safe to re-run. Existing files are never overwritten; completed steps are logged and skipped.
 
