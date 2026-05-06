@@ -639,7 +639,7 @@ uninstall_rtk() {
 # Copies Catppuccin theme JSON files from the dotfiles repo into ~/.claude/themes/.
 # Skips any file that already exists so user-customized themes are preserved.
 install_claude_themes() {
-    local themes_src="${DOTFILES_DIR}/.claude/themes"
+    local themes_src="${DOTFILES_DIR}/claude/themes"
     local themes_dst="${HOME}/.claude/themes"
 
     if ! command -v claude &>/dev/null; then

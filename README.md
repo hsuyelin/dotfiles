@@ -226,7 +226,7 @@ Then:
 
 ```
 ~/.config/
-├── .claude/         # Claude Code — Catppuccin Mocha + Latte custom themes
+├── claude/          # Claude Code — Catppuccin Mocha + Latte custom themes
 ├── .github/         # CI/CD — tag-based release workflow + asset cleanup
 ├── aerospace/       # AeroSpace tiling WM
 ├── alias/           # Shell aliases
