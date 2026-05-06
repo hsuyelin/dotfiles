@@ -139,6 +139,7 @@
     branch = yellow
 [push]
     default = current
+    autoSetupRemote = true
 [branch]
     autosetuprebase = always
 [fetch]
