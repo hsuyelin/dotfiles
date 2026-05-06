@@ -88,13 +88,54 @@ zi snippet OMZL::key-bindings.zsh
 # Bind all variants: VT100 (^[[A), ANSI app mode (^[OA), and terminfo-based.
 # This must come after zi snippet OMZL::key-bindings.zsh to win the race.
 autoload -Uz up-line-or-history down-line-or-history
+
+# Tracks whether we have entered history navigation (guards ↓ from clearing on fresh line).
+typeset -g _hist_nav_active=0
+
+# ↑: accept autosuggestion if visible; otherwise go up in history.
+#    At the oldest entry, clear the buffer and reset position so next ↑ restarts from newest.
+_up-or-autosuggest-accept() {
+  if [[ -n "$POSTDISPLAY" ]]; then
+    zle autosuggest-accept
+    _hist_nav_active=0
+    return
+  fi
+  local before=$HISTNO
+  zle up-line-or-history
+  if [[ $HISTNO -eq $before ]]; then
+    zle kill-whole-line
+    HISTNO=$HISTCMD
+    _hist_nav_active=0
+  else
+    _hist_nav_active=1
+  fi
+}
+zle -N _up-or-autosuggest-accept
+
+# ↓: go down in history.
+#    At the newest entry (only after having navigated up), clear the buffer and reset position.
+_down-or-clear() {
+  local before=$HISTNO
+  zle down-line-or-history
+  if [[ $HISTNO -eq $before ]]; then
+    if (( _hist_nav_active )); then
+      zle kill-whole-line
+      HISTNO=$HISTCMD
+    fi
+    _hist_nav_active=0
+  else
+    _hist_nav_active=1
+  fi
+}
+zle -N _down-or-clear
+
 for _km in emacs viins vicmd; do
-  bindkey -M $_km '^[[A' up-line-or-history
-  bindkey -M $_km '^[OA' up-line-or-history
-  bindkey -M $_km '^[[B' down-line-or-history
-  bindkey -M $_km '^[OB' down-line-or-history
-  [[ -n "${terminfo[kcuu1]}" ]] && bindkey -M $_km "${terminfo[kcuu1]}" up-line-or-history
-  [[ -n "${terminfo[kcud1]}" ]] && bindkey -M $_km "${terminfo[kcud1]}" down-line-or-history
+  bindkey -M $_km '^[[A' _up-or-autosuggest-accept
+  bindkey -M $_km '^[OA' _up-or-autosuggest-accept
+  bindkey -M $_km '^[[B' _down-or-clear
+  bindkey -M $_km '^[OB' _down-or-clear
+  [[ -n "${terminfo[kcuu1]}" ]] && bindkey -M $_km "${terminfo[kcuu1]}" _up-or-autosuggest-accept
+  [[ -n "${terminfo[kcud1]}" ]] && bindkey -M $_km "${terminfo[kcud1]}" _down-or-clear
 done
 unset _km
 
