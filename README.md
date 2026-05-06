@@ -226,37 +226,37 @@ Then:
 
 ```
 ~/.config/
-├── claude/          # Claude Code — Catppuccin Mocha + Latte custom themes
 ├── .github/         # CI/CD — tag-based release workflow + asset cleanup
 ├── aerospace/       # AeroSpace tiling WM
 ├── alias/           # Shell aliases
 ├── assets/          # Repository assets (logo, screenshots)
 ├── bash/            # bash_profile, AI shell helpers
-├── bat/             # bat config + Catppuccin Mocha theme
+├── bat/             # bat syntax highlighter — Catppuccin Mocha theme
 ├── bin/             # Utility scripts (brew export, Carthage, Xcode helpers)
 ├── borders/         # JankyBorders config
-├── brew/            # Homebrew formulae + casks lists
-├── btop/            # btop config + Catppuccin Mocha theme
+├── brew/            # Homebrew formulae + casks
+├── btop/            # System monitor — Catppuccin Mocha theme
 ├── bundle/          # Bundler config
-├── fzf/             # fzf shell integration
-├── ghostty/         # Ghostty terminal config + cursor shaders (default)
-├── iterm2/          # iTerm2 Catppuccin Mocha color preset
-├── kitty/           # kitty terminal config (alternative, mirrors Ghostty)
+├── claude/          # Claude Code — Catppuccin Mocha / Latte custom themes
+├── fzf/             # Fuzzy finder shell integration
+├── ghostty/         # Ghostty terminal — cursor shaders (default terminal)
 ├── git/             # Global git config + commit template
 ├── glow/            # Glow markdown renderer config
-├── lazygit/         # lazygit UI config
+├── iterm2/          # iTerm2 color preset (Catppuccin Mocha)
+├── kitty/           # kitty terminal config (alternative, mirrors Ghostty)
+├── lazygit/         # lazygit TUI config
 ├── npm/             # npm XDG config
-├── nvim/            # Neovim (Lazy.nvim)
-├── rtk/             # RTK config — Claude Code token-optimizer hook
+├── nvim/            # Neovim — Lazy.nvim · LSP · Treesitter
+├── rtk/             # RTK (Rust Token Killer) — Claude Code hook config
 ├── rvm/             # RVM install helper
-├── starship/        # Starship prompt config
+├── starship/        # Starship prompt — Catppuccin Mocha palette
 ├── swiftformat/     # SwiftFormat rules
-├── tmux/            # tmux config + TPM
-├── zsh/             # .zshrc · .zshenv · .zprofile · env/
-├── private/         # gitignored — personal identity (git name/email)
+├── tmux/            # tmux config + TPM plugins
+├── zsh/             # .zshrc · .zprofile · env/ · zi plugin config
+├── private/         # gitignored — personal identity (git name / email)
 ├── secrets/         # gitignored — API keys, tokens
-├── bootstrap.sh     # Full machine setup (run once on new hardware)
-└── install.sh       # Dotfiles installer (idempotent)
+├── bootstrap.sh     # One-command machine setup (run once on new hardware)
+└── install.sh       # Dotfiles installer — idempotent, safe to re-run
 ```
 
 ---
