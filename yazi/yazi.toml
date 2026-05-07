@@ -1,0 +1,90 @@
+# ── Manager ───────────────────────────────────────────────────────────────────
+
+[mgr]
+ratio          = [1, 4, 3]
+sort_by        = "natural"
+sort_sensitive = false
+sort_reverse   = false
+sort_dir_first = true
+linemode       = "size"
+show_hidden    = false
+show_symlink   = true
+scrolloff      = 5
+mouse_events   = ["click", "scroll"]
+
+# ── Preview ───────────────────────────────────────────────────────────────────
+
+[preview]
+wrap          = "no"
+tab_size      = 4
+max_width     = 1200
+max_height    = 900
+cache_dir     = ""
+image_delay   = 30
+image_filter  = "triangle"
+image_quality = 75
+
+# ── Opener definitions ────────────────────────────────────────────────────────
+
+[opener]
+
+edit = [
+    { run = '$EDITOR "$@"',       block  = true,                     for = "unix"  },
+]
+reveal = [
+    { run = 'open -R "$1"',       desc   = "Reveal in Finder",       for = "macos" },
+]
+open = [
+    { run = 'open "$@"',                                              for = "macos" },
+]
+play = [
+    { run = 'open -a IINA "$@"',  desc   = "Play with IINA",         for = "macos" },
+]
+
+# ── Open rules ────────────────────────────────────────────────────────────────
+
+[open]
+append_rules = [
+    { mime = "{audio,video}/*",   use = ["play", "open", "reveal"] },
+]
+
+# ── Tasks ─────────────────────────────────────────────────────────────────────
+
+[tasks]
+file_workers     = 5
+plugin_workers   = 3
+fetch_workers    = 5
+preload_workers  = 2
+process_workers  = 5
+bizarre_retry    = 3
+suppress_preload = false
+image_alloc      = 536870912    # 512 MiB — raise if large RAW/HEIC files stall
+image_bound      = [0, 0]
+
+# ── Plugin: previewers / preloaders ───────────────────────────────────────────
+# Only entries that extend or override the built-in defaults.
+# Built-in: folder · code · json · image · video · pdf · archive
+#
+# External dependencies (all provided by Homebrew):
+#   imagemagick   → SVG / HEIC / JPEG XL / font preview
+#   ffmpegthumbnailer → video thumbnails
+#   poppler (pdftoppm) → PDF preview
+#   unar              → archive listing
+#   fd / ripgrep      → find / search (wired in keymap.toml)
+#   fzf / zoxide      → jump (wired in keymap.toml)
+
+[plugin]
+
+prepend_preloaders = [
+    # imagemagick handles formats the built-in loader cannot decode
+    { mime = "image/{svg+xml,avif,hei?,jxl}", run = "magick" },
+    { mime = "font/{ttf,otf,woff,woff2}",     run = "magick" },
+    { mime = "application/font-*",            run = "magick" },
+]
+
+prepend_previewers = [
+    # imagemagick — SVG · HEIC · JPEG XL · font glyphs
+    { mime = "image/{svg+xml,avif,hei?,jxl}", run = "magick" },
+    { mime = "font/{ttf,otf,woff,woff2}",     run = "magick" },
+    { mime = "application/font-*",            run = "magick" },
+]

@@ -1,0 +1,99 @@
+# Keybindings use prepend_keymap so custom bindings shadow the defaults
+# without replacing the entire default set.
+#
+# Navigation model:
+#   h / l          → parent / enter  (default)
+#   j / k          → down / up       (default)
+#   z              → zoxide jump
+#   <C-f>          → fzf jump
+#   /              → find by name (fd)
+#   <C-s>          → search content  (rg)
+#   .              → toggle hidden   (default)
+#
+# File operations  →  y · d · p · D · r · a  (defaults kept)
+# Editor           →  E  (block-open in $EDITOR)
+# Reveal in Finder →  R
+
+# ── Manager ───────────────────────────────────────────────────────────────────
+
+[[mgr.prepend_keymap]]
+on  = "z"
+run = "jump --type zoxide"
+desc = "Jump to directory via zoxide"
+
+[[mgr.prepend_keymap]]
+on  = "<C-f>"
+run = "jump --type fzf"
+desc = "Jump to directory via fzf"
+
+[[mgr.prepend_keymap]]
+on  = "<C-s>"
+run = "search --hidden"
+desc = "Search file content (ripgrep)"
+
+[[mgr.prepend_keymap]]
+on  = "E"
+run = "open --interactive"
+desc = "Open with interactive picker"
+
+[[mgr.prepend_keymap]]
+on  = "e"
+run = "shell '$EDITOR \"$@\"' --block --confirm"
+desc = "Open in $EDITOR"
+
+[[mgr.prepend_keymap]]
+on  = "R"
+run = "shell 'open -R \"$1\"' --confirm"
+desc = "Reveal in Finder"
+
+# Half-page scrolling (mirrors Neovim defaults)
+[[mgr.prepend_keymap]]
+on  = "<C-u>"
+run = "arrow -50%"
+desc = "Scroll up half page"
+
+[[mgr.prepend_keymap]]
+on  = "<C-d>"
+run = "arrow 50%"
+desc = "Scroll down half page"
+
+# Visual selection helpers
+[[mgr.prepend_keymap]]
+on  = "V"
+run = "select_all --state=true"
+desc = "Select all files"
+
+[[mgr.prepend_keymap]]
+on  = "<C-a>"
+run = "select_all --state=true"
+desc = "Select all files"
+
+# Quick tab management
+[[mgr.prepend_keymap]]
+on  = "T"
+run = "tab_create --current"
+desc = "Open new tab in current directory"
+
+# Sort shortcuts
+[[mgr.prepend_keymap]]
+on  = ["g", "s"]
+run = "sort natural --dir-first"
+desc = "Sort: natural (default)"
+
+[[mgr.prepend_keymap]]
+on  = ["g", "S"]
+run = "sort size --reverse --dir-first"
+desc = "Sort: size descending"
+
+[[mgr.prepend_keymap]]
+on  = ["g", "m"]
+run = "sort mtime --reverse --dir-first"
+desc = "Sort: modified time (newest first)"
+
+# ── Input ─────────────────────────────────────────────────────────────────────
+# Make Esc close the input field (instead of clearing only)
+
+[[input.prepend_keymap]]
+on  = "<Esc>"
+run = "close"
+desc = "Cancel input"

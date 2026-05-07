@@ -52,6 +52,7 @@ Intel Macs are **allowed but untested** — the installer prompts for confirmati
 | [zoxide](https://github.com/ajeetdsouza/zoxide) | 0.9.9 |
 | [delta](https://github.com/dandavison/delta) | 0.19.2 |
 | [btop](https://github.com/aristocratos/btop) | 1.4.6 |
+| [Yazi](https://github.com/sxyazi/yazi) | 26.5.6 |
 
 ---
 
@@ -127,6 +128,7 @@ Intel Macs are **allowed but untested** — the installer prompts for confirmati
 | Editor | [Neovim](https://neovim.io) | Lazy.nvim · LSP · Treesitter |
 | Window Manager | [AeroSpace](https://github.com/nikitabobko/AeroSpace) | Tiling · vim-style keybinds |
 | Window Borders | [JankyBorders](https://github.com/FelixKratz/JankyBorders) | Auto-launched by AeroSpace |
+| File manager | [Yazi](https://github.com/sxyazi/yazi) | `yy` alias · Catppuccin Mocha · image/video/PDF/archive preview |
 | File listing | [eza](https://github.com/eza-community/eza) | Replaces `ls` · icons · git status |
 | Fuzzy finder | [fzf](https://github.com/junegunn/fzf) + [zoxide](https://github.com/ajeetdsouza/zoxide) | `z` for directory jumping |
 | Diff pager | [delta](https://github.com/dandavison/delta) | Syntax-highlighted git diffs |
@@ -225,6 +227,7 @@ Then:
 - Open **tmux** → `<prefix>+I` to install plugins via TPM
 - Open **Neovim** — Lazy.nvim installs plugins automatically on first launch
 - Open **Ghostty** — cursor shader loads from `ghostty/shaders/`
+- Open **Yazi** — run `yy` to launch; exits back to the directory you navigated to
 - Install a Ruby version: `rvminstall 3.x.x`
 
 ---
@@ -254,6 +257,7 @@ Then:
 ├── lazygit/         # lazygit TUI config
 ├── npm/             # npm XDG config
 ├── nvim/            # Neovim — Lazy.nvim · LSP · Treesitter
+├── yazi/            # Yazi file manager — Catppuccin Mocha · image/video/PDF/archive preview
 ├── rtk/             # RTK (Rust Token Killer) — Claude Code hook config
 ├── rvm/             # RVM install helper
 ├── starship/        # Starship prompt — Catppuccin Mocha palette
@@ -268,13 +272,54 @@ Then:
 
 ---
 
+## Yazi
+
+[Yazi](https://github.com/sxyazi/yazi) is configured as a full-featured terminal file manager. Launch with `yy` — the shell exits back to whatever directory you navigated to.
+
+### Preview support
+
+| Format | Backend |
+|---|---|
+| Images (PNG/JPG/GIF/WebP) | Kitty image protocol (native, zero deps) |
+| SVG · HEIC · JPEG XL · Fonts | `imagemagick` |
+| Video thumbnails | `ffmpegthumbnailer` |
+| PDF | `poppler` (`pdftoppm`) |
+| Archives (zip/tar/7z/rar/…) | `unar` |
+| JSON | built-in |
+| Code (Swift · ObjC · Python · Go · Bash · Rust · Ruby · …) | built-in syntect + Catppuccin Mocha `.tmTheme` |
+| Markdown | built-in |
+
+### Keybindings (custom additions)
+
+| Key | Action |
+|---|---|
+| `z` | Jump to directory via **zoxide** |
+| `<C-f>` | Jump to directory via **fzf** |
+| `/` | Find by filename (**fd**) |
+| `<C-s>` | Search file content (**ripgrep**) |
+| `e` | Open in `$EDITOR` |
+| `E` | Open with interactive picker |
+| `R` | Reveal in Finder |
+| `<C-u>` / `<C-d>` | Scroll half-page up / down |
+| `V` / `<C-a>` | Select all |
+| `T` | New tab in current directory |
+| `gs` / `gS` / `gm` | Sort: natural / size-desc / mtime-desc |
+
+All default vim-style bindings (`h/j/k/l`, `y/d/p/D/r/a`, `gg/G`, `.`, `q`, …) are preserved.
+
+### Theme
+
+Uses the [Catppuccin Mocha](https://github.com/catppuccin/yazi) flavor, stored at `yazi/flavors/catppuccin-mocha.yazi/flavor.toml`. The code previewer reuses the same `.tmTheme` file as `bat` for identical colors in both tools.
+
+---
+
 ## Design Notes
 
 **XDG compliance** — Everything lives under `~/.config`. A single `~/.zshenv` bootstraps `ZDOTDIR`; no scattered dotfiles in `$HOME`.
 
 **Private by default** — `private/git.config` holds identity; `secrets/` holds credentials. Both are gitignored and stubbed by `install.sh`. The repo contains zero personal data.
 
-**Theme consistency** — [Catppuccin](https://github.com/catppuccin/catppuccin) is the single theme family applied uniformly across every tool: Ghostty, Starship, bat, btop, Neovim, and lazygit all use **Mocha** (dark). Claude Code ships two custom themes — **Mocha** (dark) and **Latte** (light) — selectable via `/theme`. Colors, contrast, and accent palette are identical everywhere — no visual context-switching between tools.
+**Theme consistency** — [Catppuccin](https://github.com/catppuccin/catppuccin) is the single theme family applied uniformly across every tool: Ghostty, Starship, bat, btop, Neovim, lazygit, and Yazi all use **Mocha** (dark). Claude Code ships two custom themes — **Mocha** (dark) and **Latte** (light) — selectable via `/theme`. Colors, contrast, and accent palette are identical everywhere — no visual context-switching between tools.
 
 **Idempotency** — Every script is safe to re-run. Existing files are never overwritten; completed steps are logged and skipped.
 

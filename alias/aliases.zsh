@@ -194,6 +194,23 @@ alias cx='codex'
 
 
 # -----------------------------
+# Yazi file manager
+# - Changes the working directory to wherever Yazi exits.
+# - The function is defined here (lazy: only runs when called) so it
+#   adds zero overhead to shell startup time.
+# -----------------------------
+yy() {
+    local tmp cwd
+    tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
+    yazi "$@" --cwd-file="$tmp"
+    if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+        builtin cd -- "$cwd"
+    fi
+    rm -f -- "$tmp"
+}
+
+
+# -----------------------------
 # SSH
 # -----------------------------
 alias ssh='TERM=xterm-256color ssh'

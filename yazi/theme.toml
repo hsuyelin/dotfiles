@@ -1,0 +1,14 @@
+# ── Flavor ────────────────────────────────────────────────────────────────────
+# Points to flavors/catppuccin-mocha.yazi/flavor.toml
+# Use "catppuccin-latte" here to switch to the light variant.
+
+[flavor]
+dark  = "catppuccin-mocha"
+light = "catppuccin-mocha"
+
+# ── Code syntax highlighting ──────────────────────────────────────────────────
+# Reuse the same Catppuccin Mocha .tmTheme used by bat, ensuring identical
+# colors in both the file previewer and bat-driven pagers.
+
+[mgr]
+syntect_theme = "~/.config/bat/themes/Catppuccin Mocha.tmTheme"

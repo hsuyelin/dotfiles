@@ -1,0 +1,8 @@
+-- init.lua — Yazi Lua entry point
+--
+-- All core behaviour is driven by:
+--   yazi.toml   → manager layout · preview settings · opener rules · plugin previewers
+--   keymap.toml → fd · rg · fzf · zoxide bindings and all custom shortcuts
+--   theme.toml  → catppuccin-mocha flavor reference + syntect_theme for code preview
+--
+-- Add custom plugins or Status/Header overrides here when needed.
