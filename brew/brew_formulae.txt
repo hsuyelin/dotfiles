@@ -23,7 +23,6 @@ duti
 eza
 fastfetch
 fd
-ffmpeg
 ffmpeg-full
 ffmpegthumbnailer
 flac
@@ -58,7 +57,6 @@ harfbuzz
 hdrhistogram_c
 highway
 icu4c@78
-imagemagick
 imagemagick-full
 imath
 ipatool

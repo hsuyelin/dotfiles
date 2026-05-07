@@ -195,15 +195,16 @@ alias cx='codex'
 
 # -----------------------------
 # Yazi file manager
-# - Changes the working directory to wherever Yazi exits.
-# - The function is defined here (lazy: only runs when called) so it
-#   adds zero overhead to shell startup time.
+# - On exit, automatically cd to the last directory navigated inside Yazi.
+# - Uses yazi's --cwd-file mechanism (official shell integration).
+# - Defined as a function (not an alias) so it can call `builtin cd`;
+#   zero startup overhead — yazi only launches when you call yy.
 # -----------------------------
 yy() {
     local tmp cwd
-    tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
+    tmp="$(mktemp -t "yazi-cwd.XXXXXX")" || return 1
     yazi "$@" --cwd-file="$tmp"
-    if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+    if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
         builtin cd -- "$cwd"
     fi
     rm -f -- "$tmp"
