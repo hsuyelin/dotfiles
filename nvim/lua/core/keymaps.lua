@@ -94,6 +94,34 @@ wk.add({
 	{ "<leader>fr", "<cmd>Telescope oldfiles<cr>", desc = "最近文件 (Recent Files)" },
 	{ "<leader>fd", "<cmd>Ex<cr>", desc = "文件管理器 (Netrw)" },
 	{ "<leader>fh", "<cmd>Neotree toggle<CR>", desc = "展开收起文件浏览器侧边栏 (Toggle File Explorer)" },
+	{ "<leader>fy", group = "复制路径 (Yank Path)" },
+	{
+		"<leader>fyy",
+		function()
+			local path = vim.fn.expand("%:p")
+			vim.fn.setreg("+", path)
+			vim.notify("Copied: " .. path, vim.log.levels.INFO)
+		end,
+		desc = "复制绝对路径 (Absolute Path)",
+	},
+	{
+		"<leader>fyr",
+		function()
+			local path = vim.fn.expand("%:.")
+			vim.fn.setreg("+", path)
+			vim.notify("Copied: " .. path, vim.log.levels.INFO)
+		end,
+		desc = "复制相对路径 (Relative Path)",
+	},
+	{
+		"<leader>fyn",
+		function()
+			local name = vim.fn.expand("%:t")
+			vim.fn.setreg("+", name)
+			vim.notify("Copied: " .. name, vim.log.levels.INFO)
+		end,
+		desc = "复制文件名 (Filename Only)",
+	},
 	-- Window
 	{ "<leader>w", group = "窗口 (Window)" },
 	-- Git
