@@ -294,6 +294,7 @@ prepend_exts = [
   { name = "rb",           text = "",  fg = "#f38ba8" },
   { name = "rake",         text = "",  fg = "#f38ba8" },
   { name = "gemspec",      text = "",  fg = "#f38ba8" },
+  { name = "podspec",      text = "",  fg = "#f38ba8" },
   { name = "erb",          text = "",  fg = "#f38ba8" },
 
   # ── Java / JVM ──────────────────────────────────────────────────────────────

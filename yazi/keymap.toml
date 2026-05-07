@@ -38,12 +38,19 @@ desc = "Open with interactive picker"
 
 [[mgr.prepend_keymap]]
 on  = "e"
-run = "shell '$EDITOR \"$@\"' --block --confirm"
+run = "shell '$EDITOR \"$@\"' --block"
 desc = "Open in $EDITOR"
+
+# Open in Neovim explicitly.
+# Silently does nothing if nvim is not installed — no error, no popup.
+[[mgr.prepend_keymap]]
+on  = "<C-e>"
+run = "shell 'command -v nvim >/dev/null 2>&1 && nvim -- \"$@\"' --block"
+desc = "Open in Neovim"
 
 [[mgr.prepend_keymap]]
 on  = "R"
-run = "shell 'open -R \"$1\"' --confirm"
+run = "shell 'open -R \"$1\"'"
 desc = "Reveal in Finder"
 
 # Half-page scrolling (mirrors Neovim defaults)
