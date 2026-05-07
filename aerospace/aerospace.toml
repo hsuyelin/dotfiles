@@ -132,7 +132,7 @@ ctrl-alt-t = [
 
 # Focus on Telegram (App name: Telegram)
 ctrl-alt-g = [
-    'workspace C',
+    'workspace 9',
     'exec-and-forget open -a Telegram'
 ]
 
@@ -230,7 +230,7 @@ run = 'move-node-to-workspace C'
 
 [[on-window-detected]]
 if.app-id = 'ru.keepcoder.Telegram'
-run = 'move-node-to-workspace C'
+run = 'move-node-to-workspace 9'
 
 ## 5. Docs/Office (O)
 [[on-window-detected]]
