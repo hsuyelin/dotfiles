@@ -380,6 +380,27 @@ _brew_install_list() {
     done < "${list}"
 }
 
+_preflight_brew_conflicts() {
+    log_step "Checking" "for conflicting non-full packages"
+
+    # Yazi requires ffmpeg-full and imagemagick-full.
+    # The plain variants conflict with the -full formulae at link time.
+    local -a pairs=("ffmpeg:ffmpeg-full" "imagemagick:imagemagick-full")
+
+    for pair in "${pairs[@]}"; do
+        local plain="${pair%%:*}"
+        local full="${pair##*:}"
+        if brew list "${plain}" &>/dev/null 2>&1; then
+            log_warn "${plain} installed — ${full} is required for Yazi"
+            log_step "Removing" "brew uninstall --ignore-dependencies ${plain}"
+            run brew uninstall --ignore-dependencies "${plain}" \
+                || log_warn "Failed to remove ${plain} — continuing"
+        else
+            log_info "no conflict: ${plain} not present"
+        fi
+    done
+}
+
 install_brew_packages() {
     log_step "Checking" "Homebrew package lists"
 
@@ -395,6 +416,8 @@ install_brew_packages() {
         log_step "brew" "tap nikitabobko/tap (required for aerospace)"
         run brew tap nikitabobko/tap || log_warn "tap nikitabobko/tap failed (skipping)"
     fi
+
+    _preflight_brew_conflicts
 
     _brew_install_list "formula" "${DOTFILES_DIR}/brew/brew_formulae.txt"
     _brew_install_list "cask"    "${DOTFILES_DIR}/brew/brew_casks.txt"
