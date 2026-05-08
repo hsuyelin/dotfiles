@@ -77,13 +77,6 @@ zi light "zsh-users/zsh-completions"
 
 zi light "z-shell/zsh-eza"
 
-# ============================================================
-# ZI Snippets
-# ============================================================
-zi snippet OMZP::git
-zi snippet OMZL::completion.zsh
-zi snippet OMZL::key-bindings.zsh
-
 # Override OMZ's prefix-filtered search with plain history cycling.
 # Bind all variants: VT100 (^[[A), ANSI app mode (^[OA), and terminfo-based.
 # This must come after zi snippet OMZL::key-bindings.zsh to win the race.
@@ -144,6 +137,7 @@ unset _km
 # ============================================================
 [[ -f "${XDG_CONFIG_HOME}/bash/.bash_profile" ]] && source "${XDG_CONFIG_HOME}/bash/.bash_profile"
 [[ -f "${XDG_CONFIG_HOME}/alias/aliases.zsh" ]] && source "${XDG_CONFIG_HOME}/alias/aliases.zsh"
+[[ -f "${XDG_CONFIG_HOME}/alias/git.zsh" ]] && source "${XDG_CONFIG_HOME}/alias/git.zsh"
 [[ -f "${XDG_CONFIG_HOME}/private/xcode.zsh" ]] && source "${XDG_CONFIG_HOME}/private/xcode.zsh"
 [[ -f "${XDG_CONFIG_HOME}/bash/ai.zsh" ]] && source "${XDG_CONFIG_HOME}/bash/ai.zsh"
 
