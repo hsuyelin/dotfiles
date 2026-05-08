@@ -645,6 +645,28 @@ uninstall_rtk() {
     log_info "To also remove the config: rm -rf \"\${XDG_CONFIG_HOME}/rtk\""
 }
 
+# ── Step: File associations ───────────────────────────────────────────────────
+# kitty's Info.plist declares itself as a handler for public.shell-script,
+# which makes all .sh / .zsh files display the kitty icon in Finder even after
+# switching to Ghostty. Use duti to reassign the UTI to TextEdit.
+configure_file_associations() {
+    log_step "Checking" "file associations (duti)"
+
+    if ! command -v duti &>/dev/null; then
+        log_info "duti not found — skipping file association setup"
+        log_info "Run 'brew install duti && bash install.sh' to apply this step"
+        return 0
+    fi
+
+    if [[ "${DRY_RUN}" == "true" ]]; then
+        log_info "[dry-run] would reassign public.shell-script → com.apple.TextEdit"
+        return 0
+    fi
+
+    duti -s com.apple.TextEdit public.shell-script all
+    log_step "Set" "public.shell-script → com.apple.TextEdit"
+}
+
 # ── Step: Claude Code themes ──────────────────────────────────────────────────
 # Copies Catppuccin theme JSON files from the dotfiles repo into ~/.claude/themes/.
 # Skips any file that already exists so user-customized themes are preserved.
@@ -751,6 +773,7 @@ main() {
     set_permissions
     migrate_xdg_homes
     [[ "${INSTALL_RTK}" == "true" ]] && install_rtk
+    configure_file_associations
     install_claude_themes
     print_checklist
 }
