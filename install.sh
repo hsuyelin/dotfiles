@@ -385,64 +385,76 @@ create_placeholder_secrets() {
 }
 
 # ── Step: Proxy configuration ────────────────────────────────────────────────
-# Prompts for the HTTP proxy port. The SOCKS5 port is always http_port+1.
+# Prompts for the HTTP and SOCKS5 proxy ports independently.
 # Writes PROXY_PORT_HTTP / PROXY_PORT_SOCKS into private/zsh.zprofile so each
-# machine can use a different port without touching the tracked aliases.zsh.
+# machine can use different ports without touching the tracked aliases.zsh.
 configure_proxy() {
     log_step "Checking" "proxy port configuration"
 
     local private_profile="${DOTFILES_DIR}/private/zsh.zprofile"
     local default_http=6152
+    local default_socks=6153
 
-    # Read the current configured value if it already exists
+    # Read current configured values if they already exist
     if [[ -f "${private_profile}" ]]; then
-        local existing
-        existing="$(grep -E '^export PROXY_PORT_HTTP=' "${private_profile}" \
+        local ex_http ex_socks
+        ex_http="$(grep -E '^export PROXY_PORT_HTTP=' "${private_profile}" \
             | head -1 | sed 's/export PROXY_PORT_HTTP=//')"
-        [[ -n "${existing}" ]] && default_http="${existing}"
+        ex_socks="$(grep -E '^export PROXY_PORT_SOCKS=' "${private_profile}" \
+            | head -1 | sed 's/export PROXY_PORT_SOCKS=//')"
+        [[ -n "${ex_http}"  ]] && default_http="${ex_http}"
+        [[ -n "${ex_socks}" ]] && default_socks="${ex_socks}"
     fi
 
     # Skip interactive prompt in non-TTY sessions
     if [[ ! -t 0 ]]; then
-        log_info "Non-interactive session — using proxy port ${default_http}"
-        _write_proxy_port "${private_profile}" "${default_http}"
+        log_info "Non-interactive — using proxy http=${default_http} socks5=${default_socks}"
+        _write_proxy_port "${private_profile}" "${default_http}" "${default_socks}"
         return 0
     fi
 
     if [[ "${DRY_RUN}" == "true" ]]; then
-        log_info "[dry-run] would prompt for proxy port (default ${default_http})"
+        log_info "[dry-run] would prompt for proxy ports (http=${default_http}, socks5=${default_socks})"
         return 0
     fi
 
-    printf '\n'
-    printf '    %s\n' "HTTP proxy port for proxy_on (SOCKS5 = port+1):"
-    printf '    %s' "Port [default: ${default_http}, auto-confirm in 15 s]: "
+    local http_port socks_port
+    http_port="$(_prompt_port "HTTP  proxy port" "${default_http}")"
+    socks_port="$(_prompt_port "SOCKS5 proxy port" "${default_socks}")"
 
+    _write_proxy_port "${private_profile}" "${http_port}" "${socks_port}"
+    log_step "Configured" "proxy ports: http=${http_port}, socks5=${socks_port}"
+}
+
+# _prompt_port <label> <default>  — prints the validated port to stdout
+_prompt_port() {
+    local label="$1"
+    local default="$2"
     local input=""
+
+    printf '    %s' "${label} [default: ${default}, auto-confirm in 15 s]: "
     if read -t 15 -r input 2>/dev/null; then
         :
     else
         printf '\n'
-        log_info "Timeout — using default port ${default_http}"
     fi
 
-    local port="${default_http}"
     if [[ -n "${input}" ]]; then
         if [[ "${input}" =~ ^[0-9]+$ ]] && (( input >= 1 && input <= 65535 )); then
-            port="${input}"
+            printf '%s' "${input}"
+            return 0
         else
-            log_warn "Invalid port '${input}' — using default ${default_http}"
+            log_warn "Invalid port '${input}' — using default ${default}" >&2
         fi
     fi
 
-    _write_proxy_port "${private_profile}" "${port}"
-    log_step "Configured" "proxy port: http=${port}, socks5=$(( port + 1 ))"
+    printf '%s' "${default}"
 }
 
 _write_proxy_port() {
     local profile="$1"
-    local port="$2"
-    local socks=$(( port + 1 ))
+    local http_port="$2"
+    local socks_port="$3"
 
     # Remove existing PROXY_PORT lines then append updated values
     if [[ -f "${profile}" ]]; then
@@ -453,7 +465,7 @@ _write_proxy_port() {
     fi
 
     printf '\nexport PROXY_PORT_HTTP=%s\nexport PROXY_PORT_SOCKS=%s\n' \
-        "${port}" "${socks}" >> "${profile}"
+        "${http_port}" "${socks_port}" >> "${profile}"
 }
 
 # ── Step 7: tmux plugin manager (TPM) ────────────────────────────────────────
