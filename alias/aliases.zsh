@@ -7,10 +7,12 @@ proxy_off() {
 }
 
 proxy_on() {
-  export https_proxy="http://127.0.0.1:6152"
-  export http_proxy="http://127.0.0.1:6152"
-  export all_proxy="socks5://127.0.0.1:6153"
-  echo "Proxy enabled."
+  local http_port="${PROXY_PORT_HTTP:-6152}"
+  local socks_port="${PROXY_PORT_SOCKS:-6153}"
+  export https_proxy="http://127.0.0.1:${http_port}"
+  export http_proxy="http://127.0.0.1:${http_port}"
+  export all_proxy="socks5://127.0.0.1:${socks_port}"
+  echo "Proxy enabled (http=${http_port}, socks5=${socks_port})."
 }
 
 proxy_status() {

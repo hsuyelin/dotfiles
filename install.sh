@@ -20,7 +20,8 @@
 #   4.  Create XDG base directory tree
 #   5.  Write ~/.zshenv to bootstrap ZDOTDIR
 #   6.  Create placeholder files for secrets/ and private/
-#   7.  Initialize tmux plugin manager (TPM)
+#   7.  Configure proxy port (PROXY_PORT_HTTP / PROXY_PORT_SOCKS)
+#   8.  Initialize tmux plugin manager (TPM)
 #   8.  Clone Ghostty cursor shaders (if missing)
 #   9.  Set executable permissions on bin/ scripts
 #   10. Print post-install checklist
@@ -381,6 +382,78 @@ create_placeholder_secrets() {
         _placeholder_content "${type}" > "${target}"
         log_step "Created" "placeholder ${rel_path}"
     done
+}
+
+# ── Step: Proxy configuration ────────────────────────────────────────────────
+# Prompts for the HTTP proxy port. The SOCKS5 port is always http_port+1.
+# Writes PROXY_PORT_HTTP / PROXY_PORT_SOCKS into private/zsh.zprofile so each
+# machine can use a different port without touching the tracked aliases.zsh.
+configure_proxy() {
+    log_step "Checking" "proxy port configuration"
+
+    local private_profile="${DOTFILES_DIR}/private/zsh.zprofile"
+    local default_http=6152
+
+    # Read the current configured value if it already exists
+    if [[ -f "${private_profile}" ]]; then
+        local existing
+        existing="$(grep -E '^export PROXY_PORT_HTTP=' "${private_profile}" \
+            | head -1 | sed 's/export PROXY_PORT_HTTP=//')"
+        [[ -n "${existing}" ]] && default_http="${existing}"
+    fi
+
+    # Skip interactive prompt in non-TTY sessions
+    if [[ ! -t 0 ]]; then
+        log_info "Non-interactive session — using proxy port ${default_http}"
+        _write_proxy_port "${private_profile}" "${default_http}"
+        return 0
+    fi
+
+    if [[ "${DRY_RUN}" == "true" ]]; then
+        log_info "[dry-run] would prompt for proxy port (default ${default_http})"
+        return 0
+    fi
+
+    printf '\n'
+    printf '    %s\n' "HTTP proxy port for proxy_on (SOCKS5 = port+1):"
+    printf '    %s' "Port [default: ${default_http}, auto-confirm in 15 s]: "
+
+    local input=""
+    if read -t 15 -r input 2>/dev/null; then
+        :
+    else
+        printf '\n'
+        log_info "Timeout — using default port ${default_http}"
+    fi
+
+    local port="${default_http}"
+    if [[ -n "${input}" ]]; then
+        if [[ "${input}" =~ ^[0-9]+$ ]] && (( input >= 1 && input <= 65535 )); then
+            port="${input}"
+        else
+            log_warn "Invalid port '${input}' — using default ${default_http}"
+        fi
+    fi
+
+    _write_proxy_port "${private_profile}" "${port}"
+    log_step "Configured" "proxy port: http=${port}, socks5=$(( port + 1 ))"
+}
+
+_write_proxy_port() {
+    local profile="$1"
+    local port="$2"
+    local socks=$(( port + 1 ))
+
+    # Remove existing PROXY_PORT lines then append updated values
+    if [[ -f "${profile}" ]]; then
+        local tmp
+        tmp="$(mktemp)"
+        grep -v -E '^export PROXY_PORT_(HTTP|SOCKS)=' "${profile}" > "${tmp}" || true
+        mv "${tmp}" "${profile}"
+    fi
+
+    printf '\nexport PROXY_PORT_HTTP=%s\nexport PROXY_PORT_SOCKS=%s\n' \
+        "${port}" "${socks}" >> "${profile}"
 }
 
 # ── Step 7: tmux plugin manager (TPM) ────────────────────────────────────────
@@ -766,6 +839,7 @@ main() {
     create_xdg_dirs
     write_zshenv
     create_placeholder_secrets
+    configure_proxy
     init_tpm
     select_terminal
     install_terminal_app

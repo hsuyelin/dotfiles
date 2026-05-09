@@ -109,7 +109,12 @@ Intel Macs are **allowed but untested** — the installer prompts for confirmati
         <strong>lazygit — Git TUI</strong><br/>
         <sub>Delta diff pager · full keyboard workflow</sub>
       </td>
-      <td width="50%"></td>
+      <td align="center" width="50%">
+        <video src="https://github.com/user-attachments/assets/2ba9881e-f32f-4e03-a338-c458d28c9624" controls width="100%"></video>
+        <br/>
+        <strong>Yazi — File Manager</strong><br/>
+        <sub>Catppuccin Mocha · image/video/PDF/archive preview</sub>
+      </td>
     </tr>
   </tbody>
 </table>
