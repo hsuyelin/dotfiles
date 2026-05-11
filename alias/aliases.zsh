@@ -72,6 +72,65 @@ alias dns:flush='sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder'
 # -----------------------------
 alias chrome="open -a \"Google Chrome\" --args --variations-override-country=us"
 
+# sign_app: strip quarantine attributes and re-sign a macOS .app bundle.
+# Usage: sign_app <app>
+# <app> can be:
+#   - absolute path:  /Applications/Paste.app
+#   - name with ext:  Paste.app  (or paste.app)
+#   - name only:      paste
+sign_app() {
+  local input="$1"
+
+  local _bold='\033[1m'
+  local _green='\033[0;32m'
+  local _yellow='\033[0;33m'
+  local _red='\033[0;31m'
+  local _cyan='\033[0;36m'
+  local _reset='\033[0m'
+
+  if [[ -z "$input" ]]; then
+    printf "${_yellow}Usage:${_reset} sign_app <app-path|app-name>\n"
+    return 1
+  fi
+
+  local app_path
+
+  if [[ "$input" == /* ]]; then
+    app_path="$input"
+  else
+    local name="${input%.[aA][pP][pP]}"
+    local found
+    found="$(find /Applications -maxdepth 1 -iname "${name}.app" -print -quit 2>/dev/null)"
+    if [[ -z "$found" ]]; then
+      printf "${_red}error:${_reset} cannot find '${_bold}${name}.app${_reset}' in /Applications\n" >&2
+      return 1
+    fi
+    app_path="$found"
+  fi
+
+  if [[ ! -d "$app_path" ]]; then
+    printf "${_red}error:${_reset} '${_bold}${app_path}${_reset}' does not exist or is not a directory\n" >&2
+    return 1
+  fi
+
+  printf "${_cyan}  Found${_reset} ${_bold}${app_path}${_reset}\n"
+  printf "${_yellow}Proceed with signing?${_reset} [y/N] "
+  local reply
+  read -r reply
+  if [[ "$reply" != [yY] ]]; then
+    printf "${_yellow}Aborted.${_reset}\n"
+    return 0
+  fi
+
+  printf "${_cyan}Stripping${_reset} quarantine attributes ...\n"
+  xattr -cr "$app_path" || { printf "${_red}error:${_reset} xattr failed\n" >&2; return 1; }
+
+  printf "${_cyan} Signing${_reset} ${_bold}${app_path}${_reset} ...\n"
+  codesign -fs - --deep "$app_path" || { printf "${_red}error:${_reset} codesign failed\n" >&2; return 1; }
+
+  printf "${_green}   Done${_reset} ${_bold}${app_path}${_reset}\n"
+}
+
 
 # -----------------------------
 # Safer rm wrapper
