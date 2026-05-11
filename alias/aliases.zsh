@@ -122,11 +122,14 @@ sign_app() {
     return 0
   fi
 
+  local _sudo=''
+  [[ "$EUID" -ne 0 ]] && _sudo='sudo'
+
   printf "${_cyan}Stripping${_reset} quarantine attributes ...\n"
-  xattr -cr "$app_path" || { printf "${_red}error:${_reset} xattr failed\n" >&2; return 1; }
+  $_sudo xattr -cr "$app_path" || { printf "${_red}error:${_reset} xattr failed\n" >&2; return 1; }
 
   printf "${_cyan} Signing${_reset} ${_bold}${app_path}${_reset} ...\n"
-  codesign -fs - --deep "$app_path" || { printf "${_red}error:${_reset} codesign failed\n" >&2; return 1; }
+  $_sudo codesign -fs - --deep "$app_path" || { printf "${_red}error:${_reset} codesign failed\n" >&2; return 1; }
 
   printf "${_green}   Done${_reset} ${_bold}${app_path}${_reset}\n"
 }
