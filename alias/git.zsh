@@ -12,6 +12,10 @@ alias gca='git commit --amend'
 alias gcane='git commit --amend --no-edit'
 alias gcam='git commit -a -m'
 
+# WIP
+alias gwip='git add -A && git commit -m "WIP [skip ci]"'
+alias gunwip='git log -1 --format=%s | grep -q "WIP" && git reset HEAD~1'
+
 # Branch
 alias gco='git checkout'
 alias gcb='git checkout -b'
@@ -20,12 +24,26 @@ alias gcf='git checkout -f'
 alias gbr='git branch'
 alias gbd='git branch -d'
 alias gbD='git branch -D'
+alias gbmv='git branch -m'
+
+# Fetch
+alias gf='git fetch'
+alias gfa='git fetch --all --prune'
 
 # Merge / Rebase
 alias gm='git merge'
+alias gma='git merge --abort'
 alias gmt='git mergetool'
 alias grb='git rebase'
 alias grbi='git rebase -i'
+alias grba='git rebase --abort'
+alias grbc='git rebase --continue'
+alias grbs='git rebase --skip'
+
+# Cherry-pick
+alias gcp='git cherry-pick'
+alias gcpa='git cherry-pick --abort'
+alias gcpc='git cherry-pick --continue'
 
 # Pull / Push
 alias gpl='git pull'
@@ -36,11 +54,15 @@ alias gpo='git push origin'
 
 # Log / Diff
 alias gl='git log --oneline --graph --decorate'
+alias gloa='git log --oneline --graph --decorate --all'
 alias glg='git log --stat'
 alias gd='git diff'
 alias gds='git diff --staged'
 alias gdc='git diff --cached'
 alias gdt='git difftool'
+
+# Blame
+alias gbl='git blame'
 
 # Clone
 alias gcl='git clone'
@@ -55,6 +77,7 @@ alias gsh='git show'
 alias gtag='git tag'
 
 # Reset / Clean
+alias grhs='git reset --soft HEAD~1'
 alias grhh='git reset --hard'
 alias gclean='git clean -dfx'
 alias gnuke='git reset --hard && git clean -dfx'
@@ -90,6 +113,10 @@ ghelp() {
     _ghelp_row "gcane"  "git commit --amend --no-edit"
     _ghelp_row "gcam"   "git commit -a -m <msg>"
 
+    _ghelp_section "WIP"
+    _ghelp_row "gwip"   "git add -A && git commit -m 'WIP [skip ci]'"
+    _ghelp_row "gunwip" "undo last commit if it is a WIP"
+
     _ghelp_section "Branch"
     _ghelp_row "gco"    "git checkout <branch>"
     _ghelp_row "gcb"    "git checkout -b <branch>"
@@ -98,12 +125,26 @@ ghelp() {
     _ghelp_row "gbr"    "git branch"
     _ghelp_row "gbd"    "git branch -d <branch>"
     _ghelp_row "gbD"    "git branch -D <branch>"
+    _ghelp_row "gbmv"   "git branch -m <old> <new>"
+
+    _ghelp_section "Fetch"
+    _ghelp_row "gf"     "git fetch"
+    _ghelp_row "gfa"    "git fetch --all --prune"
 
     _ghelp_section "Merge / Rebase"
     _ghelp_row "gm"     "git merge <branch>"
+    _ghelp_row "gma"    "git merge --abort"
     _ghelp_row "gmt"    "git mergetool"
     _ghelp_row "grb"    "git rebase <branch>"
     _ghelp_row "grbi"   "git rebase -i <base>"
+    _ghelp_row "grba"   "git rebase --abort"
+    _ghelp_row "grbc"   "git rebase --continue"
+    _ghelp_row "grbs"   "git rebase --skip"
+
+    _ghelp_section "Cherry-pick"
+    _ghelp_row "gcp"    "git cherry-pick <commit>"
+    _ghelp_row "gcpa"   "git cherry-pick --abort"
+    _ghelp_row "gcpc"   "git cherry-pick --continue"
 
     _ghelp_section "Pull / Push"
     _ghelp_row "gpl"    "git pull"
@@ -115,11 +156,15 @@ ghelp() {
 
     _ghelp_section "Log / Diff"
     _ghelp_row "gl"     "git log --oneline --graph --decorate"
+    _ghelp_row "gloa"   "git log --oneline --graph --decorate --all"
     _ghelp_row "glg"    "git log --stat"
     _ghelp_row "gd"     "git diff"
     _ghelp_row "gds"    "git diff --staged"
     _ghelp_row "gdc"    "git diff --cached"
     _ghelp_row "gdt"    "git difftool"
+
+    _ghelp_section "Blame"
+    _ghelp_row "gbl"    "git blame <file>"
 
     _ghelp_section "Clone"
     _ghelp_row "gcl"    "git clone <url>"
@@ -134,6 +179,7 @@ ghelp() {
     _ghelp_row "gtag"   "git tag"
 
     _ghelp_section "Reset / Clean"
+    _ghelp_row "grhs"   "git reset --soft HEAD~1  (undo last commit, keep staged)"
     _ghelp_row "grhh"   "git reset --hard"
     _ghelp_row "gclean" "git clean -dfx"
     _ghelp_row "gnuke"  "git reset --hard && git clean -dfx"
