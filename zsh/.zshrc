@@ -157,6 +157,7 @@ unset _km
 # Completions (must run before fzf-tab and zoxide)
 # ============================================================
 autoload -Uz compinit && compinit -C
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
 
 # ============================================================
 # Fzf Setup
