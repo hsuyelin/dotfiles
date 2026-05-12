@@ -1,11 +1,12 @@
 applite
 cc-switch
-claude-code
+claude-code@latest
 codex
 db-browser-for-sqlite
 font-fira-code
 font-fira-code-nerd-font
 font-lxgw-wenkai
+font-symbols-only-nerd-font
 lyricsx
 oracle-jdk@25
 orbstack
@@ -19,5 +20,4 @@ aerospace
 # ── Terminal emulators — only one is installed based on your selection ─────
 # bootstrap.sh / install.sh prompt you to choose; default is Ghostty.
 ghostty
-iterm2
 kitty
