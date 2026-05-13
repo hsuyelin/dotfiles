@@ -138,6 +138,7 @@ unset _km
 [[ -f "${XDG_CONFIG_HOME}/bash/.bash_profile" ]] && source "${XDG_CONFIG_HOME}/bash/.bash_profile"
 [[ -f "${XDG_CONFIG_HOME}/alias/aliases.zsh" ]] && source "${XDG_CONFIG_HOME}/alias/aliases.zsh"
 [[ -f "${XDG_CONFIG_HOME}/alias/git.zsh" ]] && source "${XDG_CONFIG_HOME}/alias/git.zsh"
+[[ -f "${XDG_CONFIG_HOME}/alias/ai.zsh" ]] && source "${XDG_CONFIG_HOME}/alias/ai.zsh"
 [[ -f "${XDG_CONFIG_HOME}/private/xcode.zsh" ]] && source "${XDG_CONFIG_HOME}/private/xcode.zsh"
 [[ -f "${XDG_CONFIG_HOME}/bash/ai.zsh" ]] && source "${XDG_CONFIG_HOME}/bash/ai.zsh"
 

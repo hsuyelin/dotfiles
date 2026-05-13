@@ -251,13 +251,6 @@ alias gba='git branch -a | fzf --height=40% --border --preview "git log --onelin
 
 
 # -----------------------------
-# AI
-# -----------------------------
-alias cc='claude'
-alias cx='codex'
-
-
-# -----------------------------
 # Yazi file manager
 # - On exit, automatically cd to the last directory navigated inside Yazi.
 # - Uses yazi's --cwd-file mechanism (official shell integration).
