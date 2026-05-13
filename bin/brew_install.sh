@@ -157,6 +157,72 @@ preflight_brew_conflicts() {
     done
 }
 
+# ── Claude Code preflight ─────────────────────────────────────────────────────
+# If claude is installed but NOT via claude-code@latest, offer to reinstall.
+# Defaults to No; times out to No so the script never hangs in non-interactive
+# or unattended runs.
+preflight_claude_code() {
+    log_step "Checking" "Claude Code installation"
+
+    if ! command -v claude &>/dev/null; then
+        log_info "claude not found — will be installed from cask list"
+        return 0
+    fi
+
+    if brew list --cask claude-code@latest &>/dev/null 2>&1; then
+        log_info "claude-code@latest already installed"
+        return 0
+    fi
+
+    local current_version
+    current_version="$(claude --version 2>/dev/null | head -1 || echo "unknown")"
+
+    log_warn "claude (${current_version}) is installed, but not via claude-code@latest"
+    printf '\n'
+    printf '    %s\n' "claude-code@latest always tracks the newest release automatically."
+    printf '    %s\n' "Note: Claude Code updates very frequently."
+    printf '\n'
+
+    if [[ ! -t 0 ]]; then
+        log_info "Non-interactive session — skipping Claude Code reinstall"
+        return 0
+    fi
+
+    printf '    %s' "Reinstall via claude-code@latest? [y/N] (auto-selects N in 30 s): "
+
+    local choice=""
+    if ! read -t 30 -r choice 2>/dev/null; then
+        printf '\n'
+        log_info "Timeout — skipping Claude Code reinstall"
+        return 0
+    fi
+    printf '\n'
+
+    case "${choice}" in
+        [yY]|[yY][eE][sS])
+            log_step "Removing" "existing Claude Code installations"
+            if [[ "${DRY_RUN}" == "true" ]]; then
+                log_info "[dry-run] npm uninstall -g @anthropic-ai/claude-code"
+                log_info "[dry-run] brew uninstall --cask claude"
+                log_info "[dry-run] brew uninstall --cask claude-code"
+                log_info "[dry-run] brew cleanup --prune=all"
+                log_info "[dry-run] brew install --cask claude-code@latest"
+            else
+                npm uninstall -g @anthropic-ai/claude-code 2>/dev/null || true
+                brew uninstall --cask claude      2>/dev/null || true
+                brew uninstall --cask claude-code 2>/dev/null || true
+                brew cleanup --prune=all
+                log_step "Installing" "claude-code@latest"
+                brew install --cask claude-code@latest \
+                    || log_warn "Failed to install claude-code@latest"
+            fi
+            ;;
+        *)
+            log_info "Skipped — keeping current Claude Code installation"
+            ;;
+    esac
+}
+
 # ── Package list installer ────────────────────────────────────────────────────
 _brew_install_list() {
     local kind="$1"
@@ -234,6 +300,7 @@ main() {
     fi
 
     preflight_brew_conflicts
+    preflight_claude_code
     select_terminal
 
     _brew_install_list "formula" "${DOTFILES_DIR}/brew/brew_formulae.txt"
