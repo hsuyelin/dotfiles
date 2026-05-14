@@ -11,3 +11,7 @@ export BUNDLE_USER_PLUGIN="$XDG_DATA_HOME/bundle"
 
 # Avoid ambiguous variable (some versions treat it as a file path)
 unset BUNDLE_USER_CONFIG
+
+# Suppress Ruby deprecation/constant-reinitialization warnings globally,
+# including direct invocations like `pod install` that bypass bundle exec.
+export RUBYOPT="-W0"
