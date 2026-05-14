@@ -1,1 +1,2 @@
 ---
+BUNDLE_RUBYOPT: "-W0"
