@@ -40,6 +40,7 @@ tn() {
 # ta: fzf picker — attach or switch to a session.
 #   space      toggle selection + move down
 #   d          kill all selected sessions (no selection = kill focused), reload list
+#   r          rename focused session, reload list
 #   enter      attach/switch to the last selected session in list order
 ta() {
   if ! tmux list-sessions &>/dev/null; then
@@ -56,6 +57,7 @@ ta() {
             --preview-window=right:45% \
             --bind="space:toggle+down" \
             --bind="d:execute-silent(for s in {+}; do tmux kill-session -t \$s; done)+reload(tmux list-sessions -F '#{session_name}' 2>/dev/null || true)" \
+            --bind="r:execute(printf 'rename \"{}\"\nnew name: '; read -r n; [ -n \"\$n\" ] && tmux rename-session -t '{}' \"\$n\")+reload(tmux list-sessions -F '#{session_name}' 2>/dev/null || true)" \
     | tail -1
   )
   [[ -z "$session" ]] && return 0
@@ -65,6 +67,15 @@ ta() {
     tmux attach-session -t "$session"
   fi
 }
+
+# Alt+R: pop up ta with a clean screen, restore prompt on exit.
+_ta_widget() {
+  clear
+  ta
+  zle reset-prompt
+}
+zle -N _ta_widget
+bindkey '\er' _ta_widget
 
 # tk: detach from the current session.
 tk() {
