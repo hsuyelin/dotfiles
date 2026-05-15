@@ -70,6 +70,7 @@ ta() {
 
 # Alt+R: pop up ta with a clean screen, restore prompt on exit.
 _ta_widget() {
+  zle -I
   clear
   ta
   zle reset-prompt
