@@ -75,8 +75,8 @@ tk() {
   tmux detach-client
 }
 
-# ts: kill the current session immediately (use-and-discard).
-ts() {
+# tq: quit and kill the current session immediately (use-and-discard).
+tq() {
   if [[ -z "$TMUX" ]]; then
     echo "not in a tmux session."
     return 0
