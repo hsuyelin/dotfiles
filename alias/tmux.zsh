@@ -56,7 +56,7 @@ ta() {
               -F '  #{window_index}  #{window_name}  #{?window_active,(active),}'" \
             --preview-window=right:45% \
             --bind="space:toggle+down" \
-            --bind="d:execute-silent(cur=\$(tmux display-message -p '#S' 2>/dev/null); for s in {+}; do [ \"\$s\" != \"\$cur\" ] && tmux kill-session -t \"\$s\"; done)+reload(tmux list-sessions -F '#{session_name}' 2>/dev/null || true)" \
+            --bind="d:execute-silent(cur=\$(tmux display-message -p '#S' 2>/dev/null); cnt=\$(tmux list-sessions 2>/dev/null | wc -l); for s in {+}; do ([ \"\$s\" != \"\$cur\" ] || [ \"\$cnt\" -le 1 ]) && tmux kill-session -t \"\$s\"; done)+reload(tmux list-sessions -F '#{session_name}' 2>/dev/null || true)" \
             --bind="r:execute(new=\$(echo | fzf --print-query --no-info --height=5 --border --prompt='rename: ' --query='{}' 2>/dev/null | head -1); [ -n \"\$new\" ] && tmux rename-session -t '{}' \"\$new\")+reload(tmux list-sessions -F '#{session_name}' 2>/dev/null || true)+clear-screen" \
     | tail -1
   )
