@@ -94,9 +94,15 @@ tq() {
 
 # Option+R: session picker via ta().
 _tmux_session_picker_widget() {
-    zle -I
-    ta
-    zle reset-prompt
+    if [[ -n "$TMUX" ]]; then
+        zle -I
+        ta
+        zle reset-prompt
+    else
+        zle push-line
+        BUFFER="ta"
+        zle accept-line
+    fi
 }
 zle -N _tmux_session_picker_widget
 bindkey '\er' _tmux_session_picker_widget
