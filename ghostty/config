@@ -61,7 +61,8 @@ macos-option-as-alt = true
 # title text area. Better than native for AeroSpace: titlebar height is constant
 # regardless of tab count (native would grow/shrink content area when tabs appear).
 # transparent/hidden cause content-area resize events that confuse AeroSpace.
-macos-titlebar-style = tabs
+#macos-titlebar-style = tabs
+macos-titlebar-style = hidden
 macos-titlebar-proxy-icon = hidden
 macos-icon = custom
 macos-custom-icon = ~/.config/ghostty/icons/catppuccin-mocha.icns
