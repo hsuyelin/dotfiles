@@ -72,6 +72,14 @@ zi light "zsh-users/zsh-autosuggestions"
 bindkey '^H' backward-delete-char
 bindkey '^?' backward-delete-char
 
+# Shift+Enter → insert literal newline without submitting (Kitty keyboard protocol,
+# requires tmux `extended-keys on` + `terminal-features extkeys`).
+# Uses a shell-function-backed widget to avoid zsh-syntax-highlighting complaints
+# about unhandled built-in widgets like `self-insert-newline`.
+_zle_insert_newline() { LBUFFER+=$'\n' }
+zle -N _zle_insert_newline
+bindkey '^[[13;2u' _zle_insert_newline
+
 zi ice lucid
 zi light "zsh-users/zsh-completions"
 

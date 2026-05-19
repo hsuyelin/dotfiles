@@ -80,7 +80,9 @@ alias gtag='git tag'
 alias grhs='git reset --soft HEAD~1'
 alias grhh='git reset --hard'
 alias gclean='git clean -dfx'
-alias gnuke='git reset --hard && git clean -dfx'
+# shellcheck disable=SC2139  # alias length exceeds 100 chars by necessity
+alias gnuke='git reset --hard && git clean -dfx && git submodule foreach --recursive "git reset --hard; git clean -fd" && git submodule update --init --recursive --force'
+alias gsnuke='git submodule foreach --recursive "git reset --hard; git clean -fd" && git submodule update --init --recursive --force'
 
 # Gerrit
 gpgnv() { git push origin HEAD:refs/for/$(git rev-parse --abbrev-ref HEAD) --no-verify }
@@ -91,10 +93,11 @@ ghelp() {
     local cyan='\033[0;36m'
     local yellow='\033[0;33m'
     local reset='\033[0m'
+    local sep='────────────────────────────'
 
     echo ""
     printf "${bold}Git Aliases Cheatsheet${reset}\n"
-    echo "────────────────────────────────────────────────────"
+    echo "$sep"
 
     _ghelp_section() { printf "\n${yellow}  %-12s${reset}\n" "$1"; }
     _ghelp_row()     { printf "  ${cyan}%-12s${reset}  %s\n" "$1" "$2"; }
@@ -182,10 +185,11 @@ ghelp() {
     _ghelp_row "grhs"   "git reset --soft HEAD~1  (undo last commit, keep staged)"
     _ghelp_row "grhh"   "git reset --hard"
     _ghelp_row "gclean" "git clean -dfx"
-    _ghelp_row "gnuke"  "git reset --hard && git clean -dfx"
+    _ghelp_row "gnuke"  "reset --hard + clean -dfx + nuke all submodules"
+    _ghelp_row "gsnuke" "nuke all submodules only (reset --hard + clean + update)"
 
     echo ""
-    echo "────────────────────────────────────────────────────"
+    echo "$sep"
     echo ""
 
     unfunction _ghelp_section _ghelp_row
