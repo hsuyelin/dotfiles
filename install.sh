@@ -57,26 +57,102 @@ readonly XDG_DIRS=(
     ".local/xdg-runtime"
 )
 
-# Shell config files that may conflict on a pre-XDG machine
+# Files that may conflict on a pre-XDG / pre-dotfiles machine.
+# Each entry is backed up to BACKUP_DIR and then removed so the
+# dotfiles-managed version (symlink or generated file) can take its place.
 readonly CONFLICT_FILES=(
+    # zsh
     "${HOME}/.zshrc"
     "${HOME}/.zprofile"
-    "${HOME}/.bash_profile"
-    "${HOME}/.bashrc"
+    "${HOME}/.zsh_history"
     "${HOME}/.p10k.zsh"
     "${HOME}/.z"
-    "${HOME}/.zsh_history"
-    "${HOME}/.viminfo"
+
+    # bash / POSIX shell
+    "${HOME}/.bash_profile"
+    "${HOME}/.bashrc"
+    "${HOME}/.bash_history"
+    "${HOME}/.profile"
+
+    # readline
+    "${HOME}/.inputrc"
+
+    # git
+    "${HOME}/.gitconfig"
+    "${HOME}/.gitignore_global"
+    "${HOME}/.gitattributes_global"
+
+    # tmux (legacy non-XDG location)
+    "${HOME}/.tmux.conf"
+
+    # vim / neovim (legacy non-XDG)
     "${HOME}/.vimrc"
-    "${HOME}/.swiftformat"
+    "${HOME}/.viminfo"
+
+    # curl / wget
+    "${HOME}/.curlrc"
+    "${HOME}/.wgetrc"
+
+    # Ruby
+    "${HOME}/.gemrc"
+    "${HOME}/.irbrc"
+    "${HOME}/.pryrc"
+    "${HOME}/.ruby-version"
     "${HOME}/.rvminstall.sh"
+
+    # Node / npm / yarn
+    "${HOME}/.npmrc"
+    "${HOME}/.yarnrc"
+    "${HOME}/.yarnrc.yml"
+    "${HOME}/.node_repl_history"
+
+    # Python
+    "${HOME}/.python_history"
+    "${HOME}/.pythonrc"
+
+    # Swift
+    "${HOME}/.swiftformat"
+
+    # pager history
+    "${HOME}/.lesshst"
+
+    # suppress macOS last-login banner
+    "${HOME}/.hushlogin"
 )
 
 # Directories that may conflict (backed up via cp -r, not cp -P)
 readonly CONFLICT_DIRS=(
+    # zsh
     "${HOME}/.zsh_sessions"
     "${HOME}/.zi"
+
+    # Swift
     "${HOME}/.swiftpm"
+
+    # Rust toolchain (should live under XDG_DATA_HOME)
+    "${HOME}/.cargo"
+    "${HOME}/.rustup"
+
+    # Ruby
+    "${HOME}/.rvm"
+    "${HOME}/.gem"
+    "${HOME}/.bundle"
+
+    # CocoaPods (CP_HOME_DIR → XDG)
+    "${HOME}/.cocoapods"
+
+    # Node / npm
+    "${HOME}/.npm"
+
+    # tmux plugin manager
+    "${HOME}/.tmux"
+
+    # shell frameworks that may have been installed previously
+    "${HOME}/.oh-my-zsh"
+    "${HOME}/.prezto"
+
+    # iOS / macOS tooling
+    "${HOME}/.fastlane"
 )
 
 # Placeholder files: path (relative to DOTFILES_DIR) and content marker
