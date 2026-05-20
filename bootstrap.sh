@@ -488,8 +488,8 @@ main() {
     install_homebrew
     clone_dotfiles
     select_terminal
-    run_install_sh
     install_brew_packages
+    run_install_sh
     install_rvm
     print_next_steps
 }
