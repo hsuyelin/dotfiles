@@ -481,7 +481,6 @@ main() {
     log_step "Starting" "bootstrap (macOS Apple Silicon)"
     [[ "${DRY_RUN}" == "true" ]] && log_warn "Dry-run mode — no changes will be made"
     [[ "${SKIP_RVM}" == "true" ]] && log_info "RVM install skipped (--skip-rvm)"
-    printf '\n'
 
     check_platform
     install_xcode_clt   # must run before check_prerequisites: git lives in CLT
