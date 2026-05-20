@@ -940,6 +940,16 @@ print_checklist() {
     printf '\n'
     printf '%s\n' "  Backup location (if any files were moved):"
     printf '%s\n' "    ${BACKUP_DIR}"
+
+    local terminal_display
+    case "${TERMINAL_CHOICE}" in
+        kitty)  terminal_display="kitty" ;;
+        iterm2) terminal_display="iTerm2" ;;
+        *)      terminal_display="Ghostty" ;;
+    esac
+    printf '\n'
+    printf '  🚀  You are all set. Launch %s to begin your new development environment.\n' \
+        "${terminal_display}"
 }
 
 # ── Main ─────────────────────────────────────────────────────────────────────
