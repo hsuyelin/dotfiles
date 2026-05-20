@@ -155,6 +155,7 @@ unset _km
 # Antigravity / RVM
 # ============================================================
 [[ -d "$HOME/.antigravity/antigravity/bin" ]] && path+=("$HOME/.antigravity/antigravity/bin")
+[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
 [[ -d "$HOME/.rvm/bin" ]] && path+=("$HOME/.rvm/bin")
 
 # ============================================================
