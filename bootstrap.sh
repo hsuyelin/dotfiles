@@ -247,8 +247,8 @@ clone_dotfiles() {
         if [[ -e "${backup}" ]]; then
             die "${backup} already exists. Remove it manually, then re-run."
         fi
-        log_warn "~/.config exists but is not this dotfiles install."
-        log_step "Backing up" "~/.config → ~/.config.bak"
+        log_warn "${HOME}/.config exists but is not this dotfiles install."
+        log_step "Backing up" "${HOME}/.config → ${HOME}/.config.bak"
         run mv "${DOTFILES_TARGET}" "${backup}"
     fi
 

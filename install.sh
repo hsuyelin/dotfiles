@@ -317,14 +317,14 @@ create_xdg_dirs() {
 # This file is not inside the dotfiles repo — it lives at $HOME and is the
 # single entry point that sets ZDOTDIR before zsh loads anything else.
 write_zshenv() {
-    log_step "Checking" "~/.zshenv"
+    log_step "Checking" "${HOME}/.zshenv"
 
     if zshenv_is_ours; then
-        log_info "~/.zshenv already configured correctly (skipped)"
+        log_info "${HOME}/.zshenv already configured correctly (skipped)"
         return 0
     fi
 
-    log_step "Writing" "~/.zshenv → XDG + ZDOTDIR bootstrap"
+    log_step "Writing" "${HOME}/.zshenv → XDG + ZDOTDIR bootstrap"
 
     if [[ "${DRY_RUN}" == "true" ]]; then
         log_info "[dry-run] would write XDG bootstrap to ~/.zshenv"
@@ -670,9 +670,9 @@ install_rtk() {
     if [[ ! -e "${mac_support}" ]]; then
         mkdir -p "$(dirname "${mac_support}")"
         ln -sf "${xdg_rtk}" "${mac_support}"
-        log_step "Linked" "~/Library/Application Support/rtk → ${xdg_rtk}"
+        log_step "Linked" "${HOME}/Library/Application Support/rtk → ${xdg_rtk}"
     else
-        log_info "~/Library/Application Support/rtk already exists (skipped symlink)"
+        log_info "${HOME}/Library/Application Support/rtk already exists (skipped symlink)"
     fi
 
     # Patch Claude Code / Codex hook only when at least one is installed.
@@ -710,9 +710,11 @@ migrate_xdg_homes() {
     _migrate_dir "${HOME}/go"       "${data_home}/go"
     # Tell the go tool itself so go env is consistent (requires go in PATH).
     if command -v go &>/dev/null && [[ -d "${data_home}/go" ]]; then
-        go env -w GOPATH="${data_home}/go" 2>/dev/null \
-            && log_info "go env GOPATH → ${data_home}/go" \
-            || log_warn "go env -w failed (go env will still reflect GOPATH from shell)"
+        if go env -w GOPATH="${data_home}/go" 2>/dev/null; then
+            log_info "go env GOPATH → ${data_home}/go"
+        else
+            log_warn "go env -w failed (go env will still reflect GOPATH from shell)"
+        fi
     fi
 
     # ── CocoaPods ───────────────────────────────────────────────────────────
