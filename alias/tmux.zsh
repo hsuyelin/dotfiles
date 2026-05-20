@@ -100,7 +100,7 @@ _tmux_session_picker_widget() {
         zle reset-prompt
     else
         zle push-line
-        BUFFER="ta"
+        BUFFER="clear; ta"
         zle accept-line
     fi
 }

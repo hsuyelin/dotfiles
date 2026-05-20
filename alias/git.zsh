@@ -45,6 +45,12 @@ alias gcp='git cherry-pick'
 alias gcpa='git cherry-pick --abort'
 alias gcpc='git cherry-pick --continue'
 
+# Conflict resolution
+alias gcrf='git add'
+alias gcrall='git add -u'
+alias gours='git checkout --ours'
+alias gtheirs='git checkout --theirs'
+
 # Pull / Push
 alias gpl='git pull'
 alias gpr='git pull --rebase'
@@ -145,9 +151,15 @@ ghelp() {
     _ghelp_row "grbs"   "git rebase --skip"
 
     _ghelp_section "Cherry-pick"
-    _ghelp_row "gcp"    "git cherry-pick <commit>"
-    _ghelp_row "gcpa"   "git cherry-pick --abort"
-    _ghelp_row "gcpc"   "git cherry-pick --continue"
+    _ghelp_row "gcp"     "git cherry-pick <commit>"
+    _ghelp_row "gcpa"    "git cherry-pick --abort"
+    _ghelp_row "gcpc"    "git cherry-pick --continue"
+
+    _ghelp_section "Conflict"
+    _ghelp_row "gcrf"    "mark file as resolved  (git add <file>)"
+    _ghelp_row "gcrall"  "mark all conflicts resolved  (git add -u)"
+    _ghelp_row "gours"   "keep ours version  (git checkout --ours <file>)"
+    _ghelp_row "gtheirs" "keep theirs version  (git checkout --theirs <file>)"
 
     _ghelp_section "Pull / Push"
     _ghelp_row "gpl"    "git pull"
