@@ -199,7 +199,7 @@ check_prerequisites() {
 
     # ── Required commands ────────────────────────────────────────────────────
     local req
-    for req in git zsh curl; do
+    for req in git zsh curl brew starship fzf eza zoxide tmux nvim; do
         if command -v "${req}" &>/dev/null; then
             log_info "${req} $(${req} --version 2>&1 | head -1)"
         else
@@ -209,16 +209,9 @@ check_prerequisites() {
     done
 
     if [[ "${missing_required}" == "true" ]]; then
-        die "Missing required commands. Install Xcode CLT: xcode-select --install"
+        die "Missing required commands. Run bootstrap.sh first or install via brew."
     fi
 
-    # ── Optional commands (warn but do not abort) ────────────────────────────
-    local opt
-    for opt in brew starship fzf eza zoxide tmux nvim; do
-        if ! command -v "${opt}" &>/dev/null; then
-            log_warn "optional command not found: ${opt} (some features will be unavailable)"
-        fi
-    done
 }
 
 # ── Step 3: Back up conflicting files ────────────────────────────────────────
