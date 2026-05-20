@@ -55,7 +55,7 @@ cleanup_xcschemes() {
   find Pods -name '*.xcscheme' \
     '!' -name "${PACKAGE_NAME}.xcscheme" \
     '!' -name "${PACKAGE_NAME}-Unit-Tests.xcscheme" \
-    | xargs rm -rf
+    -print0 | xargs -0 rm -rf
   echo -e "${GREEN}✔ Cleanup completed.${RESET}"
 }
 

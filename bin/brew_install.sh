@@ -19,7 +19,8 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly SCRIPT_DIR
-readonly DOTFILES_DIR="$(dirname "${SCRIPT_DIR}")"
+DOTFILES_DIR="$(dirname "${SCRIPT_DIR}")"
+readonly DOTFILES_DIR
 readonly HOMEBREW_PREFIX="/opt/homebrew"
 
 # ── Colors ───────────────────────────────────────────────────────────────────
@@ -249,10 +250,12 @@ _brew_install_list() {
         [[ -z "${pkg}" || "${pkg}" == \#* ]] && continue
 
         local _skip=false
-        local _s
-        for _s in "${_skip_casks[@]}"; do
-            [[ "${pkg}" == "${_s}" ]] && _skip=true && break
-        done
+        if [[ ${#_skip_casks[@]} -gt 0 ]]; then
+            local _s
+            for _s in "${_skip_casks[@]}"; do
+                [[ "${pkg}" == "${_s}" ]] && _skip=true && break
+            done
+        fi
         if [[ "${_skip}" == "true" ]]; then
             log_info "skipped (not selected terminal): ${pkg}"
             continue
