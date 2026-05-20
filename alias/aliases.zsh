@@ -30,6 +30,38 @@ alias bash-edit='subl "${XDG_CONFIG_HOME}/bash/.bash_profile"'
 # -----------------------------
 # Tool shortcuts
 # -----------------------------
+if command -v bat >/dev/null 2>&1; then
+  alias batp='bat -p'       # plain style (no decorations)
+  alias batP='bat -P'       # no paging
+  alias batpp='bat -p -P'   # plain style + no paging (cat-like)
+
+  bathelp() {
+    local bold='\033[1m'
+    local cyan='\033[0;36m'
+    local yellow='\033[0;33m'
+    local reset='\033[0m'
+    local sep='────────────────────────────'
+
+    echo ""
+    printf "${bold}Bat Aliases Cheatsheet${reset}\n"
+    echo "$sep"
+
+    _bathelp_section() { printf "\n${yellow}  %-12s${reset}\n" "$1"; }
+    _bathelp_row()     { printf "  ${cyan}%-12s${reset}  %s\n" "$1" "$2"; }
+
+    _bathelp_section "Aliases"
+    _bathelp_row "batp"  "bat -p    (plain style, no decorations)"
+    _bathelp_row "batP"  "bat -P    (no paging)"
+    _bathelp_row "batpp" "bat -p -P (plain style + no paging, cat-like)"
+
+    echo ""
+    echo "$sep"
+    echo ""
+
+    unfunction _bathelp_section _bathelp_row
+  }
+fi
+
 alias rvminstall='"$HOME/.rvm/.rvminstall.sh"'
 alias carthage_build='"${XDG_CONFIG_HOME}/bin/carthage_build.sh"'
 alias brew_export='"${XDG_CONFIG_HOME}/bin/brew_export.sh"'
