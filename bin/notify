@@ -1,41 +1,136 @@
 #!/usr/bin/env bash
 #
-# notify -- cross-terminal desktop notification (OSC 99)
-# Supports Ghostty, Kitty, and iTerm2, inside and outside tmux.
+# notify -- cross-terminal desktop notification
+# Strategy: OSC 99 via tty (direct or tmux pane) → terminal-notifier → osascript
+# All paths fail silently — no errors, no output on permission denied.
 #
 # Usage: notify <title> [body]
 
 set -euo pipefail
 
-main() {
-    # No controlling terminal — nothing to notify, exit cleanly.
-    [[ -w /dev/tty ]] || exit 0
+# Returns "<bundle-id> <app-name>" for the current terminal, or empty string.
+# tmux overrides TERM_PROGRAM to "tmux", so check terminal-specific env vars first.
+terminal_info() {
+    if [[ -n "${GHOSTTY_RESOURCES_DIR:-}" ]]; then
+        echo "com.mitchellh.ghostty Ghostty"; return
+    fi
+    if [[ -n "${ITERM_SESSION_ID:-}" ]]; then
+        echo "com.googlecode.iterm2 iTerm2"; return
+    fi
+    if [[ -n "${KITTY_PID:-}" ]]; then
+        echo "net.kovidgoyal.kitty kitty"; return
+    fi
+    case "${TERM_PROGRAM:-}" in
+        ghostty)        echo "com.mitchellh.ghostty Ghostty" ;;
+        iTerm.app)      echo "com.googlecode.iterm2 iTerm2" ;;
+        Apple_Terminal) echo "com.apple.Terminal Terminal" ;;
+        kitty)          echo "net.kovidgoyal.kitty kitty" ;;
+        WezTerm)        echo "com.github.wez.wezterm WezTerm" ;;
+        *)              echo "" ;;
+    esac
+}
 
+# Returns a writable tty path, or empty string.
+# Prefers the active tmux pane over an arbitrary one.
+find_tty() {
+    if { : > /dev/tty; } 2>/dev/null; then
+        echo "/dev/tty"; return
+    fi
+
+    if [[ -n "${TMUX:-}" ]]; then
+        local tty
+        # Ask tmux for the currently active pane's tty first.
+        tty="$(tmux display-message -p "#{pane_tty}" 2>/dev/null || true)"
+        if [[ -n "$tty" && -w "$tty" ]]; then
+            echo "$tty"; return
+        fi
+        # Fall back to any writable pane tty.
+        while IFS= read -r tty; do
+            [[ -w "$tty" ]] && { echo "$tty"; return; }
+        done < <(tmux list-panes -a -F "#{pane_tty}" 2>/dev/null)
+    fi
+}
+
+send_osc() {
+    local tty="$1" payload="$2" title="$3" body="$4"
+    local is_ghostty=0
+    [[ -n "${GHOSTTY_RESOURCES_DIR:-}" ]] && is_ghostty=1
+
+    if [[ -n "${TMUX:-}" ]]; then
+        # DCS passthrough: each ESC in the inner sequence must be doubled.
+        # OSC 99 (Kitty protocol) — supported by Kitty and recent Ghostty builds.
+        printf '\ePtmux;\e\e]99;i=1:d=0;%s\e\e\\\e\\' "$payload" \
+            > "$tty" 2>/dev/null || true
+
+        # OSC 9 — Ghostty's native notification format, also ConEmu/iTerm2.
+        if [[ $is_ghostty -eq 1 || -n "${ITERM_SESSION_ID:-}" ]]; then
+            printf '\ePtmux;\e\e]9;%s\e\e\\\e\\' "${title}: ${body}" \
+                > "$tty" 2>/dev/null || true
+        fi
+    else
+        printf '\e]99;i=1:d=0;%s\e\\' "$payload" > "$tty" 2>/dev/null || true
+
+        if [[ $is_ghostty -eq 1 || -n "${ITERM_SESSION_ID:-}" ]]; then
+            printf '\e]9;%s\e\\' "${title}: ${body}" > "$tty" 2>/dev/null || true
+        fi
+    fi
+
+    printf '\a' > "$tty" 2>/dev/null || true
+}
+
+# macOS Notification Center — all attempts are silent on failure.
+send_system_notification() {
+    local title="$1" body="$2"
+    local info bundle_id app_name
+
+    info="$(terminal_info)"
+    bundle_id="${info%% *}"
+    app_name="${info##* }"
+
+    # terminal-notifier: shows terminal icon via -sender (effective on macOS ≤ 12).
+    if command -v terminal-notifier &>/dev/null; then
+        if [[ -n "$bundle_id" ]]; then
+            terminal-notifier -title "$title" -message "$body" \
+                -sender "$bundle_id" -sound default -timeout 3 2>/dev/null && return || true
+        fi
+        # Fallback: terminal-notifier without sender attribution.
+        terminal-notifier -title "$title" -message "$body" \
+            -sound default -timeout 3 2>/dev/null && return || true
+    fi
+
+    # AppleScript tell-block: attributes notification to the terminal app process.
+    if [[ -n "$app_name" ]]; then
+        NOTIFY_TITLE="$title" NOTIFY_BODY="$body" NOTIFY_APP="$app_name" \
+            osascript -e \
+            'tell application (system attribute "NOTIFY_APP") to display notification (system attribute "NOTIFY_BODY") with title (system attribute "NOTIFY_TITLE")' \
+            2>/dev/null && return || true
+    fi
+
+    # Generic fallback — no icon attribution.
+    NOTIFY_TITLE="$title" NOTIFY_BODY="$body" \
+        osascript -e \
+        'display notification (system attribute "NOTIFY_BODY") with title (system attribute "NOTIFY_TITLE")' \
+        2>/dev/null || true
+}
+
+main() {
     local title="${1:-Notification}"
     local body="${2:-}"
     local payload="${title}"
     [[ -n "$body" ]] && payload+=$'\n'"${body}"
 
-    if [[ -n "${TMUX:-}" ]]; then
-        # DCS passthrough: each ESC in the inner sequence must be doubled.
-        # OSC 99:      ESC ] 99 ; i=1:d=0 ; <payload> ST
-        # Passthrough: ESC P tmux; ESC ESC ] 99 ; i=1:d=0 ; <payload> ESC ESC \\ ESC \\
-        printf '\ePtmux;\e\e]99;i=1:d=0;%s\e\e\\\e\\' "$payload" > /dev/tty
+    local tty
+    tty="$(find_tty)"
 
-        # iTerm2 legacy OSC 9 (older versions that predate OSC 99 support)
-        if [[ -n "${ITERM_SESSION_ID:-}" ]]; then
-            printf '\ePtmux;\e\e]9;%s\e\e\\\e\\' "${title}: ${body}" > /dev/tty
-        fi
+    if [[ "$tty" == "/dev/tty" ]]; then
+        # Interactive terminal: send OSC (shown when window loses focus).
+        send_osc "$tty" "$payload" "$title" "$body"
     else
-        printf '\e]99;i=1:d=0;%s\e\\' "$payload" > /dev/tty
-
-        if [[ -n "${ITERM_SESSION_ID:-}" ]]; then
-            printf '\e]9;%s\e\\' "${title}: ${body}" > /dev/tty
-        fi
+        # Hook/headless context: fork to background so the hook returns
+        # immediately — terminal-notifier blocks until timeout otherwise.
+        send_system_notification "$title" "$body" &
+        disown
     fi
-
-    # Terminal bell — universal attention signal even when OSC 99 is unsupported.
-    printf '\a' > /dev/tty
 }
 
 main "$@"

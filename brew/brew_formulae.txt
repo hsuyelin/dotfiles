@@ -193,6 +193,7 @@ swift-protobuf
 swiftformat
 swiftlint
 tealdeer
+terminal-notifier
 tesseract
 theora
 tmux
