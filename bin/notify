@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+#
+# notify -- cross-terminal desktop notification (OSC 99)
+# Supports Ghostty, Kitty, and iTerm2, inside and outside tmux.
+#
+# Usage: notify <title> [body]
+
+set -euo pipefail
+
+main() {
+    # No controlling terminal — nothing to notify, exit cleanly.
+    [[ -w /dev/tty ]] || exit 0
+
+    local title="${1:-Notification}"
+    local body="${2:-}"
+    local payload="${title}"
+    [[ -n "$body" ]] && payload+=$'\n'"${body}"
+
+    if [[ -n "${TMUX:-}" ]]; then
+        # DCS passthrough: each ESC in the inner sequence must be doubled.
+        # OSC 99:      ESC ] 99 ; i=1:d=0 ; <payload> ST
+        # Passthrough: ESC P tmux; ESC ESC ] 99 ; i=1:d=0 ; <payload> ESC ESC \\ ESC \\
+        printf '\ePtmux;\e\e]99;i=1:d=0;%s\e\e\\\e\\' "$payload" > /dev/tty
+
+        # iTerm2 legacy OSC 9 (older versions that predate OSC 99 support)
+        if [[ -n "${ITERM_SESSION_ID:-}" ]]; then
+            printf '\ePtmux;\e\e]9;%s\e\e\\\e\\' "${title}: ${body}" > /dev/tty
+        fi
+    else
+        printf '\e]99;i=1:d=0;%s\e\\' "$payload" > /dev/tty
+
+        if [[ -n "${ITERM_SESSION_ID:-}" ]]; then
+            printf '\e]9;%s\e\\' "${title}: ${body}" > /dev/tty
+        fi
+    fi
+
+    # Terminal bell — universal attention signal even when OSC 99 is unsupported.
+    printf '\a' > /dev/tty
+}
+
+main "$@"

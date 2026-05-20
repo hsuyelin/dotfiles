@@ -208,6 +208,11 @@ zstyle ':fzf-tab:*' fzf-flags '--bind=ctrl-d:preview-page-down,ctrl-u:preview-pa
     && source "${XDG_CONFIG_HOME}/kitty/kitty.zsh"
 
 # ============================================================
+# Notify (long-running command completion alerts)
+# ============================================================
+[[ -f "${XDG_CONFIG_HOME}/zsh/notify.zsh" ]] && source "${XDG_CONFIG_HOME}/zsh/notify.zsh"
+
+# ============================================================
 # RTK (Rust Token Killer)
 # ============================================================
 [[ -f "${XDG_CONFIG_HOME}/rtk/rtk.zsh" ]] && source "${XDG_CONFIG_HOME}/rtk/rtk.zsh"
