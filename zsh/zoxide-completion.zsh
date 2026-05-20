@@ -76,6 +76,7 @@ if command -v zoxide >/dev/null; then
         local selected
         selected=$(printf '%s\n' "${candidates[@]}" | fzf \
           --height=40% --layout=reverse --border --info=inline \
+          --query="$query" \
           --bind='tab:down,btab:up,ctrl-d:preview-page-down,ctrl-u:preview-page-up' \
           --preview='command -v eza >/dev/null && eza -1 --color=always --group-directories-first -- {} 2>/dev/null || ls -1 -- {}' \
           --preview-window=right:40% \
