@@ -41,7 +41,7 @@ readonly SCRIPT_DIR
 readonly DOTFILES_DIR="${SCRIPT_DIR}"
 
 # ── Runtime constants ────────────────────────────────────────────────────────
-readonly HOMEBREW_PREFIX="/opt/homebrew"
+HOMEBREW_PREFIX="/opt/homebrew"
 readonly HOMEBREW_INSTALL_URL="https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"
 readonly DOTFILES_TARGET="${HOME}/.config"
 readonly INSTALL_SCRIPT="${DOTFILES_TARGET}/install.sh"
