@@ -31,14 +31,22 @@ set -euo pipefail
 
 # ── Script location ──────────────────────────────────────────────────────────
 # When executed via pipe (curl | bash) or process substitution (bash <(...)),
-# BASH_SOURCE[0] is either empty, "bash", or a /dev/fd/N path.
-# All three cases fall back to the dotfiles canonical location.
-if [[ -n "${BASH_SOURCE[0]:-}" && "${BASH_SOURCE[0]}" != "bash" \
-      && "${BASH_SOURCE[0]}" != /dev/fd/* ]]; then
-    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-else
-    SCRIPT_DIR="${HOME}/.config"
-fi
+# BASH_SOURCE[0] is empty, "bash", or a pseudo-filesystem path (/dev/fd/N,
+# /dev/stdin, /proc/self/fd/N, etc.). Resolve the directory first, then
+# reject any path under /dev or /proc and fall back to the canonical location.
+_resolve_script_dir() {
+    local src="${BASH_SOURCE[0]:-}"
+    [[ -z "${src}" || "${src}" == "bash" ]] && { printf '%s' "${HOME}/.config"; return; }
+    local dir
+    dir="$(cd "$(dirname "${src}")" 2>/dev/null && pwd)" \
+        || { printf '%s' "${HOME}/.config"; return; }
+    case "${dir}" in
+        /dev/*|/proc/*) printf '%s' "${HOME}/.config" ;;
+        *)              printf '%s' "${dir}" ;;
+    esac
+}
+SCRIPT_DIR="$(_resolve_script_dir)"
+unset -f _resolve_script_dir
 readonly SCRIPT_DIR
 readonly DOTFILES_DIR="${SCRIPT_DIR}"
 
