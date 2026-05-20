@@ -190,18 +190,16 @@ check_platform() {
 }
 
 # ── Step 2: Prerequisites ─────────────────────────────────────────────────────
-# Required: script cannot proceed without these.
-# Optional: dotfiles will work but some features will be degraded; logged as warnings.
 check_prerequisites() {
     log_step "Checking" "required tools"
 
     local missing_required=false
 
-    # ── Required commands ────────────────────────────────────────────────────
+    # System tools that cannot be installed via brew — fatal if absent.
     local req
-    for req in git zsh curl brew starship fzf eza zoxide tmux nvim; do
+    for req in git zsh curl brew; do
         if command -v "${req}" &>/dev/null; then
-            log_info "${req} $(${req} --version 2>&1 | head -1)"
+            log_info "${req} $("${req}" --version 2>&1 | head -1)"
         else
             log_error "required command not found: ${req}"
             missing_required=true
@@ -209,9 +207,34 @@ check_prerequisites() {
     done
 
     if [[ "${missing_required}" == "true" ]]; then
-        die "Missing required commands. Run bootstrap.sh first or install via brew."
+        die "Missing system tools. Run bootstrap.sh first or: xcode-select --install"
     fi
 
+    # Brew-installable tools — auto-install if missing, then re-verify.
+    # Format: "command:formula"  (formula differs from command for neovim/nvim)
+    local entry cmd formula
+    for entry in "starship:starship" "fzf:fzf" "eza:eza" \
+                 "zoxide:zoxide" "tmux:tmux" "nvim:neovim"; do
+        cmd="${entry%%:*}"
+        formula="${entry##*:}"
+        if command -v "${cmd}" &>/dev/null; then
+            log_info "${cmd} $("${cmd}" --version 2>&1 | head -1)"
+        else
+            log_warn "${cmd} not found — installing via brew"
+            brew install "${formula}" \
+                || { log_error "brew install ${formula} failed"; missing_required=true; continue; }
+            if command -v "${cmd}" &>/dev/null; then
+                log_info "${cmd} installed: $("${cmd}" --version 2>&1 | head -1)"
+            else
+                log_error "${cmd} still not found after install"
+                missing_required=true
+            fi
+        fi
+    done
+
+    if [[ "${missing_required}" == "true" ]]; then
+        die "Some required tools could not be installed. Check brew output above."
+    fi
 }
 
 # ── Step 3: Back up conflicting files ────────────────────────────────────────
