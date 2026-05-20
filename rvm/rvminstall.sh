@@ -128,11 +128,14 @@ install_ruby() {
 
     # Disable autolibs so RVM uses our manually specified Homebrew paths rather
     # than attempting to install system libraries itself.
+    # RVM shell functions reference unbound variables internally; disable -u around all rvm calls.
+    set +u
     run rvm autolibs disable
 
     log_step "Installing" "Ruby ${version}"
 
     if [[ "${DRY_RUN}" == "true" ]]; then
+        set -u
         log_info "[dry-run] would run: rvm install ${version} \\"
         log_info "         --with-libyaml-dir=${libyaml_dir} \\"
         log_info "         --with-openssl-dir=${openssl_dir}"
@@ -142,9 +145,11 @@ install_ruby() {
     if rvm install "${version}" \
         --with-libyaml-dir="${libyaml_dir}" \
         --with-openssl-dir="${openssl_dir}"; then
+        set -u
         log_success "Ruby ${version} installed"
         log_info "Switch with: rvm use ${version}"
     else
+        set -u
         die "Ruby ${version} installation failed — check the output above"
     fi
 }
@@ -160,7 +165,13 @@ main() {
     fi
 
     # Load RVM into this shell session if not already active.
-    [[ -s "${HOME}/.rvm/scripts/rvm" ]] && source "${HOME}/.rvm/scripts/rvm"
+    # RVM's own scripts reference unbound variables, so -u must be off while sourcing.
+    if [[ -s "${HOME}/.rvm/scripts/rvm" ]]; then
+        set +u
+        # shellcheck disable=SC1091
+        source "${HOME}/.rvm/scripts/rvm"
+        set -u
+    fi
 
     printf '\n'
     log_step "Starting" "Ruby ${RUBY_VERSION} install via RVM"
