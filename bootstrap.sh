@@ -330,7 +330,11 @@ run_install_sh() {
     # Pass the terminal choice so install.sh skips its own prompt
     [[ -n "${TERMINAL_CHOICE}" ]] && args+=("--terminal=${TERMINAL_CHOICE}")
 
-    bash "${INSTALL_SCRIPT}" "${args[@]+"${args[@]}"}"
+    if [[ ${#args[@]} -gt 0 ]]; then
+        bash "${INSTALL_SCRIPT}" "${args[@]}"
+    else
+        bash "${INSTALL_SCRIPT}"
+    fi
 }
 
 # ── Step 7 & 8: Homebrew packages ────────────────────────────────────────────
@@ -364,10 +368,12 @@ _brew_install_list() {
 
         # Skip terminals that were not selected (install.sh handles the chosen one)
         local _skip=false
-        local _s
-        for _s in "${_skip_casks[@]+"${_skip_casks[@]}"}"; do
-            [[ "${pkg}" == "${_s}" ]] && _skip=true && break
-        done
+        if [[ ${#_skip_casks[@]} -gt 0 ]]; then
+            local _s
+            for _s in "${_skip_casks[@]}"; do
+                [[ "${pkg}" == "${_s}" ]] && _skip=true && break
+            done
+        fi
         if [[ "${_skip}" == "true" ]]; then
             log_info "skipped (not selected terminal): ${pkg}"
             continue
@@ -451,7 +457,11 @@ install_rvm() {
     log_step "Running" "rvm/install_rvm.sh"
     local args=()
     [[ "${DRY_RUN}" == "true" ]] && args+=("--dry-run")
-    bash "${rvm_install}" "${args[@]+"${args[@]}"}"
+    if [[ ${#args[@]} -gt 0 ]]; then
+        bash "${rvm_install}" "${args[@]}"
+    else
+        bash "${rvm_install}"
+    fi
 }
 
 # ── Step 10: Next steps ───────────────────────────────────────────────────────
