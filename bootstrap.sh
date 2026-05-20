@@ -482,6 +482,19 @@ install_rvm() {
     else
         bash "${rvm_install}"
     fi
+
+    # Deploy the rvminstall helper so the shell alias works out of the box.
+    local rvminstall_src="${DOTFILES_DIR}/rvm/rvminstall.sh"
+    local rvminstall_dst="${HOME}/.rvm/.rvminstall.sh"
+    if [[ -f "${rvminstall_src}" && -d "${HOME}/.rvm" ]]; then
+        if [[ "${DRY_RUN}" == "true" ]]; then
+            log_info "[dry-run] would deploy ${rvminstall_dst}"
+        else
+            cp "${rvminstall_src}" "${rvminstall_dst}"
+            chmod +x "${rvminstall_dst}"
+            log_step "Deployed" "rvminstall → ${rvminstall_dst}"
+        fi
+    fi
 }
 
 # ── Next steps ───────────────────────────────────────────────────────
