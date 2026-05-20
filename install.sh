@@ -51,6 +51,7 @@ readonly ZSHENV_HOME="${HOME}/.zshenv"
 # XDG directories to create (relative to $HOME)
 readonly XDG_DIRS=(
     ".local/share"
+    ".local/share/gnupg"
     ".local/state"
     ".local/state/zsh"
     ".cache"
@@ -385,6 +386,9 @@ create_xdg_dirs() {
     for dir in "${XDG_DIRS[@]}"; do
         run mkdir -p "${HOME}/${dir}"
     done
+
+    # gpg refuses to use a keyring directory that is group- or world-readable.
+    run chmod 700 "${HOME}/.local/share/gnupg"
 
     log_info "XDG tree ready under ${HOME}/.local"
 }

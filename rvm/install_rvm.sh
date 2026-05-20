@@ -91,6 +91,14 @@ import_gpg_keys() {
         return 0
     fi
 
+    # If GNUPGHOME points to a non-existent directory (e.g. XDG path not yet
+    # created), gpg cannot initialise its keyring and all imports fail.
+    if [[ -n "${GNUPGHOME:-}" && ! -d "${GNUPGHOME}" ]]; then
+        mkdir -p "${GNUPGHOME}"
+        chmod 700 "${GNUPGHOME}"
+        log_info "Created GNUPGHOME at ${GNUPGHOME}"
+    fi
+
     curl -sSL "${RVM_GPG_KEY_MPAPIS}" | gpg --import - || \
         log_warn "mpapis key import failed — continuing anyway"
     curl -sSL "${RVM_GPG_KEY_PKU}"    | gpg --import - || \
