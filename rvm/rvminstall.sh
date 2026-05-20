@@ -31,7 +31,7 @@ log_error()   { printf "${BOLD}${RED}%12s${NC} %s\n"    "Error" "$1" >&2; }
 log_success() { printf "${BOLD}${GREEN}%12s${NC} %s\n"  "Finished" "$1"; }
 die()         { log_error "$1"; exit 1; }
 
-RUBY_VERSION=""
+TARGET_RUBY_VERSION=""
 DRY_RUN=false
 
 parse_args() {
@@ -54,15 +54,15 @@ parse_args() {
                 die "Unknown option: ${_arg}"
                 ;;
             *)
-                if [[ -n "${RUBY_VERSION}" ]]; then
+                if [[ -n "${TARGET_RUBY_VERSION}" ]]; then
                     die "Unexpected argument: ${_arg}"
                 fi
-                RUBY_VERSION="${_arg}"
+                TARGET_RUBY_VERSION="${_arg}"
                 ;;
         esac
     done
     unset _arg
-    readonly DRY_RUN RUBY_VERSION
+    readonly DRY_RUN TARGET_RUBY_VERSION
 }
 
 run() {
@@ -152,7 +152,7 @@ install_ruby() {
 main() {
     parse_args "$@"
 
-    if [[ -z "${RUBY_VERSION}" ]]; then
+    if [[ -z "${TARGET_RUBY_VERSION}" ]]; then
         log_error "No Ruby version specified."
         printf 'Usage: %s <version> [--dry-run]\n' "$(basename "$0")"
         printf 'Example: %s 3.3.7\n' "$(basename "$0")"
@@ -169,13 +169,13 @@ main() {
     fi
 
     printf '\n'
-    log_step "Starting" "Ruby ${RUBY_VERSION} install via RVM"
+    log_step "Starting" "Ruby ${TARGET_RUBY_VERSION} install via RVM"
     [[ "${DRY_RUN}" == "true" ]] && log_warn "Dry-run mode — no changes will be made"
     printf '\n'
 
     check_prerequisites
     ensure_brew_deps
-    install_ruby "${RUBY_VERSION}"
+    install_ruby "${TARGET_RUBY_VERSION}"
 
     printf '\n'
     log_success "Done"
