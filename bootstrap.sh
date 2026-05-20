@@ -353,8 +353,6 @@ _brew_install_list() {
         return 0
     fi
 
-    log_step "Installing" "Homebrew ${kind}s from $(basename "${list}")"
-
     # When installing casks, only install the selected terminal emulator.
     # Collect the set of skipped terminals so the loop can skip them.
     local -a _skip_casks=()
