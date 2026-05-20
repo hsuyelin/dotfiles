@@ -30,8 +30,9 @@
 set -euo pipefail
 
 # ── Script location ──────────────────────────────────────────────────────────
-# When bootstrap.sh is piped from curl, BASH_SOURCE[0] is empty.
-# In that case we fall back to the dotfiles canonical location.
+# When executed via pipe (curl | bash) or process substitution (bash <(...)),
+# BASH_SOURCE[0] is either empty, "bash", or a /dev/fd/N path.
+# All three cases fall back to the dotfiles canonical location.
 if [[ -n "${BASH_SOURCE[0]:-}" && "${BASH_SOURCE[0]}" != "bash" \
       && "${BASH_SOURCE[0]}" != /dev/fd/* ]]; then
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
