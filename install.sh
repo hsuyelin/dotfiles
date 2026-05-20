@@ -28,6 +28,15 @@
 
 set -euo pipefail
 
+# ── Homebrew PATH bootstrap ───────────────────────────────────────────────────
+# Ensure brew-installed binaries are visible regardless of how this script is
+# invoked (standalone, via bootstrap.sh, or any other caller).
+if [[ -x /opt/homebrew/bin/brew ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [[ -x /usr/local/bin/brew ]]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+fi
+
 # ── Script location ──────────────────────────────────────────────────────────
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly SCRIPT_DIR
