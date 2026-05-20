@@ -131,8 +131,12 @@ main() {
     printf '\n'
 
     check_prerequisites
-    import_gpg_keys
-    install_rvm
+    if [[ -s "${HOME}/.rvm/scripts/rvm" ]]; then
+        log_info "RVM already installed — skipping GPG key import and installation"
+    else
+        import_gpg_keys
+        install_rvm
+    fi
 
     printf '\n'
     log_success "RVM setup complete"
