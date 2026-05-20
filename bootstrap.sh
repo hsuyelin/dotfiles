@@ -474,6 +474,13 @@ install_rvm() {
         return 0
     fi
 
+    # gnupg is required by install_rvm.sh for GPG key verification.
+    if ! command -v gpg &>/dev/null; then
+        log_warn "gpg not found — installing gnupg via brew"
+        brew install gnupg \
+            || die "gnupg installation failed — cannot proceed with RVM setup"
+    fi
+
     log_step "Running" "rvm/install_rvm.sh"
     local args=()
     [[ "${DRY_RUN}" == "true" ]] && args+=("--dry-run")
