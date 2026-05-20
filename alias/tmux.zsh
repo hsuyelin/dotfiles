@@ -99,9 +99,7 @@ _tmux_session_picker_widget() {
         ta
         zle reset-prompt
     else
-        zle -I
-        printf '\033[H\033[2J'  # clear visible screen, cursor to home
-        zle reset-prompt        # redraw prompt at top; fzf renders below it
+        zle clear-screen        # ZLE built-in: clear screen + redraw prompt
         ta
         zle reset-prompt
     fi
