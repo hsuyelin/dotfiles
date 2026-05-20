@@ -34,7 +34,7 @@ set -euo pipefail
 # BASH_SOURCE[0] is empty, "bash", or a pseudo-filesystem path (/dev/fd/N,
 # /dev/stdin, /proc/self/fd/N, etc.). Resolve the directory first, then
 # reject any path under /dev or /proc and fall back to the canonical location.
-_resolve_script_dir() {
+_detect_script_dir() {
     local src="${BASH_SOURCE[0]:-}"
     [[ -z "${src}" || "${src}" == "bash" ]] && { printf '%s' "${HOME}/.config"; return; }
     local dir
@@ -45,8 +45,8 @@ _resolve_script_dir() {
         *)              printf '%s' "${dir}" ;;
     esac
 }
-SCRIPT_DIR="$(_resolve_script_dir)"
-unset -f _resolve_script_dir
+SCRIPT_DIR="$(_detect_script_dir)"
+unset -f _detect_script_dir
 readonly SCRIPT_DIR
 readonly DOTFILES_DIR="${SCRIPT_DIR}"
 
