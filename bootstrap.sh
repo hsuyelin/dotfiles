@@ -338,6 +338,11 @@ run_install_sh() {
 }
 
 # ── Step 7 & 8: Homebrew packages ────────────────────────────────────────────
+# Newline-separated "PACKAGE KIND" pairs written by _brew_install_list and
+# printed at the end of install_brew_packages. Plain string — no arrays —
+# so it is safe under set -u on every bash version.
+_BREW_FAILED=""
+
 # Reads line-by-line from a text file, skipping blank lines and # comments.
 _brew_install_list() {
     local kind="$1"   # formula | cask
@@ -387,10 +392,12 @@ _brew_install_list() {
                 log_info "[dry-run] brew install ${kind:+--${kind} }${pkg}"
             elif [[ "${kind}" == "cask" ]]; then
                 brew install --cask "${pkg}" \
-                    || log_warn "failed to install cask: ${pkg} (skipping)"
+                    || { log_warn "failed to install cask: ${pkg} (skipping)"; \
+                         _BREW_FAILED="${_BREW_FAILED}${pkg} cask"$'\n'; }
             else
                 brew install "${pkg}" \
-                    || log_warn "failed to install formula: ${pkg} (skipping)"
+                    || { log_warn "failed to install formula: ${pkg} (skipping)"; \
+                         _BREW_FAILED="${_BREW_FAILED}${pkg} formula"$'\n'; }
             fi
         fi
     done < "${list}"
@@ -437,6 +444,21 @@ install_brew_packages() {
 
     _brew_install_list "formula" "${DOTFILES_DIR}/brew/brew_formulae.txt"
     _brew_install_list "cask"    "${DOTFILES_DIR}/brew/brew_casks.txt"
+
+    if [[ -n "${_BREW_FAILED}" ]]; then
+        printf '\n'
+        log_warn "The following packages failed to install — retry manually:"
+        while IFS=' ' read -r _pkg _kind; do
+            [[ -z "${_pkg}" ]] && continue
+            if [[ "${_kind}" == "cask" ]]; then
+                printf "         brew install --cask %s\n" "${_pkg}"
+            else
+                printf "         brew install %s\n" "${_pkg}"
+            fi
+        done <<EOF
+${_BREW_FAILED}
+EOF
+    fi
 }
 
 # ── Step 9: RVM ───────────────────────────────────────────────────────────────
