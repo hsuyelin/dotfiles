@@ -168,18 +168,14 @@ main() {
         source "${HOME}/.rvm/scripts/rvm"
     fi
 
-    printf '\n'
     log_step "Starting" "Ruby ${TARGET_RUBY_VERSION} install via RVM"
     [[ "${DRY_RUN}" == "true" ]] && log_warn "Dry-run mode — no changes will be made"
-    printf '\n'
 
     check_prerequisites
     ensure_brew_deps
     install_ruby "${TARGET_RUBY_VERSION}"
 
-    printf '\n'
     log_success "Done"
-    printf '\n'
 }
 
 main "$@"

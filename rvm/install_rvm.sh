@@ -125,10 +125,8 @@ install_rvm() {
 }
 
 main() {
-    printf '\n'
     log_step "Starting" "RVM installer"
     [[ "${DRY_RUN}" == "true" ]] && log_warn "Dry-run mode — no changes will be made"
-    printf '\n'
 
     check_prerequisites
     if [[ -s "${HOME}/.rvm/scripts/rvm" ]]; then
@@ -138,7 +136,6 @@ main() {
         install_rvm
     fi
 
-    printf '\n'
     log_success "RVM setup complete"
     printf '\n'
     printf '%s\n' "  Next steps:"
@@ -146,7 +143,6 @@ main() {
     printf '%s\n' "  1. Open a new shell (or: source ~/.rvm/scripts/rvm)"
     printf '%s\n' "  2. Install a Ruby version:  rvminstall <version>"
     printf '%s\n' "     Example:                 rvminstall 3.3.7"
-    printf '\n'
 }
 
 main "$@"
