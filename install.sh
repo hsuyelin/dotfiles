@@ -14,17 +14,17 @@
 #                           prompt is shown before proceeding.
 #
 # Steps:
-#   1.  Verify platform (macOS; arm64 recommended, x86_64 allowed)
-#   2.  Verify git is available
-#   3.  Back up conflicting shell config files
-#   4.  Create XDG base directory tree
-#   5.  Write ~/.zshenv to bootstrap ZDOTDIR
-#   6.  Create placeholder files for secrets/ and private/
-#   7.  Configure proxy port (PROXY_PORT_HTTP / PROXY_PORT_SOCKS)
-#   8.  Initialize tmux plugin manager (TPM)
-#   8.  Clone Ghostty cursor shaders (if missing)
-#   9.  Set executable permissions on bin/ scripts
-#   10. Print post-install checklist
+#   - Verify platform (macOS; arm64 recommended, x86_64 allowed)
+#   - Verify git is available
+#   - Back up conflicting shell config files
+#   - Create XDG base directory tree
+#   - Write ~/.zshenv to bootstrap ZDOTDIR
+#   - Create placeholder files for secrets/ and private/
+#   - Configure proxy port (PROXY_PORT_HTTP / PROXY_PORT_SOCKS)
+#   - Initialize tmux plugin manager (TPM)
+#   - Clone Ghostty cursor shaders (if missing)
+#   - Set executable permissions on bin/ scripts
+#   - Print post-install checklist
 
 set -euo pipefail
 
@@ -149,7 +149,7 @@ run() {
     fi
 }
 
-# ── Step 1: Platform check ────────────────────────────────────────────────────
+# ── Platform check ────────────────────────────────────────────────────
 check_platform() {
     log_step "Checking" "platform requirements"
 
@@ -189,7 +189,7 @@ check_platform() {
     log_info "macOS $(sw_vers -productVersion) on ${arch}"
 }
 
-# ── Step 2: Prerequisites ─────────────────────────────────────────────────────
+# ── Prerequisites ─────────────────────────────────────────────────────
 check_prerequisites() {
     log_step "Checking" "required tools"
 
@@ -237,7 +237,7 @@ check_prerequisites() {
     fi
 }
 
-# ── Step 3: Back up conflicting files ────────────────────────────────────────
+# ── Back up conflicting files ────────────────────────────────────────
 # ~/.zshenv is handled separately: we only back it up when it does NOT already
 # contain our XDG bootstrap (to avoid nuking a correctly configured machine).
 zshenv_is_ours() {
@@ -301,7 +301,7 @@ backup_conflicts() {
     fi
 }
 
-# ── Step 4: XDG directory tree ────────────────────────────────────────────────
+# ── XDG directory tree ────────────────────────────────────────────────
 create_xdg_dirs() {
     log_step "Creating" "XDG base directories"
 
@@ -313,7 +313,7 @@ create_xdg_dirs() {
     log_info "XDG tree ready under ${HOME}/.local"
 }
 
-# ── Step 5: Write ~/.zshenv ───────────────────────────────────────────────────
+# ── Write ~/.zshenv ───────────────────────────────────────────────────
 # This file is not inside the dotfiles repo — it lives at $HOME and is the
 # single entry point that sets ZDOTDIR before zsh loads anything else.
 write_zshenv() {
@@ -347,7 +347,7 @@ ZSHENV
     log_info "Wrote ${ZSHENV_HOME}"
 }
 
-# ── Step 6: Placeholder files for secrets and private configs ─────────────────
+# ── Placeholder files for secrets and private configs ─────────────────
 # These files are gitignored and must be populated manually. The install script
 # creates empty-but-valid stubs so that shell sourcing does not produce errors
 # on a fresh clone. Existing files are never overwritten.
@@ -493,7 +493,7 @@ _write_proxy_port() {
         "${http_port}" "${socks_port}" >> "${profile}"
 }
 
-# ── Step 7: tmux plugin manager (TPM) ────────────────────────────────────────
+# ── tmux plugin manager (TPM) ────────────────────────────────────────
 init_tpm() {
     log_step "Checking" "tmux plugin manager (TPM)"
 
@@ -602,7 +602,7 @@ install_terminal_app() {
     esac
 }
 
-# ── Step 8: Ghostty cursor shaders ───────────────────────────────────────────
+# ── Ghostty cursor shaders ───────────────────────────────────────────
 clone_ghostty_shaders() {
     # Shaders are only relevant for Ghostty
     [[ "${TERMINAL_CHOICE}" != "ghostty" ]] && return 0
@@ -619,7 +619,7 @@ clone_ghostty_shaders() {
         "${GHOSTTY_SHADERS_DIR}"
 }
 
-# ── Step 9: Executable permissions ───────────────────────────────────────────
+# ── Executable permissions ───────────────────────────────────────────
 set_permissions() {
     log_step "Permissions" "chmod +x on scripts"
 
@@ -824,7 +824,7 @@ install_claude_themes() {
     fi
 }
 
-# ── Step 10: Post-install checklist ──────────────────────────────────────────
+# ── Post-install checklist ──────────────────────────────────────────
 print_checklist() {
     printf '\n'
     log_success "dotfiles installed — open a new shell to load the configuration"

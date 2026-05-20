@@ -16,16 +16,16 @@
 #                   Example: DOTFILES_REPO=https://github.com/you/dotfiles
 #
 # Steps:
-#   1.  Verify platform is macOS on Apple Silicon (ARM64)
-#   2.  Check bootstrap prerequisites (curl, git)
-#   3.  Install Xcode Command Line Tools
-#   4.  Install Homebrew
-#   5.  Clone dotfiles repository to ~/.config (if not present)
-#   6.  Run install.sh (XDG dirs, zshenv, placeholders, plugins)
-#   7.  Install Homebrew formulae from brew/brew_formulae.txt
-#   8.  Install Homebrew casks from brew/brew_casks.txt
-#   9.  Install RVM (Ruby Version Manager)
-#   10. Print next steps
+#   - Verify platform is macOS on Apple Silicon (ARM64)
+#   - Check bootstrap prerequisites (curl, git)
+#   - Install Xcode Command Line Tools
+#   - Install Homebrew
+#   - Clone dotfiles repository to ~/.config (if not present)
+#   - Run install.sh (XDG dirs, zshenv, placeholders, plugins)
+#   - Install Homebrew formulae from brew/brew_formulae.txt
+#   - Install Homebrew casks from brew/brew_casks.txt
+#   - Install RVM (Ruby Version Manager)
+#   - Print next steps
 
 set -euo pipefail
 
@@ -142,7 +142,7 @@ export GOPATH="${XDG_DATA_HOME}/go"
 # CocoaPods — XDG home
 export CP_HOME_DIR="${XDG_DATA_HOME}/cocoapods"
 
-# ── Step 1: Platform check ────────────────────────────────────────────────────
+# ── Platform check ────────────────────────────────────────────────────
 check_platform() {
     log_step "Checking" "platform"
 
@@ -159,7 +159,7 @@ check_platform() {
     log_info "macOS $(sw_vers -productVersion) on ${arch}"
 }
 
-# ── Step 2: Bootstrap prerequisites ──────────────────────────────────────────
+# ── Bootstrap prerequisites ──────────────────────────────────────────
 # Only curl is required before Xcode CLT is installed — it ships with every
 # macOS release at /usr/bin/curl. git is provided by Xcode CLT, which is
 # installed in the next step, so we must not require it here.
@@ -173,7 +173,7 @@ check_prerequisites() {
     fi
 }
 
-# ── Step 3: Xcode Command Line Tools ─────────────────────────────────────────
+# ── Xcode Command Line Tools ─────────────────────────────────────────
 install_xcode_clt() {
     log_step "Checking" "Xcode Command Line Tools"
 
@@ -203,7 +203,7 @@ install_xcode_clt() {
     log_step "Installed" "Xcode CLT at $(xcode-select -p)"
 }
 
-# ── Step 4: Homebrew ──────────────────────────────────────────────────────────
+# ── Homebrew ──────────────────────────────────────────────────────────
 install_homebrew() {
     log_step "Checking" "Homebrew"
 
@@ -227,7 +227,7 @@ install_homebrew() {
     log_step "Installed" "Homebrew $(brew --version | head -1)"
 }
 
-# ── Step 5: Clone dotfiles ────────────────────────────────────────────────────
+# ── Clone dotfiles ────────────────────────────────────────────────────
 # Detection strategy: a .dotfiles-marker file in the repo root is the canonical
 # signal that ~/.config is already this dotfiles installation. Any ~/.config
 # directory without that marker is treated as the user's pre-existing config
@@ -316,7 +316,7 @@ select_terminal() {
     esac
 }
 
-# ── Step 5: Run install.sh ────────────────────────────────────────────────────
+# ── Run install.sh ────────────────────────────────────────────────────
 run_install_sh() {
     if [[ ! -f "${INSTALL_SCRIPT}" ]]; then
         log_warn "install.sh not found at ${INSTALL_SCRIPT} — skipping dotfiles setup"
@@ -337,7 +337,7 @@ run_install_sh() {
     fi
 }
 
-# ── Step 7 & 8: Homebrew packages ────────────────────────────────────────────
+# ── Homebrew packages ────────────────────────────────────────────
 # Newline-separated "PACKAGE KIND" pairs written by _brew_install_list and
 # printed at the end of install_brew_packages. Plain string — no arrays —
 # so it is safe under set -u on every bash version.
@@ -461,7 +461,7 @@ EOF
     fi
 }
 
-# ── Step 9: RVM ───────────────────────────────────────────────────────────────
+# ── RVM ───────────────────────────────────────────────────────────────
 install_rvm() {
     log_step "Checking" "RVM"
 
@@ -486,7 +486,7 @@ install_rvm() {
     fi
 }
 
-# ── Step 10: Next steps ───────────────────────────────────────────────────────
+# ── Next steps ───────────────────────────────────────────────────────
 print_next_steps() {
     printf '\n'
     log_success "bootstrap complete — restart your terminal to load the new shell"
