@@ -99,9 +99,10 @@ _tmux_session_picker_widget() {
         ta
         zle reset-prompt
     else
-        zle clear-screen        # ZLE built-in: clear screen + redraw prompt
-        ta
-        zle reset-prompt
+        zle clear-screen        # clear screen + redraw prompt at top
+        zle push-line           # save any typed buffer; restored after ta exits
+        BUFFER="ta"
+        zle accept-line         # hand ta back to shell so tmux can own the tty
     fi
 }
 zle -N _tmux_session_picker_widget
