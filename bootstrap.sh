@@ -32,7 +32,8 @@ set -euo pipefail
 # ── Script location ──────────────────────────────────────────────────────────
 # When bootstrap.sh is piped from curl, BASH_SOURCE[0] is empty.
 # In that case we fall back to the dotfiles canonical location.
-if [[ -n "${BASH_SOURCE[0]:-}" && "${BASH_SOURCE[0]}" != "bash" ]]; then
+if [[ -n "${BASH_SOURCE[0]:-}" && "${BASH_SOURCE[0]}" != "bash" \
+      && "${BASH_SOURCE[0]}" != /dev/fd/* ]]; then
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 else
     SCRIPT_DIR="${HOME}/.config"
