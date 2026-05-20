@@ -483,6 +483,16 @@ create_placeholder_secrets() {
         _placeholder_content "${type}" > "${target}"
         log_step "Created" "placeholder ${rel_path}"
     done
+
+    # Suppress "Last login:" banner that Terminal/Ghostty/kitty shows on open.
+    if [[ ! -f "${HOME}/.hushlogin" ]]; then
+        if [[ "${DRY_RUN}" == "true" ]]; then
+            log_info "[dry-run] would create ${HOME}/.hushlogin"
+        else
+            touch "${HOME}/.hushlogin"
+            log_step "Created" "${HOME}/.hushlogin (suppresses login banner)"
+        fi
+    fi
 }
 
 # ── Step: Proxy configuration ────────────────────────────────────────────────
@@ -902,7 +912,6 @@ install_claude_themes() {
 
 # ── Post-install checklist ──────────────────────────────────────────
 print_checklist() {
-    printf '\n'
     log_success "dotfiles installed — open a new shell to load the configuration"
     printf '\n'
     printf '%s\n' "  Post-install checklist:"
@@ -931,7 +940,6 @@ print_checklist() {
     printf '\n'
     printf '%s\n' "  Backup location (if any files were moved):"
     printf '%s\n' "    ${BACKUP_DIR}"
-    printf '\n'
 }
 
 # ── Main ─────────────────────────────────────────────────────────────────────
@@ -942,11 +950,9 @@ main() {
         return 0
     fi
 
-    printf '\n'
     log_step "Starting" "dotfiles installer (DOTFILES_DIR=${DOTFILES_DIR})"
     [[ "${DRY_RUN}" == "true" ]] && log_warn "Dry-run mode enabled — no changes will be made"
     [[ "${INSTALL_RTK}" == "false" ]] && log_info "RTK install skipped (--skip-rtk)"
-    printf '\n'
 
     check_platform
     check_prerequisites

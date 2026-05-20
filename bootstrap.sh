@@ -488,7 +488,6 @@ install_rvm() {
 
 # ── Next steps ───────────────────────────────────────────────────────
 print_next_steps() {
-    printf '\n'
     log_success "bootstrap complete — restart your terminal to load the new shell"
     printf '\n'
     printf '%s\n' "  Next steps:"
@@ -514,7 +513,6 @@ print_next_steps() {
         printf '%s\n' "  ☐  Open Ghostty — cursor shaders load from ghostty/shaders/"
     fi
     printf '%s\n' "  ☐  Sign in to Homebrew services (e.g. mas, 1Password)"
-    printf '\n'
 }
 
 # ── Main ─────────────────────────────────────────────────────────────────────
