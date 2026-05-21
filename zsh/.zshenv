@@ -46,7 +46,13 @@ mkdir -p "$DATADIR"
 # Editors
 # ============================================================
 
-export EDITOR='subl'
+if command -v subl >/dev/null 2>&1; then
+    export EDITOR='subl'
+elif command -v nvim >/dev/null 2>&1; then
+    export EDITOR='nvim'
+else
+    export EDITOR='vi'
+fi
 export GIT_EDITOR='nvim'
 export TERMINAL='/Applications/Ghostty.app/Contents/MacOS/ghostty'
 
