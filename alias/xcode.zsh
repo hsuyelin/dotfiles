@@ -267,7 +267,7 @@ xinstall() {
         case "$line" in
             '== Devices ==')    in_dev=1; in_sim=0; continue ;;
             '== Simulators ==') in_sim=1; in_dev=0; continue ;;
-            ==*==)              in_dev=0; in_sim=0; continue ;;
+            '=='*'==')          in_dev=0; in_sim=0; continue ;;
         esac
 
         [[ -z "${line// }" ]]        && continue
