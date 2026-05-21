@@ -37,6 +37,22 @@ _xcode_require() {
 }
 
 # ---------------------------------------------------------------------------
+# Pre-build clean prompt.
+# Prints a [y/N] question; waits up to 10s, defaults to N on timeout.
+# Returns 0 if the user confirms, 1 otherwise.
+# ---------------------------------------------------------------------------
+
+_xcode_ask_clean() {
+    local reply
+    printf '\n\033[1mClean before building?\033[0m  \033[2m[y/N]  (10s, default N)\033[0m '
+    if ! IFS= read -r -t 10 reply 2>/dev/null; then
+        printf 'N\n'
+        return 1
+    fi
+    [[ "$reply" == [yY] ]]
+}
+
+# ---------------------------------------------------------------------------
 # Shared argument parser (sets workspace / scheme / configuration in caller)
 # ---------------------------------------------------------------------------
 
@@ -98,6 +114,14 @@ xbuild() {
         return 1
     }
 
+    if _xcode_ask_clean; then
+        _xlog "Cleaning" "${scheme} (${configuration})"
+        local clean_cmd=(xcodebuild)
+        [ -n "$workspace" ] && clean_cmd+=(-workspace "${workspace}.xcworkspace")
+        clean_cmd+=(-scheme "$scheme" -sdk iphoneos -configuration "$configuration" clean)
+        "${clean_cmd[@]}" | xcbeautify
+    fi
+
     local cmd=(xcodebuild)
     [ -n "$workspace" ] && cmd+=(-workspace "${workspace}.xcworkspace")
     cmd+=(-scheme "$scheme" -sdk iphoneos -configuration "$configuration" build)
@@ -131,6 +155,14 @@ xarchive() {
     [ -z "$scheme" ]        && printf 'Missing required option: --scheme\n'        >&2 && return 1
     [ -z "$configuration" ] && printf 'Missing required option: --configuration\n' >&2 && return 1
     [ -z "$archive_path" ]  && printf 'Missing required option: --archive-path\n'  >&2 && return 1
+
+    if _xcode_ask_clean; then
+        _xlog "Cleaning" "${scheme} (${configuration})"
+        local clean_cmd=(xcodebuild)
+        [ -n "$workspace" ] && clean_cmd+=(-workspace "${workspace}.xcworkspace")
+        clean_cmd+=(-scheme "$scheme" -sdk iphoneos -configuration "$configuration" clean)
+        "${clean_cmd[@]}" | xcbeautify
+    fi
 
     local cmd=(xcodebuild)
     [ -n "$workspace" ] && cmd+=(-workspace "${workspace}.xcworkspace")
@@ -250,6 +282,14 @@ xinstall() {
     [ -z "$configuration" ] && {
         _xerr "missing required option: --configuration"; return 1
     }
+
+    if _xcode_ask_clean; then
+        _xlog "Cleaning" "${scheme} (${configuration})"
+        local clean_cmd=(xcodebuild)
+        [ -n "$workspace" ] && clean_cmd+=(-workspace "${workspace}.xcworkspace")
+        clean_cmd+=(-scheme "$scheme" -configuration "$configuration" clean)
+        "${clean_cmd[@]}" | xcbeautify
+    fi
 
     # ── Discover devices ──────────────────────────────────────────────────
     _xlog "Scanning" "available devices ..."
