@@ -416,10 +416,29 @@ xinstall() {
     (( _rc == 2 )) && return 0
     (( _rc != 0 )) && return 1
 
+    # Resolve the actual .app product name — it may differ from the scheme name.
+    # Primary: read PRODUCT_NAME from xcodebuild build settings.
+    # Fallback: prompt the user; empty input is fatal.
+    local app_name=""
+    local _bs_args=()
+    [ -n "$workspace" ] && _bs_args+=(-workspace "${workspace}.xcworkspace")
+    _bs_args+=(-scheme "$scheme" -configuration "$configuration" -sdk "$_xt_sdk")
+    app_name=$(xcodebuild -showBuildSettings "${_bs_args[@]}" 2>/dev/null \
+        | awk -F' = ' '/^\s*PRODUCT_NAME\s*=/ {
+            gsub(/^[[:space:]]+/, "", $2); print $2; exit
+        }')
+
+    if [ -z "$app_name" ]; then
+        _xwarn "Warning" "could not read PRODUCT_NAME from build settings"
+        printf '\n  \033[1mEnter app name\033[0m  \033[2m(without .app extension)\033[0m: '
+        IFS= read -r app_name
+        [ -z "$app_name" ] && { _xerr "app name is required"; return 1; }
+    fi
+
     local app_path=""
 
     if (( skip_build )); then
-        _xlog "Searching" "existing .app for '${scheme}' in DerivedData ..."
+        _xlog "Searching" "existing ${app_name}.app in DerivedData ..."
     else
         if _xcode_ask "Clean before building?"; then
             _xlog "Cleaning" "${scheme} (${configuration} | ${_xt_sdk})"
@@ -450,12 +469,12 @@ xinstall() {
             return 1
         fi
 
-        _xlog "Searching" ".app for '${scheme}' in DerivedData ..."
+        _xlog "Searching" "${app_name}.app in DerivedData ..."
     fi
 
     app_path=$(
         find "${HOME}/Library/Developer/Xcode/DerivedData" \
-            -maxdepth 6 -name "${scheme}.app" -type d 2>/dev/null \
+            -maxdepth 6 -iname "${app_name}.app" -type d 2>/dev/null \
         | while IFS= read -r p; do
             printf '%s\t%s\n' \
                 "$(stat -f '%m' "$p" 2>/dev/null || printf '0')" "$p"
@@ -463,7 +482,7 @@ xinstall() {
         | sort -rn | head -1 | cut -f2-
     )
     if [ -z "$app_path" ]; then
-        _xerr "no .app found for '${scheme}' in DerivedData"
+        _xerr "no .app found for '${app_name}' in DerivedData"
         return 1
     fi
     _xlog "Found" "$app_path"
