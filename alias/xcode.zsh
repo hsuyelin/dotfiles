@@ -13,6 +13,30 @@ _xwarn() { printf '\033[1;33m%12s\033[0m  %s\n' "$1" "$2"; }
 _xerr()  { printf '\033[1;31m%12s\033[0m  %s\n' "error" "$1" >&2; }
 
 # ---------------------------------------------------------------------------
+# Dependency check — call at the top of every public function.
+# Verifies xcodebuild (Xcode) and xcbeautify (brew) are available.
+# ---------------------------------------------------------------------------
+
+_xcode_require() {
+    local missing=0
+
+    if ! command -v xcodebuild >/dev/null 2>&1; then
+        _xerr "xcodebuild not found"
+        printf '         Install Xcode from the App Store or run:\n' >&2
+        printf '           xcode-select --install\n' >&2
+        missing=1
+    fi
+
+    if ! command -v xcbeautify >/dev/null 2>&1; then
+        _xerr "xcbeautify not found"
+        printf '         Install with: brew install xcbeautify\n' >&2
+        missing=1
+    fi
+
+    return "$missing"
+}
+
+# ---------------------------------------------------------------------------
 # Shared argument parser (sets workspace / scheme / configuration in caller)
 # ---------------------------------------------------------------------------
 
@@ -44,6 +68,7 @@ _xcode_parse_args() {
 # ---------------------------------------------------------------------------
 
 xclean() {
+    _xcode_require || return 1
     local workspace="" scheme="" configuration=""
 
     _xcode_parse_args "$@" || {
@@ -64,6 +89,7 @@ xclean() {
 # ---------------------------------------------------------------------------
 
 xbuild() {
+    _xcode_require || return 1
     local workspace="" scheme="" configuration=""
 
     _xcode_parse_args "$@" || {
@@ -84,6 +110,7 @@ xbuild() {
 # ---------------------------------------------------------------------------
 
 xarchive() {
+    _xcode_require || return 1
     local workspace="" scheme="" configuration="" archive_path=""
 
     while [ $# -gt 0 ]; do
@@ -197,6 +224,7 @@ _xcode_menu() {
 # ---------------------------------------------------------------------------
 
 xinstall() {
+    _xcode_require || return 1
     local workspace="" scheme="" configuration=""
 
     while [ $# -gt 0 ]; do
