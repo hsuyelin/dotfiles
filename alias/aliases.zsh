@@ -290,6 +290,10 @@ alias gba='git branch -a | fzf --height=40% --border --preview "git log --onelin
 #   zero startup overhead — yazi only launches when you call yy.
 # -----------------------------
 yy() {
+    if ! command -v yazi &>/dev/null; then
+        printf 'yy: yazi not installed. Run: brew install yazi\n' >&2
+        return 1
+    fi
     local tmp cwd
     tmp="$(mktemp -t "yazi-cwd.XXXXXX")" || return 1
     yazi "$@" --cwd-file="$tmp"

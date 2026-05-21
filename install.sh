@@ -289,9 +289,12 @@ check_prerequisites() {
 
     # Brew-installable tools — auto-install if missing, then re-verify.
     # Format: "command:formula"  (formula differs from command for neovim/nvim)
+    # node/go: required by mason to install pyright, bash-language-server, gopls.
+    # yazi: required by the yy shell function.
     local entry cmd formula
     for entry in "starship:starship" "fzf:fzf" "eza:eza" \
-                 "zoxide:zoxide" "tmux:tmux" "nvim:neovim"; do
+                 "zoxide:zoxide" "tmux:tmux" "nvim:neovim" \
+                 "node:node" "go:go" "yazi:yazi" "bat:bat"; do
         cmd="${entry%%:*}"
         formula="${entry##*:}"
         if command -v "${cmd}" &>/dev/null; then
@@ -944,6 +947,16 @@ print_checklist() {
     printf '\n'
     printf '%s\n' "  Backup location (if any files were moved):"
     printf '%s\n' "    ${BACKUP_DIR}"
+    printf '\n'
+    printf '%s\n' "  ─────────────────────────────────────────────────────────"
+    printf '%s\n' "  Full environment (all Homebrew packages):"
+    printf '%s\n' "    This script installs only the minimum required tools."
+    printf '%s\n' "    For the complete package set (LSP runtimes, CLI tools, etc.),"
+    printf '%s\n' "    run brew_install.sh — reads brew_formulae.txt + brew_casks.txt,"
+    printf '%s\n' "    skips already-installed packages, and continues past any errors:"
+    printf '\n'
+    printf '%s\n' "      bash ${DOTFILES_DIR}/bin/brew_install.sh"
+    printf '\n'
 
     local terminal_display
     case "${TERMINAL_CHOICE}" in

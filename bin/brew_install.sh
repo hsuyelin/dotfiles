@@ -245,36 +245,48 @@ _brew_install_list() {
         done
     fi
 
-    local pkg
+    local _list_flag="--formula"
+    local _install_flag="--formula"
+    if [[ "${kind}" == "cask" ]]; then
+        _list_flag="--cask"
+        _install_flag="--cask"
+    fi
+
+    local pkg _skip _s
+    local _skipped=0 _already=0 _installed=0 _failed=0
     while IFS= read -r pkg; do
         [[ -z "${pkg}" || "${pkg}" == \#* ]] && continue
 
-        local _skip=false
+        _skip=false
         if [[ ${#_skip_casks[@]} -gt 0 ]]; then
-            local _s
             for _s in "${_skip_casks[@]}"; do
                 [[ "${pkg}" == "${_s}" ]] && _skip=true && break
             done
         fi
         if [[ "${_skip}" == "true" ]]; then
-            log_info "skipped (not selected terminal): ${pkg}"
+            (( _skipped++ )) || true
             continue
         fi
 
-        if brew list "${pkg}" &>/dev/null 2>&1; then
-            log_info "already installed: ${pkg}"
+        if brew list "${_list_flag}" "${pkg}" &>/dev/null 2>&1; then
+            (( _already++ )) || true
         elif [[ "${DRY_RUN}" == "true" ]]; then
-            log_info "[dry-run] brew install ${kind:+--${kind} }${pkg}"
-        elif [[ "${kind}" == "cask" ]]; then
-            log_step "brew" "install --cask ${pkg}"
-            brew install --cask "${pkg}" \
-                || log_warn "failed to install cask: ${pkg} (skipping)"
+            log_info "[dry-run] brew install ${_install_flag} ${pkg}"
         else
-            log_step "brew" "install ${pkg}"
-            brew install "${pkg}" \
-                || log_warn "failed to install formula: ${pkg} (skipping)"
+            log_step "brew" "install ${_install_flag} ${pkg}"
+            if brew install "${_install_flag}" "${pkg}"; then
+                (( _installed++ )) || true
+            else
+                log_warn "failed to install ${kind}: ${pkg} (skipping)"
+                (( _failed++ )) || true
+            fi
         fi
     done < "${list}"
+
+    local _summary="installed ${_installed}, skipped ${_already} already-installed"
+    [[ ${_skipped}  -gt 0 ]] && _summary+=", ${_skipped} excluded"
+    [[ ${_failed}   -gt 0 ]] && _summary+=", ${_failed} failed"
+    log_step "Done" "${_summary}"
 }
 
 # ── Main ──────────────────────────────────────────────────────────────────────
