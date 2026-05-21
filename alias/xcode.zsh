@@ -53,6 +53,23 @@ _xcode_ask_clean() {
 }
 
 # ---------------------------------------------------------------------------
+# Pre-build target prompt.
+# Prints a [y/N] question; waits up to 10s, defaults to N on timeout.
+# Returns 0 if the user wants to pick a target, 1 otherwise (use default).
+# ---------------------------------------------------------------------------
+
+_xcode_ask_select_target() {
+    local reply
+    printf '\n\033[1mSelect target device/simulator?\033[0m'
+    printf '  \033[2m[y/N]  (10s, default N)\033[0m '
+    if ! IFS= read -r -t 10 reply 2>/dev/null; then
+        printf 'N\n'
+        return 1
+    fi
+    [[ "$reply" == [yY] ]]
+}
+
+# ---------------------------------------------------------------------------
 # Shared argument parser (sets workspace / scheme / configuration in caller)
 # ---------------------------------------------------------------------------
 
@@ -114,11 +131,13 @@ xbuild() {
         return 1
     }
 
-    local _xt_sdk="" _xt_dest="" _xt_type="" _xt_id="" _xt_label=""
-    _xcode_select_target
-    local _rc=$?
-    (( _rc == 2 )) && return 0
-    (( _rc != 0 )) && return 1
+    local _xt_sdk="iphoneos" _xt_dest="" _xt_type="" _xt_id="" _xt_label=""
+    if _xcode_ask_select_target; then
+        _xcode_select_target
+        local _rc=$?
+        (( _rc == 2 )) && return 0
+        (( _rc != 0 )) && return 1
+    fi
 
     if _xcode_ask_clean; then
         _xlog "Cleaning" "${scheme} (${configuration} | ${_xt_sdk})"
@@ -131,8 +150,9 @@ xbuild() {
     _xlog "Building" "${scheme} (${configuration} | ${_xt_sdk})"
     local cmd=(xcodebuild)
     [ -n "$workspace" ] && cmd+=(-workspace "${workspace}.xcworkspace")
-    cmd+=(-scheme "$scheme" -sdk "$_xt_sdk" -configuration "$configuration"
-          -destination "$_xt_dest" build)
+    cmd+=(-scheme "$scheme" -sdk "$_xt_sdk" -configuration "$configuration")
+    [ -n "$_xt_dest" ] && cmd+=(-destination "$_xt_dest")
+    cmd+=(build)
     "${cmd[@]}" | xcbeautify
 }
 
