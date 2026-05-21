@@ -114,11 +114,11 @@ alias tl='tmux list-sessions 2>/dev/null || echo "no tmux sessions."'
 
 # thelp: print all tmux shortcuts and helper aliases.
 thelp() {
-    local bold='\033[1m'
-    local cyan='\033[0;36m'
-    local yellow='\033[0;33m'
-    local dim='\033[2m'
-    local reset='\033[0m'
+    local bold=$'\033[1m'
+    local cyan=$'\033[0;36m'
+    local yellow=$'\033[0;33m'
+    local dim=$'\033[2m'
+    local reset=$'\033[0m'
     local sep='────────────────────────────'
 
     _thelp_section() { printf '\n%s  %-16s%s\n' "$yellow" "$1" "$reset"; }

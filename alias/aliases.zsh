@@ -36,10 +36,10 @@ if command -v bat >/dev/null 2>&1; then
   alias batpp='bat -p -P'   # plain style + no paging (cat-like)
 
   bathelp() {
-    local bold='\033[1m'
-    local cyan='\033[0;36m'
-    local yellow='\033[0;33m'
-    local reset='\033[0m'
+    local bold=$'\033[1m'
+    local cyan=$'\033[0;36m'
+    local yellow=$'\033[0;33m'
+    local reset=$'\033[0m'
     local sep='────────────────────────────'
 
     echo ""
@@ -113,12 +113,12 @@ alias chrome="open -a \"Google Chrome\" --args --variations-override-country=us"
 sign_app() {
   local input="$1"
 
-  local _bold='\033[1m'
-  local _green='\033[0;32m'
-  local _yellow='\033[0;33m'
-  local _red='\033[0;31m'
-  local _cyan='\033[0;36m'
-  local _reset='\033[0m'
+  local _bold=$'\033[1m'
+  local _green=$'\033[0;32m'
+  local _yellow=$'\033[0;33m'
+  local _red=$'\033[0;31m'
+  local _cyan=$'\033[0;36m'
+  local _reset=$'\033[0m'
 
   if [[ -z "$input" ]]; then
     printf '%sUsage:%s sign_app <app-path|app-name>\n' "$_yellow" "$_reset"

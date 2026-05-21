@@ -445,10 +445,10 @@ xinstall() {
 # ---------------------------------------------------------------------------
 
 xhelp() {
-    local bold='\033[1m'
-    local cyan='\033[0;36m'
-    local yellow='\033[0;33m'
-    local reset='\033[0m'
+    local bold=$'\033[1m'
+    local cyan=$'\033[0;36m'
+    local yellow=$'\033[0;33m'
+    local reset=$'\033[0m'
     local sep='────────────────────────────'
 
     echo ""
