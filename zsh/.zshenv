@@ -60,6 +60,7 @@ export TERMINAL='/Applications/Ghostty.app/Contents/MacOS/ghostty'
 # fpath
 # ============================================================
 
+# shellcheck disable=SC2206
 fpath=(
   "$DOTFILES/config/zsh/functions"
   "$HOMEBREW_PREFIX/share/zsh/site-functions"
@@ -70,6 +71,7 @@ fpath=(
 # PATH
 # ============================================================
 
+# shellcheck disable=SC2034
 typeset -aU path
 
 # ============================================================
@@ -77,6 +79,7 @@ typeset -aU path
 # ============================================================
 
 for f in "$ZDOTDIR"/env/*.zsh; do
+  # shellcheck disable=SC1090
   [[ -r "$f" ]] && source "$f"
 done
 
@@ -84,5 +87,7 @@ done
 # Local overrides
 # ============================================================
 
+# shellcheck disable=SC1091
 [[ -f "$HOME/.zshenv.local" ]] && source "$HOME/.zshenv.local"
+# shellcheck disable=SC1091
 [[ -f "$HOME/.localrc"   ]] && source "$HOME/.localrc"

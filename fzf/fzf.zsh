@@ -4,6 +4,7 @@ if [[ ! "$PATH" == *"${HOMEBREW_PREFIX:-/opt/homebrew}/opt/fzf/bin"* ]]; then
   PATH="${PATH:+${PATH}:}${HOMEBREW_PREFIX:-/opt/homebrew}/opt/fzf/bin"
 fi
 
+# shellcheck disable=SC1090
 source <(fzf --zsh)
 
 # Catppuccin Mocha theme for fzf

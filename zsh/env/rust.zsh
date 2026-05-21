@@ -7,5 +7,6 @@ export RUSTUP_HOME="$XDG_DATA_HOME/rustup"
 
 # Ensure cargo/rustup binaries are on PATH
 typeset -aU path
+# shellcheck disable=SC2128,SC2206
 path=("$CARGO_HOME/bin" $path)
 export PATH

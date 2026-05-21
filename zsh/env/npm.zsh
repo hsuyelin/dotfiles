@@ -8,5 +8,6 @@ export NPM_CONFIG_CACHE="$XDG_CACHE_HOME/npm"
 
 # Ensure global npm binaries are on PATH
 typeset -aU path
+# shellcheck disable=SC2128,SC2206
 path=("$XDG_DATA_HOME/npm/bin" $path)
 export PATH

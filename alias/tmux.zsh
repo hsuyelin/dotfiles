@@ -101,6 +101,7 @@ _tmux_session_picker_widget() {
     else
         zle clear-screen        # clear screen + redraw prompt at top
         zle push-line           # save any typed buffer; restored after ta exits
+        # shellcheck disable=SC2034
         BUFFER="ta"
         zle accept-line         # hand ta back to shell so tmux can own the tty
     fi
@@ -120,13 +121,14 @@ thelp() {
     local reset='\033[0m'
     local sep='────────────────────────────'
 
-    _thelp_section() { printf "\n${yellow}  %-16s${reset}\n" "$1"; }
-    _thelp_row()     { printf "  ${cyan}%-16s${reset}  %s\n" "$1" "$2"; }
-    _thelp_note()    { printf "  ${dim}%-16s  %s${reset}\n" "" "$1"; }
+    _thelp_section() { printf '\n%s  %-16s%s\n' "$yellow" "$1" "$reset"; }
+    _thelp_row()     { printf '  %s%-16s%s  %s\n' "$cyan" "$1" "$reset" "$2"; }
+    # shellcheck disable=SC2329
+    _thelp_note()    { printf '  %s%-16s  %s%s\n' "$dim" "" "$1" "$reset"; }
 
     echo ""
-    printf "${bold}Tmux Cheatsheet${reset}  "
-    printf "${dim}prefix = Ctrl+a${reset}\n"
+    printf '%sTmux Cheatsheet%s  ' "$bold" "$reset"
+    printf '%sprefix = Ctrl+a%s\n' "$dim" "$reset"
     echo "$sep"
 
     _thelp_section "Panes"

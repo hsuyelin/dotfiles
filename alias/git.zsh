@@ -91,7 +91,7 @@ alias gnuke='git reset --hard && git clean -dfx && git submodule foreach --recur
 alias gsnuke='git submodule foreach --recursive "git reset --hard; git clean -fd" && git submodule update --init --recursive --force'
 
 # Gerrit
-gpgnv() { git push origin HEAD:refs/for/$(git rev-parse --abbrev-ref HEAD) --no-verify }
+gpgnv() { git push origin HEAD:refs/for/"$(git rev-parse --abbrev-ref HEAD)" --no-verify; }
 
 # Help — print all git aliases
 ghelp() {
@@ -102,11 +102,11 @@ ghelp() {
     local sep='────────────────────────────'
 
     echo ""
-    printf "${bold}Git Aliases Cheatsheet${reset}\n"
+    printf '%sGit Aliases Cheatsheet%s\n' "$bold" "$reset"
     echo "$sep"
 
-    _ghelp_section() { printf "\n${yellow}  %-12s${reset}\n" "$1"; }
-    _ghelp_row()     { printf "  ${cyan}%-12s${reset}  %s\n" "$1" "$2"; }
+    _ghelp_section() { printf '\n%s  %-12s%s\n' "$yellow" "$1" "$reset"; }
+    _ghelp_row()     { printf '  %s%-12s%s  %s\n' "$cyan" "$1" "$reset" "$2"; }
 
     _ghelp_section "Status"
     _ghelp_row "gst"    "git status"

@@ -51,6 +51,7 @@ cc-bg() {
 
 _cc_bg_agents() {
   local -a agents
+  # shellcheck disable=SC2296,SC2206,SC2034
   agents=(${(f)"$(claude agents 2>/dev/null | awk '/^  [a-zA-Z]/{printf "%s:%s\n", $1, $3}')"})
   _describe 'agent' agents
 }
@@ -64,5 +65,6 @@ _cc_bg() {
 }
 
 if (( ${+_comps} )); then
+  # shellcheck disable=SC2154
   _comps[cc-bg]=_cc_bg
 fi

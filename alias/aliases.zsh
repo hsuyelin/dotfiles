@@ -43,11 +43,11 @@ if command -v bat >/dev/null 2>&1; then
     local sep='────────────────────────────'
 
     echo ""
-    printf "${bold}Bat Aliases Cheatsheet${reset}\n"
+    printf '%sBat Aliases Cheatsheet%s\n' "$bold" "$reset"
     echo "$sep"
 
-    _bathelp_section() { printf "\n${yellow}  %-12s${reset}\n" "$1"; }
-    _bathelp_row()     { printf "  ${cyan}%-12s${reset}  %s\n" "$1" "$2"; }
+    _bathelp_section() { printf '\n%s  %-12s%s\n' "$yellow" "$1" "$reset"; }
+    _bathelp_row()     { printf '  %s%-12s%s  %s\n' "$cyan" "$1" "$reset" "$2"; }
 
     _bathelp_section "Aliases"
     _bathelp_row "batp"  "bat -p    (plain style, no decorations)"
@@ -121,7 +121,7 @@ sign_app() {
   local _reset='\033[0m'
 
   if [[ -z "$input" ]]; then
-    printf "${_yellow}Usage:${_reset} sign_app <app-path|app-name>\n"
+    printf '%sUsage:%s sign_app <app-path|app-name>\n' "$_yellow" "$_reset"
     return 1
   fi
 
@@ -134,36 +134,38 @@ sign_app() {
     local found
     found="$(find /Applications -maxdepth 1 -iname "${name}.app" -print -quit 2>/dev/null)"
     if [[ -z "$found" ]]; then
-      printf "${_red}error:${_reset} cannot find '${_bold}${name}.app${_reset}' in /Applications\n" >&2
+      printf '%serror:%s cannot find '"'"'%s%s.app%s'"'"' in /Applications\n' \
+          "$_red" "$_reset" "$_bold" "$name" "$_reset" >&2
       return 1
     fi
     app_path="$found"
   fi
 
   if [[ ! -d "$app_path" ]]; then
-    printf "${_red}error:${_reset} '${_bold}${app_path}${_reset}' does not exist or is not a directory\n" >&2
+    printf '%serror:%s '"'"'%s%s%s'"'"' does not exist or is not a directory\n' \
+        "$_red" "$_reset" "$_bold" "$app_path" "$_reset" >&2
     return 1
   fi
 
-  printf "${_cyan}  Found${_reset} ${_bold}${app_path}${_reset}\n"
-  printf "${_yellow}Proceed with signing?${_reset} [y/N] "
+  printf '%s  Found%s %s%s%s\n' "$_cyan" "$_reset" "$_bold" "$app_path" "$_reset"
+  printf '%sProceed with signing?%s [y/N] ' "$_yellow" "$_reset"
   local reply
   read -r reply
   if [[ "$reply" != [yY] ]]; then
-    printf "${_yellow}Aborted.${_reset}\n"
+    printf '%sAborted.%s\n' "$_yellow" "$_reset"
     return 0
   fi
 
   local _sudo=''
   [[ "$EUID" -ne 0 ]] && _sudo='sudo'
 
-  printf "${_cyan}Stripping${_reset} quarantine attributes ...\n"
-  $_sudo xattr -cr "$app_path" || { printf "${_red}error:${_reset} xattr failed\n" >&2; return 1; }
+  printf '%sStripping%s quarantine attributes ...\n' "$_cyan" "$_reset"
+  $_sudo xattr -cr "$app_path" || { printf '%serror:%s xattr failed\n' "$_red" "$_reset" >&2; return 1; }
 
-  printf "${_cyan} Signing${_reset} ${_bold}${app_path}${_reset} ...\n"
-  $_sudo codesign -fs - --deep "$app_path" || { printf "${_red}error:${_reset} codesign failed\n" >&2; return 1; }
+  printf '%s Signing%s %s%s%s ...\n' "$_cyan" "$_reset" "$_bold" "$app_path" "$_reset"
+  $_sudo codesign -fs - --deep "$app_path" || { printf '%serror:%s codesign failed\n' "$_red" "$_reset" >&2; return 1; }
 
-  printf "${_green}   Done${_reset} ${_bold}${app_path}${_reset}\n"
+  printf '%s   Done%s %s%s%s\n' "$_green" "$_reset" "$_bold" "$app_path" "$_reset"
 }
 
 
@@ -215,6 +217,7 @@ fix() {
   local clipboard_content fixed_content
 
   clipboard_content="$(pbpaste)"
+  # shellcheck disable=SC2016
   fixed_content="$(echo "$clipboard_content" | sed -E 's/\`([^\`]+)\`/$(\1)/g')"
 
   echo "$fixed_content" | pbcopy
@@ -298,7 +301,7 @@ yy() {
     tmp="$(mktemp -t "yazi-cwd.XXXXXX")" || return 1
     yazi "$@" --cwd-file="$tmp"
     if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
-        builtin cd -- "$cwd"
+        builtin cd -- "$cwd" || return 1
     fi
     rm -f -- "$tmp"
 }

@@ -19,16 +19,20 @@ setopt HIST_FIND_NO_DUPS
 if [[ ! -f "${ZI[BIN_DIR]}/zi.zsh" ]]; then
   print -P "%F{33}▓▒░ %F{160}Installing (%F{33}z-shell/zi%F{160})…%f"
   command mkdir -p "${ZI[HOME_DIR]}" && command chmod go-rwX "${ZI[HOME_DIR]}"
+  # shellcheck disable=SC2015
   command git clone -q --depth=1 --branch "main" https://github.com/z-shell/zi "${ZI[BIN_DIR]}" && \
     print -P "%F{33}▓▒░ %F{34}Installation successful.%f%b" || \
     print -P "%F{160}▓▒░ The clone has failed.%f%b"
 fi
+# shellcheck disable=SC1091
 source "${ZI[BIN_DIR]}/zi.zsh"
 
 autoload -Uz _zi
+# shellcheck disable=SC2154
 (( ${+_comps} )) && _comps[zi]=_zi
 
 zstyle ':completion:*' menu no
+# shellcheck disable=SC2296
 zstyle ':completion:*' list-colors "${(@s.:.)LS_COLORS}"
 zstyle ':completion:*:*:cp:*' file-sort size
 zstyle ':completion:*' file-sort modification
@@ -76,7 +80,7 @@ bindkey '^?' backward-delete-char
 # requires tmux `extended-keys on` + `terminal-features extkeys`).
 # Uses a shell-function-backed widget to avoid zsh-syntax-highlighting complaints
 # about unhandled built-in widgets like `self-insert-newline`.
-_zle_insert_newline() { LBUFFER+=$'\n' }
+_zle_insert_newline() { LBUFFER+=$'\n'; }
 zle -N _zle_insert_newline
 bindkey '^[[13;2u' _zle_insert_newline
 
@@ -143,25 +147,35 @@ unset _km
 # ============================================================
 # Environment Setup
 # ============================================================
+# shellcheck disable=SC1091
 [[ -f "${XDG_CONFIG_HOME}/bash/.bash_profile" ]] && source "${XDG_CONFIG_HOME}/bash/.bash_profile"
+# shellcheck disable=SC1091
 [[ -f "${XDG_CONFIG_HOME}/alias/aliases.zsh" ]] && source "${XDG_CONFIG_HOME}/alias/aliases.zsh"
+# shellcheck disable=SC1091
 [[ -f "${XDG_CONFIG_HOME}/alias/git.zsh" ]] && source "${XDG_CONFIG_HOME}/alias/git.zsh"
+# shellcheck disable=SC1091
 [[ -f "${XDG_CONFIG_HOME}/alias/ai.zsh" ]] && source "${XDG_CONFIG_HOME}/alias/ai.zsh"
+# shellcheck disable=SC1091
 [[ -f "${XDG_CONFIG_HOME}/alias/tmux.zsh" ]] && source "${XDG_CONFIG_HOME}/alias/tmux.zsh"
+# shellcheck disable=SC1091
 [[ -f "${XDG_CONFIG_HOME}/private/xcode.zsh" ]] && source "${XDG_CONFIG_HOME}/private/xcode.zsh"
+# shellcheck disable=SC1091
 [[ -f "${XDG_CONFIG_HOME}/bash/ai.zsh" ]] && source "${XDG_CONFIG_HOME}/bash/ai.zsh"
 
 # ============================================================
 # Antigravity / RVM
 # ============================================================
 [[ -d "$HOME/.antigravity/antigravity/bin" ]] && path+=("$HOME/.antigravity/antigravity/bin")
+# shellcheck disable=SC1091
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
 [[ -d "$HOME/.rvm/bin" ]] && path+=("$HOME/.rvm/bin")
 
 # ============================================================
 # Secrets / Cargo
 # ============================================================
+# shellcheck disable=SC1091
 [[ -f "${XDG_CONFIG_HOME}/secrets/.env.secrets" ]] && source "${XDG_CONFIG_HOME}/secrets/.env.secrets"
+# shellcheck disable=SC1091
 [[ -s "${CARGO_HOME}/env" ]] && source "${CARGO_HOME}/env"
 
 # ============================================================
@@ -173,21 +187,26 @@ zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
 # ============================================================
 # Fzf Setup
 # ============================================================
+# shellcheck disable=SC1091
 [[ -f "${XDG_CONFIG_HOME}/fzf/fzf.zsh" ]] && source "${XDG_CONFIG_HOME}/fzf/fzf.zsh"
 
 zi ice lucid
 zi light "Aloxaf/fzf-tab"
 
+# shellcheck disable=SC2016
 zstyle ':fzf-tab:complete:cd:*' fzf-preview '
   [[ -n "$realpath" && -e "$realpath" ]] && (command -v eza >/dev/null && eza -1 --color=always --group-directories-first -- "$realpath" || ls -1 -- "$realpath")
 '
+# shellcheck disable=SC2016
 zstyle ':fzf-tab:complete:git-checkout:*' fzf-preview '
   git log --oneline --graph --decorate --color=always -- "$word" 2>/dev/null | head -80
 '
+# shellcheck disable=SC2016
 zstyle ':fzf-tab:complete:kill:*' fzf-preview '
   pid="${word##*:}"
   ps -p "$pid" -o pid,%cpu,%mem,comm -c 2>/dev/null
 '
+# shellcheck disable=SC2016
 zstyle ':fzf-tab:complete:z:*' fzf-preview '
   [[ -n "$realpath" && -d "$realpath" ]] && (command -v eza >/dev/null && eza -1 --color=always --group-directories-first -- "$realpath" || ls -1 -- "$realpath")
 '
@@ -198,24 +217,29 @@ zstyle ':fzf-tab:*' fzf-flags '--bind=ctrl-d:preview-page-down,ctrl-u:preview-pa
 # ============================================================
 # Zoxide
 # ============================================================
+# shellcheck disable=SC1091,SC1094
 [[ -f "${XDG_CONFIG_HOME}/zsh/zoxide-completion.zsh" ]] && source "${XDG_CONFIG_HOME}/zsh/zoxide-completion.zsh"
 
 # ============================================================
 # Terminal Integration
 # ============================================================
+# shellcheck disable=SC1091
 [[ -f "${XDG_CONFIG_HOME}/ghostty/ghostty.zsh" ]] \
     && source "${XDG_CONFIG_HOME}/ghostty/ghostty.zsh"
+# shellcheck disable=SC1091
 [[ -n "$KITTY_WINDOW_ID" && -f "${XDG_CONFIG_HOME}/kitty/kitty.zsh" ]] \
     && source "${XDG_CONFIG_HOME}/kitty/kitty.zsh"
 
 # ============================================================
 # Notify (long-running command completion alerts)
 # ============================================================
+# shellcheck disable=SC1091
 [[ -f "${XDG_CONFIG_HOME}/zsh/notify.zsh" ]] && source "${XDG_CONFIG_HOME}/zsh/notify.zsh"
 
 # ============================================================
 # RTK (Rust Token Killer)
 # ============================================================
+# shellcheck disable=SC1091
 [[ -f "${XDG_CONFIG_HOME}/rtk/rtk.zsh" ]] && source "${XDG_CONFIG_HOME}/rtk/rtk.zsh"
 
 # ============================================================

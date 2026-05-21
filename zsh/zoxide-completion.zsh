@@ -41,6 +41,7 @@ if command -v zoxide >/dev/null; then
   [[ "$_z_cur_tab" != "_z_tab_complete" ]] && typeset -g _z_orig_tab="$_z_cur_tab"
   unset _z_cur_tab
 
+  # shellcheck disable=SC1009,SC1073,SC1056,SC1072,SC1141
   _z_tab_complete() {
     if [[ "$BUFFER" != 'z' && "$BUFFER" != 'z '* ]]; then
       zle "$_z_orig_tab"
