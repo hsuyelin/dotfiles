@@ -294,7 +294,6 @@ main() {
     printf '\n'
     log_step "Starting" "Homebrew package installation"
     [[ "${DRY_RUN}" == "true" ]] && log_warn "Dry-run mode — no changes will be made"
-    printf '\n'
 
     if ! command -v brew &>/dev/null; then
         if [[ -x "${HOMEBREW_PREFIX}/bin/brew" ]]; then
