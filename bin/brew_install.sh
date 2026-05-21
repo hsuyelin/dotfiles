@@ -320,9 +320,7 @@ main() {
     _brew_install_list "formula" "${DOTFILES_DIR}/brew/brew_formulae.txt"
     _brew_install_list "cask"    "${DOTFILES_DIR}/brew/brew_casks.txt"
 
-    printf '\n'
     log_success "all packages installed — restart your shell if PATH changed"
-    printf '\n'
 }
 
 main "$@"
