@@ -437,43 +437,27 @@ xinstall() {
     (( _rc == 2 )) && return 0
     (( _rc != 0 )) && return 1
 
-    local derived_data="" app_path=""
+    local app_path=""
 
     if (( skip_build )); then
         _xlog "Searching" "existing .app for '${scheme}' in DerivedData ..."
-        app_path=$(
-            find "${HOME}/Library/Developer/Xcode/DerivedData" \
-                -maxdepth 6 -name "${scheme}.app" -type d 2>/dev/null \
-            | while IFS= read -r p; do
-                printf '%s\t%s\n' \
-                    "$(stat -f '%m' "$p" 2>/dev/null || printf '0')" "$p"
-              done \
-            | sort -rn | head -1 | cut -f2-
-        )
-        if [ -z "$app_path" ]; then
-            _xerr "no existing .app found for '${scheme}' in DerivedData"
-            return 1
-        fi
-        _xlog "Found" "$app_path"
     else
         if _xcode_ask_clean; then
-            _xlog "Cleaning" "${scheme} (${configuration})"
+            _xlog "Cleaning" "${scheme} (${configuration} | ${_xt_sdk})"
             local clean_cmd=(xcodebuild)
             [ -n "$workspace" ] && clean_cmd+=(-workspace "${workspace}.xcworkspace")
-            clean_cmd+=(-scheme "$scheme" -configuration "$configuration" clean)
+            clean_cmd+=(-scheme "$scheme" -sdk "$_xt_sdk" \
+                        -configuration "$configuration" clean)
             "${clean_cmd[@]}" | xcbeautify
         fi
-
-        derived_data=$(mktemp -d) || { _xerr "mktemp failed"; return 1; }
 
         local build_cmd=(xcodebuild)
         [ -n "$workspace" ] && build_cmd+=(-workspace "${workspace}.xcworkspace")
         build_cmd+=(
-            -scheme          "$scheme"
-            -configuration   "$configuration"
-            -sdk             "$_xt_sdk"
-            -destination     "$_xt_dest"
-            -derivedDataPath "$derived_data"
+            -scheme        "$scheme"
+            -configuration "$configuration"
+            -sdk           "$_xt_sdk"
+            -destination   "$_xt_dest"
             build
         )
 
@@ -484,19 +468,26 @@ xinstall() {
 
         if [ "$build_status" -ne 0 ]; then
             _xerr "build failed (exit ${build_status})"
-            rm -rf "$derived_data"
             return 1
         fi
 
-        app_path=$(find "$derived_data/Build/Products" \
-            -name "*.app" -maxdepth 3 -type d | head -1)
-
-        if [ -z "$app_path" ]; then
-            _xerr ".app not found under $derived_data/Build/Products"
-            rm -rf "$derived_data"
-            return 1
-        fi
+        _xlog "Searching" ".app for '${scheme}' in DerivedData ..."
     fi
+
+    app_path=$(
+        find "${HOME}/Library/Developer/Xcode/DerivedData" \
+            -maxdepth 6 -name "${scheme}.app" -type d 2>/dev/null \
+        | while IFS= read -r p; do
+            printf '%s\t%s\n' \
+                "$(stat -f '%m' "$p" 2>/dev/null || printf '0')" "$p"
+          done \
+        | sort -rn | head -1 | cut -f2-
+    )
+    if [ -z "$app_path" ]; then
+        _xerr "no .app found for '${scheme}' in DerivedData"
+        return 1
+    fi
+    _xlog "Found" "$app_path"
 
     # ── Install ───────────────────────────────────────────────────────────
     _xlog "Installing" "$(basename "$app_path")"
@@ -515,7 +506,6 @@ xinstall() {
 
         xcrun simctl install "$_xt_id" "$app_path" || {
             _xerr "simctl install failed"
-            [ -n "$derived_data" ] && rm -rf "$derived_data"
             return 1
         }
 
@@ -534,7 +524,6 @@ xinstall() {
         if [ "$ok" -eq 0 ]; then
             _xerr "install failed: no working install tool found"
             printf '         Requires Xcode 15+ (devicectl) or ios-deploy\n' >&2
-            [ -n "$derived_data" ] && rm -rf "$derived_data"
             return 1
         fi
     fi
@@ -545,7 +534,6 @@ xinstall() {
         -c "Print CFBundleIdentifier" \
         "${app_path}/Info.plist" 2>/dev/null) || bundle_id=""
 
-    [ -n "$derived_data" ] && rm -rf "$derived_data"
     _xlog "Installed" "${bundle_id:-$(basename "$app_path")}"
 
     if [[ "$_xt_type" == "simulator" ]] && [ -n "$bundle_id" ]; then
