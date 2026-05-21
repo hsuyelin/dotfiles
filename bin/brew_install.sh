@@ -246,7 +246,7 @@ _brew_install_list() {
     fi
 
     local _list_flag="--formula"
-    local _install_flag="--formula"
+    local _install_flag=""
     if [[ "${kind}" == "cask" ]]; then
         _list_flag="--cask"
         _install_flag="--cask"
@@ -271,10 +271,10 @@ _brew_install_list() {
         if brew list "${_list_flag}" "${pkg}" &>/dev/null 2>&1; then
             (( _already++ )) || true
         elif [[ "${DRY_RUN}" == "true" ]]; then
-            log_info "[dry-run] brew install ${_install_flag} ${pkg}"
+            log_info "[dry-run] brew install ${_install_flag:+${_install_flag} }${pkg}"
         else
-            log_step "brew" "install ${_install_flag} ${pkg}"
-            if brew install "${_install_flag}" "${pkg}"; then
+            log_step "brew" "install ${_install_flag:+${_install_flag} }${pkg}"
+            if brew install ${_install_flag:+${_install_flag}} "${pkg}"; then
                 (( _installed++ )) || true
             else
                 log_warn "failed to install ${kind}: ${pkg} (skipping)"
@@ -303,7 +303,7 @@ main() {
         fi
     fi
 
-    run brew update --quiet
+    run brew update --quiet || log_warn "brew update failed — continuing with cached formula list"
 
     if ! brew tap | grep -q "nikitabobko/tap"; then
         log_step "brew" "tap nikitabobko/tap  (required for aerospace)"
