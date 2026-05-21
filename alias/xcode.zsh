@@ -114,18 +114,25 @@ xbuild() {
         return 1
     }
 
+    local _xt_sdk="" _xt_dest="" _xt_type="" _xt_id="" _xt_label=""
+    _xcode_select_target
+    local _rc=$?
+    (( _rc == 2 )) && return 0
+    (( _rc != 0 )) && return 1
+
     if _xcode_ask_clean; then
-        _xlog "Cleaning" "${scheme} (${configuration})"
+        _xlog "Cleaning" "${scheme} (${configuration} | ${_xt_sdk})"
         local clean_cmd=(xcodebuild)
         [ -n "$workspace" ] && clean_cmd+=(-workspace "${workspace}.xcworkspace")
-        clean_cmd+=(-scheme "$scheme" -sdk iphoneos -configuration "$configuration" clean)
+        clean_cmd+=(-scheme "$scheme" -sdk "$_xt_sdk" -configuration "$configuration" clean)
         "${clean_cmd[@]}" | xcbeautify
     fi
 
+    _xlog "Building" "${scheme} (${configuration} | ${_xt_sdk})"
     local cmd=(xcodebuild)
     [ -n "$workspace" ] && cmd+=(-workspace "${workspace}.xcworkspace")
-    cmd+=(-scheme "$scheme" -sdk iphoneos -configuration "$configuration" build)
-
+    cmd+=(-scheme "$scheme" -sdk "$_xt_sdk" -configuration "$configuration"
+          -destination "$_xt_dest" build)
     "${cmd[@]}" | xcbeautify
 }
 
@@ -252,46 +259,17 @@ _xcode_menu() {
 }
 
 # ---------------------------------------------------------------------------
-# xinstall — interactive device/simulator picker + build + install
+# _xcode_select_target
+# Discover connected devices/simulators and let the user pick one.
+#
+# Callers MUST declare these locals before calling:
+#   local _xt_sdk="" _xt_dest="" _xt_type="" _xt_id="" _xt_label=""
+# The function writes directly into the caller's dynamic scope.
+#
+# Returns: 0 on selection, 1 on xcrun/no-devices error, 2 on user abort (q).
 # ---------------------------------------------------------------------------
 
-xinstall() {
-    _xcode_require || return 1
-    local workspace="" scheme="" configuration=""
-
-    while [ $# -gt 0 ]; do
-        case "$1" in
-            --workspace)     workspace="$2";     shift 2 ;;
-            --scheme)        scheme="$2";        shift 2 ;;
-            --configuration) configuration="$2"; shift 2 ;;
-            --help|-h)
-                printf 'Usage: xinstall [--workspace <name>] --scheme <name>'
-                printf ' --configuration <name>\n'
-                return 0
-                ;;
-            *)
-                _xerr "unknown option: $1"
-                return 1
-                ;;
-        esac
-    done
-
-    [ -z "$scheme" ] && {
-        _xerr "missing required option: --scheme"; return 1
-    }
-    [ -z "$configuration" ] && {
-        _xerr "missing required option: --configuration"; return 1
-    }
-
-    if _xcode_ask_clean; then
-        _xlog "Cleaning" "${scheme} (${configuration})"
-        local clean_cmd=(xcodebuild)
-        [ -n "$workspace" ] && clean_cmd+=(-workspace "${workspace}.xcworkspace")
-        clean_cmd+=(-scheme "$scheme" -configuration "$configuration" clean)
-        "${clean_cmd[@]}" | xcbeautify
-    fi
-
-    # ── Discover devices ──────────────────────────────────────────────────
+_xcode_select_target() {
     _xlog "Scanning" "available devices ..."
 
     local raw
@@ -332,7 +310,6 @@ xinstall() {
         return 1
     fi
 
-    # Merge: real devices first, simulators second, with section headers
     local -a labels ids types
     if [ ${#dev_labels[@]} -gt 0 ]; then
         labels+=("SEPARATOR:── Real Devices ─────────────────────────────────")
@@ -355,32 +332,78 @@ xinstall() {
         done
     fi
 
-    # ── Select target ─────────────────────────────────────────────────────
     printf '\n\033[1mSelect target\033[0m'
     printf '  \033[2m(↑↓ move   Enter confirm   q quit)\033[0m\n'
 
     local _XCODE_SELECTED=1
     _xcode_menu "${labels[@]}" || {
-        printf '\n'; _xwarn "Aborted" ""; return 0
+        printf '\n'; _xwarn "Aborted" ""; return 2
     }
 
     local idx=$_XCODE_SELECTED
-    local sel_label="${labels[$idx]}"
-    local sel_id="${ids[$idx]}"
-    local sel_type="${types[$idx]}"
+    _xt_label="${labels[$idx]}"
+    _xt_id="${ids[$idx]}"
+    _xt_type="${types[$idx]}"
 
     printf '\n'
-    _xlog "Target" "$sel_label"
+    _xlog "Target" "$_xt_label"
 
-    # ── Build ─────────────────────────────────────────────────────────────
-    local sdk dest
-    if [[ "$sel_type" == "simulator" ]]; then
-        sdk="iphonesimulator"
-        dest="platform=iOS Simulator,id=${sel_id}"
+    if [[ "$_xt_type" == "simulator" ]]; then
+        _xt_sdk="iphonesimulator"
+        _xt_dest="platform=iOS Simulator,id=${_xt_id}"
     else
-        sdk="iphoneos"
-        dest="id=${sel_id}"
+        _xt_sdk="iphoneos"
+        _xt_dest="id=${_xt_id}"
     fi
+
+    return 0
+}
+
+# ---------------------------------------------------------------------------
+# xinstall — interactive device/simulator picker + build + install
+# ---------------------------------------------------------------------------
+
+xinstall() {
+    _xcode_require || return 1
+    local workspace="" scheme="" configuration=""
+
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            --workspace)     workspace="$2";     shift 2 ;;
+            --scheme)        scheme="$2";        shift 2 ;;
+            --configuration) configuration="$2"; shift 2 ;;
+            --help|-h)
+                printf 'Usage: xinstall [--workspace <name>] --scheme <name>'
+                printf ' --configuration <name>\n'
+                return 0
+                ;;
+            *)
+                _xerr "unknown option: $1"
+                return 1
+                ;;
+        esac
+    done
+
+    [ -z "$scheme" ] && {
+        _xerr "missing required option: --scheme"; return 1
+    }
+    [ -z "$configuration" ] && {
+        _xerr "missing required option: --configuration"; return 1
+    }
+
+    if _xcode_ask_clean; then
+        _xlog "Cleaning" "${scheme} (${configuration})"
+        local clean_cmd=(xcodebuild)
+        [ -n "$workspace" ] && clean_cmd+=(-workspace "${workspace}.xcworkspace")
+        clean_cmd+=(-scheme "$scheme" -configuration "$configuration" clean)
+        "${clean_cmd[@]}" | xcbeautify
+    fi
+
+    local _xt_sdk="" _xt_dest="" _xt_type="" _xt_id="" _xt_label=""
+    _xcode_select_target
+    local _rc=$?
+    (( _rc == 2 )) && return 0
+    (( _rc != 0 )) && return 1
 
     local derived_data
     derived_data=$(mktemp -d) || { _xerr "mktemp failed"; return 1; }
@@ -390,13 +413,13 @@ xinstall() {
     build_cmd+=(
         -scheme          "$scheme"
         -configuration   "$configuration"
-        -sdk             "$sdk"
-        -destination     "$dest"
+        -sdk             "$_xt_sdk"
+        -destination     "$_xt_dest"
         -derivedDataPath "$derived_data"
         build
     )
 
-    _xlog "Building" "${scheme} (${configuration} | ${sdk})"
+    _xlog "Building" "${scheme} (${configuration} | ${_xt_sdk})"
     "${build_cmd[@]}" | xcbeautify
     # shellcheck disable=SC2154  # pipestatus is zsh-specific (lowercase, 1-based)
     local build_status=${pipestatus[1]}
@@ -421,19 +444,19 @@ xinstall() {
     # ── Install ───────────────────────────────────────────────────────────
     _xlog "Installing" "$(basename "$app_path")"
 
-    if [[ "$sel_type" == "simulator" ]]; then
+    if [[ "$_xt_type" == "simulator" ]]; then
         local sim_state
         sim_state=$(xcrun simctl list devices 2>/dev/null \
-            | grep "$sel_id" \
+            | grep "$_xt_id" \
             | grep -o 'Booted\|Shutdown' \
             | head -1)
 
         if [[ "$sim_state" != "Booted" ]]; then
             _xlog "Booting" "simulator ..."
-            xcrun simctl boot "$sel_id" 2>/dev/null || true
+            xcrun simctl boot "$_xt_id" 2>/dev/null || true
         fi
 
-        xcrun simctl install "$sel_id" "$app_path" || {
+        xcrun simctl install "$_xt_id" "$app_path" || {
             _xerr "simctl install failed"
             rm -rf "$derived_data"
             return 1
@@ -444,11 +467,11 @@ xinstall() {
     else
         local ok=0
         xcrun devicectl device install app \
-            --device "$sel_id" "$app_path" 2>/dev/null \
+            --device "$_xt_id" "$app_path" 2>/dev/null \
             && ok=1
 
         if [ "$ok" -eq 0 ] && command -v ios-deploy >/dev/null 2>&1; then
-            ios-deploy --bundle "$app_path" --id "$sel_id" && ok=1
+            ios-deploy --bundle "$app_path" --id "$_xt_id" && ok=1
         fi
 
         if [ "$ok" -eq 0 ]; then
@@ -468,12 +491,12 @@ xinstall() {
     rm -rf "$derived_data"
     _xlog "Installed" "${bundle_id:-$(basename "$app_path")}"
 
-    if [[ "$sel_type" == "simulator" ]] && [ -n "$bundle_id" ]; then
+    if [[ "$_xt_type" == "simulator" ]] && [ -n "$bundle_id" ]; then
         printf '\n\033[1mLaunch app?\033[0m  [y/N] '
         local reply
         read -r reply
         if [[ "$reply" == [yY] ]]; then
-            xcrun simctl launch "$sel_id" "$bundle_id"
+            xcrun simctl launch "$_xt_id" "$bundle_id"
         fi
     fi
 
@@ -507,7 +530,8 @@ xhelp() {
     _xhelp_section "xbuild"
     _xhelp_synopsis "xbuild" \
         "[--workspace <name>] --scheme <name> --configuration <name>"
-    _xhelp_note "Build for iphoneos SDK; output piped through xcbeautify."
+    _xhelp_note "Interactively pick a device or simulator, then build."
+    _xhelp_note "Output piped through xcbeautify."
 
     _xhelp_section "xarchive"
     _xhelp_synopsis "xarchive" \
