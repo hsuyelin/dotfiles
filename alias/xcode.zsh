@@ -11,6 +11,7 @@
 _xlog()  { printf '\033[1;32m%12s\033[0m  %s\n' "$1" "$2"; }
 _xwarn() { printf '\033[1;33m%12s\033[0m  %s\n' "$1" "$2"; }
 _xerr()  { printf '\033[1;31m%12s\033[0m  %s\n' "error" "$1" >&2; }
+_xhint() { printf '\033[2m%14s  %s\033[0m\n' "" "$1" >&2; }
 
 # ---------------------------------------------------------------------------
 # Dependency check — call at the top of every public function.
@@ -22,14 +23,13 @@ _xcode_require() {
 
     if ! command -v xcodebuild >/dev/null 2>&1; then
         _xerr "xcodebuild not found"
-        printf '         Install Xcode from the App Store or run:\n' >&2
-        printf '           xcode-select --install\n' >&2
+        _xhint "Install Xcode from the App Store or run: xcode-select --install"
         missing=1
     fi
 
     if ! command -v xcbeautify >/dev/null 2>&1; then
         _xerr "xcbeautify not found"
-        printf '         Install with: brew install xcbeautify\n' >&2
+        _xhint "Install with: brew install xcbeautify"
         missing=1
     fi
 
@@ -37,49 +37,15 @@ _xcode_require() {
 }
 
 # ---------------------------------------------------------------------------
-# Pre-build clean prompt.
-# Prints a [y/N] question; waits up to 10s, defaults to N on timeout.
-# Returns 0 if the user confirms, 1 otherwise.
+# Generic y/N prompt with timeout.
+# Usage: _xcode_ask <prompt> [timeout_secs]   (default timeout: 10s)
+# Returns 0 on y/Y, 1 on n/N or timeout.
 # ---------------------------------------------------------------------------
 
-_xcode_ask_clean() {
-    local reply
-    printf '\n\033[1mClean before building?\033[0m  \033[2m[y/N]  (10s, default N)\033[0m '
-    if ! IFS= read -r -t 10 reply 2>/dev/null; then
-        printf 'N\n'
-        return 1
-    fi
-    [[ "$reply" == [yY] ]]
-}
-
-# ---------------------------------------------------------------------------
-# Skip-build prompt.
-# Prints a [y/N] question; waits up to 10s, defaults to N on timeout.
-# Returns 0 if the user wants to reuse an existing .app, 1 to build fresh.
-# ---------------------------------------------------------------------------
-
-_xcode_ask_skip_build() {
-    local reply
-    printf '\n\033[1mSkip build (install existing .app)?\033[0m'
-    printf '  \033[2m[y/N]  (10s, default N)\033[0m '
-    if ! IFS= read -r -t 10 reply 2>/dev/null; then
-        printf 'N\n'
-        return 1
-    fi
-    [[ "$reply" == [yY] ]]
-}
-
-# ---------------------------------------------------------------------------
-# Pre-build target prompt.
-# Prints a [y/N] question; waits up to 10s, defaults to N on timeout.
-# Returns 0 if the user wants to pick a target, 1 otherwise (use default).
-# ---------------------------------------------------------------------------
-
-_xcode_ask_select_target() {
-    local reply
-    printf '\n\033[1mSelect target device/simulator?\033[0m'
-    printf '  \033[2m[y/N]  (10s, default N)\033[0m '
-    if ! IFS= read -r -t 10 reply 2>/dev/null; then
+_xcode_ask() {
+    local reply timeout="${2:-10}"
+    printf '\n\033[1m%s\033[0m  \033[2m[y/N]  (%ss, default N)\033[0m ' "$1" "$timeout"
+    if ! IFS= read -r -t "$timeout" reply 2>/dev/null; then
         printf 'N\n'
         return 1
     fi
@@ -149,14 +115,14 @@ xbuild() {
     }
 
     local _xt_sdk="iphoneos" _xt_dest="" _xt_type="" _xt_id="" _xt_label=""
-    if _xcode_ask_select_target; then
+    if _xcode_ask "Select target device/simulator?"; then
         _xcode_select_target
         local _rc=$?
         (( _rc == 2 )) && return 0
         (( _rc != 0 )) && return 1
     fi
 
-    if _xcode_ask_clean; then
+    if _xcode_ask "Clean before building?"; then
         _xlog "Cleaning" "${scheme} (${configuration} | ${_xt_sdk})"
         local clean_cmd=(xcodebuild)
         [ -n "$workspace" ] && clean_cmd+=(-workspace "${workspace}.xcworkspace")
@@ -200,7 +166,7 @@ xarchive() {
     [ -z "$configuration" ] && printf 'Missing required option: --configuration\n' >&2 && return 1
     [ -z "$archive_path" ]  && printf 'Missing required option: --archive-path\n'  >&2 && return 1
 
-    if _xcode_ask_clean; then
+    if _xcode_ask "Clean before building?"; then
         _xlog "Cleaning" "${scheme} (${configuration})"
         local clean_cmd=(xcodebuild)
         [ -n "$workspace" ] && clean_cmd+=(-workspace "${workspace}.xcworkspace")
@@ -243,9 +209,18 @@ _xcode_menu() {
             elif (( j == sel )); then
                 printf '  \033[1;36m▶  %s\033[0m\n' "${items[$j]}"
             else
-                printf '     %s\n' "${items[$j]}"
+                printf '  \033[2m   %s\033[0m\n' "${items[$j]}"
             fi
         done
+    }
+
+    _xmenu_clear() {
+        printf '\033[%dA' "$total"
+        local _cl
+        for (( _cl = 0; _cl < total; _cl++ )); do
+            printf '\033[2K\n'
+        done
+        printf '\033[%dA' "$total"
     }
 
     printf '\n'
@@ -280,12 +255,14 @@ _xcode_menu() {
                 fi
                 ;;
             $'\n'|$'\r')
+                _xmenu_clear
                 _XCODE_SELECTED=$sel
-                unfunction _xmenu_render
+                unfunction _xmenu_render _xmenu_clear
                 return 0
                 ;;
             q|Q)
-                unfunction _xmenu_render
+                _xmenu_clear
+                unfunction _xmenu_render _xmenu_clear
                 return 1
                 ;;
         esac
@@ -335,10 +312,12 @@ _xcode_select_target() {
             | tr -d '()')
         [ -z "$id" ] && continue
 
+        local label
+        label=$(printf '%s' "$line" | sed "s/ (${id})$//")
         if (( in_dev )); then
-            dev_labels+=("$line"); dev_ids+=("$id")
+            dev_labels+=("$label"); dev_ids+=("$id")
         elif (( in_sim )); then
-            sim_labels+=("$line"); sim_ids+=("$id")
+            sim_labels+=("$label"); sim_ids+=("$id")
         fi
     done <<< "$raw"
 
@@ -374,7 +353,7 @@ _xcode_select_target() {
 
     local _XCODE_SELECTED=1
     _xcode_menu "${labels[@]}" || {
-        printf '\n'; _xwarn "Aborted" ""; return 2
+        _xwarn "Aborted" "no target selected"; return 2
     }
 
     local idx=$_XCODE_SELECTED
@@ -429,7 +408,7 @@ xinstall() {
     }
 
     local skip_build=0
-    _xcode_ask_skip_build && skip_build=1
+    _xcode_ask "Skip build (install existing .app)?" && skip_build=1
 
     local _xt_sdk="" _xt_dest="" _xt_type="" _xt_id="" _xt_label=""
     _xcode_select_target
@@ -442,7 +421,7 @@ xinstall() {
     if (( skip_build )); then
         _xlog "Searching" "existing .app for '${scheme}' in DerivedData ..."
     else
-        if _xcode_ask_clean; then
+        if _xcode_ask "Clean before building?"; then
             _xlog "Cleaning" "${scheme} (${configuration} | ${_xt_sdk})"
             local clean_cmd=(xcodebuild)
             [ -n "$workspace" ] && clean_cmd+=(-workspace "${workspace}.xcworkspace")
@@ -537,10 +516,7 @@ xinstall() {
     _xlog "Installed" "${bundle_id:-$(basename "$app_path")}"
 
     if [[ "$_xt_type" == "simulator" ]] && [ -n "$bundle_id" ]; then
-        printf '\n\033[1mLaunch app?\033[0m  [y/N] '
-        local reply
-        read -r reply
-        if [[ "$reply" == [yY] ]]; then
+        if _xcode_ask "Launch app?" 30; then
             xcrun simctl launch "$_xt_id" "$bundle_id"
         fi
     fi
