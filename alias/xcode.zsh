@@ -53,6 +53,23 @@ _xcode_ask_clean() {
 }
 
 # ---------------------------------------------------------------------------
+# Skip-build prompt.
+# Prints a [y/N] question; waits up to 10s, defaults to N on timeout.
+# Returns 0 if the user wants to reuse an existing .app, 1 to build fresh.
+# ---------------------------------------------------------------------------
+
+_xcode_ask_skip_build() {
+    local reply
+    printf '\n\033[1mSkip build (install existing .app)?\033[0m'
+    printf '  \033[2m[y/N]  (10s, default N)\033[0m '
+    if ! IFS= read -r -t 10 reply 2>/dev/null; then
+        printf 'N\n'
+        return 1
+    fi
+    [[ "$reply" == [yY] ]]
+}
+
+# ---------------------------------------------------------------------------
 # Pre-build target prompt.
 # Prints a [y/N] question; waits up to 10s, defaults to N on timeout.
 # Returns 0 if the user wants to pick a target, 1 otherwise (use default).
@@ -411,13 +428,8 @@ xinstall() {
         _xerr "missing required option: --configuration"; return 1
     }
 
-    if _xcode_ask_clean; then
-        _xlog "Cleaning" "${scheme} (${configuration})"
-        local clean_cmd=(xcodebuild)
-        [ -n "$workspace" ] && clean_cmd+=(-workspace "${workspace}.xcworkspace")
-        clean_cmd+=(-scheme "$scheme" -configuration "$configuration" clean)
-        "${clean_cmd[@]}" | xcbeautify
-    fi
+    local skip_build=0
+    _xcode_ask_skip_build && skip_build=1
 
     local _xt_sdk="" _xt_dest="" _xt_type="" _xt_id="" _xt_label=""
     _xcode_select_target
@@ -425,40 +437,65 @@ xinstall() {
     (( _rc == 2 )) && return 0
     (( _rc != 0 )) && return 1
 
-    local derived_data
-    derived_data=$(mktemp -d) || { _xerr "mktemp failed"; return 1; }
+    local derived_data="" app_path=""
 
-    local build_cmd=(xcodebuild)
-    [ -n "$workspace" ] && build_cmd+=(-workspace "${workspace}.xcworkspace")
-    build_cmd+=(
-        -scheme          "$scheme"
-        -configuration   "$configuration"
-        -sdk             "$_xt_sdk"
-        -destination     "$_xt_dest"
-        -derivedDataPath "$derived_data"
-        build
-    )
+    if (( skip_build )); then
+        _xlog "Searching" "existing .app for '${scheme}' in DerivedData ..."
+        app_path=$(
+            find "${HOME}/Library/Developer/Xcode/DerivedData" \
+                -maxdepth 6 -name "${scheme}.app" -type d 2>/dev/null \
+            | while IFS= read -r p; do
+                printf '%s\t%s\n' \
+                    "$(stat -f '%m' "$p" 2>/dev/null || printf '0')" "$p"
+              done \
+            | sort -rn | head -1 | cut -f2-
+        )
+        if [ -z "$app_path" ]; then
+            _xerr "no existing .app found for '${scheme}' in DerivedData"
+            return 1
+        fi
+        _xlog "Found" "$app_path"
+    else
+        if _xcode_ask_clean; then
+            _xlog "Cleaning" "${scheme} (${configuration})"
+            local clean_cmd=(xcodebuild)
+            [ -n "$workspace" ] && clean_cmd+=(-workspace "${workspace}.xcworkspace")
+            clean_cmd+=(-scheme "$scheme" -configuration "$configuration" clean)
+            "${clean_cmd[@]}" | xcbeautify
+        fi
 
-    _xlog "Building" "${scheme} (${configuration} | ${_xt_sdk})"
-    "${build_cmd[@]}" | xcbeautify
-    # shellcheck disable=SC2154  # pipestatus is zsh-specific (lowercase, 1-based)
-    local build_status=${pipestatus[1]}
+        derived_data=$(mktemp -d) || { _xerr "mktemp failed"; return 1; }
 
-    if [ "$build_status" -ne 0 ]; then
-        _xerr "build failed (exit ${build_status})"
-        rm -rf "$derived_data"
-        return 1
-    fi
+        local build_cmd=(xcodebuild)
+        [ -n "$workspace" ] && build_cmd+=(-workspace "${workspace}.xcworkspace")
+        build_cmd+=(
+            -scheme          "$scheme"
+            -configuration   "$configuration"
+            -sdk             "$_xt_sdk"
+            -destination     "$_xt_dest"
+            -derivedDataPath "$derived_data"
+            build
+        )
 
-    # ── Locate .app ───────────────────────────────────────────────────────
-    local app_path
-    app_path=$(find "$derived_data/Build/Products" \
-        -name "*.app" -maxdepth 3 -type d | head -1)
+        _xlog "Building" "${scheme} (${configuration} | ${_xt_sdk})"
+        "${build_cmd[@]}" | xcbeautify
+        # shellcheck disable=SC2154  # pipestatus is zsh-specific (lowercase, 1-based)
+        local build_status=${pipestatus[1]}
 
-    if [ -z "$app_path" ]; then
-        _xerr ".app not found under $derived_data/Build/Products"
-        rm -rf "$derived_data"
-        return 1
+        if [ "$build_status" -ne 0 ]; then
+            _xerr "build failed (exit ${build_status})"
+            rm -rf "$derived_data"
+            return 1
+        fi
+
+        app_path=$(find "$derived_data/Build/Products" \
+            -name "*.app" -maxdepth 3 -type d | head -1)
+
+        if [ -z "$app_path" ]; then
+            _xerr ".app not found under $derived_data/Build/Products"
+            rm -rf "$derived_data"
+            return 1
+        fi
     fi
 
     # ── Install ───────────────────────────────────────────────────────────
@@ -478,7 +515,7 @@ xinstall() {
 
         xcrun simctl install "$_xt_id" "$app_path" || {
             _xerr "simctl install failed"
-            rm -rf "$derived_data"
+            [ -n "$derived_data" ] && rm -rf "$derived_data"
             return 1
         }
 
@@ -497,7 +534,7 @@ xinstall() {
         if [ "$ok" -eq 0 ]; then
             _xerr "install failed: no working install tool found"
             printf '         Requires Xcode 15+ (devicectl) or ios-deploy\n' >&2
-            rm -rf "$derived_data"
+            [ -n "$derived_data" ] && rm -rf "$derived_data"
             return 1
         fi
     fi
@@ -508,7 +545,7 @@ xinstall() {
         -c "Print CFBundleIdentifier" \
         "${app_path}/Info.plist" 2>/dev/null) || bundle_id=""
 
-    rm -rf "$derived_data"
+    [ -n "$derived_data" ] && rm -rf "$derived_data"
     _xlog "Installed" "${bundle_id:-$(basename "$app_path")}"
 
     if [[ "$_xt_type" == "simulator" ]] && [ -n "$bundle_id" ]; then
