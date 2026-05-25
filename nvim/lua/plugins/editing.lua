@@ -6,6 +6,7 @@ vim.pack.add({
   gh('folke/ts-comments.nvim'),
   gh('windwp/nvim-autopairs'),
   gh('chentoast/marks.nvim'),
+  gh('echasnovski/mini.move'),
 })
 
 require("nvim-surround").setup({})
@@ -35,6 +36,21 @@ if vim.fn.has("nvim-0.10.0") == 1 then
 end
 
 require("nvim-autopairs").setup()
+
+require("mini.move").setup({
+  mappings = {
+    -- Visual mode: move selection
+    left       = "<M-h>",
+    right      = "<M-l>",
+    down       = "<M-j>",
+    up         = "<M-k>",
+    -- Normal mode: move current line
+    line_left  = "<M-h>",
+    line_right = "<M-l>",
+    line_down  = "<M-j>",
+    line_up    = "<M-k>",
+  },
+})
 
 require("marks").setup({
   default_mappings = true,
