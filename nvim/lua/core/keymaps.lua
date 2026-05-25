@@ -94,6 +94,7 @@ wk.add({
 	{ "<leader>fr", "<cmd>Telescope oldfiles<cr>", desc = "最近文件 (Recent Files)" },
 	{ "<leader>fd", "<cmd>Ex<cr>", desc = "文件管理器 (Netrw)" },
 	{ "<leader>fh", "<cmd>Neotree toggle<CR>", desc = "展开收起文件浏览器侧边栏 (Toggle File Explorer)" },
+	{ "<leader>fF", "<cmd>Neotree reveal<cr>", desc = "在树中定位当前文件 (Reveal in Tree)" },
 	{ "<leader>fy", group = "复制路径 (Yank Path)" },
 	{
 		"<leader>fyy",
