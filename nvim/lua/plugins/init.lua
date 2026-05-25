@@ -45,6 +45,9 @@ require("plugins.markdown")
 require("plugins.swift")
 require("plugins.lua")
 
+-- Notes
+require("plugins.notes")
+
 -- Misc
 require("plugins.competitive")
 require("plugins.collaborative")
