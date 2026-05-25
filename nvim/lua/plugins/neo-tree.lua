@@ -71,13 +71,14 @@ require("neo-tree").setup({
 -- Auto-open neo-tree only when nvim is started without a file argument, or
 -- when the argument is a directory. Opening a single file leaves the tree
 -- closed so the editor area isn't wasted on a narrow view.
+--
+-- buftype check is intentionally absent for argc==0: the dashboard sets
+-- buftype="nofile", which would otherwise block neo-tree from opening.
 vim.api.nvim_create_autocmd("VimEnter", {
   once = true,
   callback = function()
     vim.defer_fn(function()
       if vim.o.diff then return end
-      local buf = vim.api.nvim_get_current_buf()
-      if vim.api.nvim_get_option_value("buftype", { buf = buf }) ~= "" then return end
 
       if vim.fn.argc() == 0 then
         vim.cmd("Neotree show")
