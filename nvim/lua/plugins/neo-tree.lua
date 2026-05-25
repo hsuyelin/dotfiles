@@ -69,17 +69,20 @@ require("neo-tree").setup({
 })
 
 -- Auto-open neo-tree on startup; reveal current file if one was provided.
--- vim.schedule defers until after the first buffer is fully loaded.
+-- defer_fn(50) outlasts the VimEnter event loop tick so neo-tree's :Neotree
+-- command is guaranteed to be registered before we call it.
 vim.api.nvim_create_autocmd("VimEnter", {
   once = true,
   callback = function()
-    vim.schedule(function()
-      if vim.bo.buftype ~= "" then return end
+    vim.defer_fn(function()
+      if vim.o.diff then return end
+      local buf = vim.api.nvim_get_current_buf()
+      if vim.api.nvim_get_option_value("buftype", { buf = buf }) ~= "" then return end
       if vim.fn.argc() > 0 then
-        require("neo-tree.command").execute({ action = "show", reveal = true })
+        vim.cmd("Neotree show reveal_force_cwd")
       else
-        require("neo-tree.command").execute({ action = "show" })
+        vim.cmd("Neotree show")
       end
-    end)
+    end, 50)
   end,
 })
