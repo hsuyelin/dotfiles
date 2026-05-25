@@ -1,3 +1,6 @@
+-- Filter current buffer lines matching a pattern → open results in a new tab
+vim.keymap.set("n", "<leader>/", utils.grep_lines_to_tab, { desc = "过滤行到新标签页 (Grep Lines → Tab)" })
+
 -- Remap jk to <ESC>
 vim.keymap.set("i", "jk", "<esc>")
 
@@ -47,6 +50,7 @@ wk.add({
 	{ "<leader>an", "<cmd>noh<cr>", desc = "停止高亮 (Stop Highlight)" },
 	{ "<leader>aj", "<cmd>Telescope jumplist<cr>", desc = "历史跳转列表 (Jumplist)" },
 	{ "<leader>as", "<cmd>Telescope live_grep<cr>", desc = "全局搜索 (Search)" },
+	{ "<leader>al", utils.grep_lines_to_tab, desc = "过滤当前文件行到新标签页 (Grep Lines → Tab)" },
 	{ "<leader>ah", "<cmd>Telescope help_tags<cr>", desc = "帮助 (Help Tags)" },
 	{ "<leader>ac", "<cmd>Telescope colorscheme<cr>", desc = "切换主题 (Colorscheme)" },
 	{ "<leader>ak", "<cmd>Telescope keymaps<cr>", desc = "键位映射 (Keymaps)" },
