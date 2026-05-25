@@ -46,10 +46,10 @@ mkdir -p "$DATADIR"
 # Editors
 # ============================================================
 
-if command -v subl >/dev/null 2>&1; then
-    export EDITOR='subl'
-elif command -v nvim >/dev/null 2>&1; then
+if command -v nvim >/dev/null 2>&1; then
     export EDITOR='nvim'
+elif command -v subl >/dev/null 2>&1; then
+    export EDITOR='subl'
 else
     export EDITOR='vi'
 fi
