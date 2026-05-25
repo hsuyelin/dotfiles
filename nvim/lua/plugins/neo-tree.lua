@@ -12,7 +12,7 @@ require("neo-tree").setup({
   close_if_last_window = true,
 
   window = {
-    width = 45,
+    width = 30,
     mappings = {
       ["<tab>"] = "open",
       ["O"] = "expand_all_nodes",
