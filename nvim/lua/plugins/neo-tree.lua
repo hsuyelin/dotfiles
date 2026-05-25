@@ -68,9 +68,9 @@ require("neo-tree").setup({
   },
 })
 
--- Auto-open neo-tree on startup; reveal current file if one was provided.
--- defer_fn(50) outlasts the VimEnter event loop tick so neo-tree's :Neotree
--- command is guaranteed to be registered before we call it.
+-- Auto-open neo-tree only when nvim is started without a file argument, or
+-- when the argument is a directory. Opening a single file leaves the tree
+-- closed so the editor area isn't wasted on a narrow view.
 vim.api.nvim_create_autocmd("VimEnter", {
   once = true,
   callback = function()
@@ -78,10 +78,15 @@ vim.api.nvim_create_autocmd("VimEnter", {
       if vim.o.diff then return end
       local buf = vim.api.nvim_get_current_buf()
       if vim.api.nvim_get_option_value("buftype", { buf = buf }) ~= "" then return end
-      if vim.fn.argc() > 0 then
-        vim.cmd("Neotree show reveal_force_cwd")
-      else
+
+      if vim.fn.argc() == 0 then
         vim.cmd("Neotree show")
+      elseif vim.fn.argc() == 1 then
+        local arg  = vim.fn.argv(0)
+        local stat = vim.uv.fs_stat(arg)
+        if stat and stat.type == "directory" then
+          vim.cmd("Neotree show dir=" .. vim.fn.fnameescape(arg))
+        end
       end
     end, 50)
   end,
