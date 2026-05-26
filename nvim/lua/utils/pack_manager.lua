@@ -268,6 +268,255 @@ M.clean = function()
     vim.keymap.set("n", "n", close, { buffer = buf, nowait = true })
 end
 
+-- ── Check-update strategies ───────────────────────────────────────────────────
+
+-- Fetch remote refs then count commits the local branch is behind upstream.
+-- Falls back to origin/HEAD if no upstream tracking branch is configured.
+-- Calls cb("↑", n_commits) when behind, cb(nil) when up-to-date, cb("✗") on error.
+local function check_update_unversioned(item, cb)
+    vim.system({ "git", "-C", item.dir, "fetch", "--quiet" }, {}, function(fetch)
+        if fetch.code ~= 0 then
+            cb("✗")
+            return
+        end
+        vim.system(
+            { "git", "-C", item.dir, "rev-list", "--count", "HEAD..@{upstream}" },
+            { text = true },
+            function(up)
+                local ref = up.code == 0 and "@{upstream}" or "origin/HEAD"
+                vim.system(
+                    { "git", "-C", item.dir, "rev-list", "--count", "HEAD.." .. ref },
+                    { text = true },
+                    function(out)
+                        local n = tonumber((out.stdout or ""):match("%d+")) or 0
+                        cb(n > 0 and "↑" or nil, n > 0 and n or nil)
+                    end
+                )
+            end
+        )
+    end)
+end
+
+-- Fetch tags then check if a newer tag satisfies the version constraint.
+-- Calls cb("↑", new_tag) when a better tag exists, cb(nil) when current, cb("✗") on error.
+local function check_update_versioned(item, cb)
+    vim.system({ "git", "-C", item.dir, "fetch", "--tags", "--quiet" }, {}, function(fetch)
+        if fetch.code ~= 0 then
+            cb("✗")
+            return
+        end
+        vim.system(
+            { "git", "-C", item.dir, "tag", "--list", "--sort=-v:refname" },
+            { text = true },
+            function(tag_out)
+                local tags = vim.split(tag_out.stdout or "", "\n", { trimempty = true })
+                local best
+                for _, tag in ipairs(tags) do
+                    local v = vim.version.parse(tag)
+                    if v and item.version:has(v) then
+                        best = tag
+                        break
+                    end
+                end
+                if not best then
+                    cb(nil)
+                    return
+                end
+                vim.system(
+                    { "git", "-C", item.dir, "describe", "--tags", "--exact-match", "HEAD" },
+                    { text = true },
+                    function(head)
+                        local current = head.code == 0 and head.stdout:gsub("%s+$", "") or nil
+                        cb(current ~= best and "↑" or nil, current ~= best and best or nil)
+                    end
+                )
+            end
+        )
+    end)
+end
+
+-- ── :PackCheckUpdate ──────────────────────────────────────────────────────────
+
+M.check_update = function()
+    local items = {}
+    for name, info in pairs(M._registry) do
+        if vim.fn.isdirectory(info.dir .. "/.git") == 1 then
+            table.insert(items, { name = name, dir = info.dir, version = info.version })
+        end
+    end
+    table.sort(items, function(a, b) return a.name < b.name end)
+
+    if #items == 0 then
+        vim.notify("PackCheckUpdate: no plugins found", vim.log.levels.WARN)
+        return
+    end
+
+    local buf, win = open_float("Pack Check Update", {
+        string.format("  Checking %d plugin(s) for updates…  [0/%d]", #items, #items),
+        "",
+        "  (no updates found yet)",
+        "",
+    })
+
+    local done = 0
+    local updates = {} -- { name, detail }
+
+    local function redraw()
+        local lines = {
+            string.format(
+                "  Checking %d plugin(s) for updates…  [%d/%d]", #items, done, #items
+            ),
+            "",
+        }
+        if #updates == 0 then
+            table.insert(lines, "  (no updates found yet)")
+        else
+            for _, u in ipairs(updates) do
+                local suffix = u.detail and ("  →  " .. tostring(u.detail)) or ""
+                table.insert(lines, string.format("  ↑ %s%s", u.name, suffix))
+            end
+        end
+        table.insert(lines, "")
+        if done == #items then
+            if #updates == 0 then
+                table.insert(lines, "  All plugins are up to date.")
+            else
+                table.insert(lines, string.format(
+                    "  %d plugin(s) available. Run :PackUpdate to apply.", #updates
+                ))
+            end
+            table.insert(lines, "  [q] close")
+        end
+        vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+        -- Resize window height to fit content.
+        local h = math.min(#lines + 2, math.floor(vim.o.lines * 0.75))
+        if vim.api.nvim_win_is_valid(win) then
+            vim.api.nvim_win_set_height(win, h)
+        end
+    end
+
+    for _, item in ipairs(items) do
+        local strategy = item.version and check_update_versioned or check_update_unversioned
+        strategy(item, function(icon, detail)
+            vim.schedule(function()
+                done = done + 1
+                if icon == "↑" then
+                    local label = type(detail) == "number"
+                        and (detail .. " commit(s) behind")
+                        or detail
+                    table.insert(updates, { name = item.name, detail = label })
+                elseif icon == "✗" then
+                    table.insert(updates, { name = item.name, detail = "check failed" })
+                end
+                redraw()
+            end)
+        end)
+    end
+end
+
+-- ── :PackCheckHealth ──────────────────────────────────────────────────────────
+
+-- Derive candidate health-module names from a plugin directory name.
+-- Most plugins follow: strip .nvim suffix, replace - with _, optionally strip nvim- prefix.
+local function health_candidates(name)
+    local base = name:gsub("%.nvim$", ""):gsub("^nvim%-", ""):gsub("%-", "_")
+    local full = name:gsub("%-", "_"):gsub("%.", "_")
+    local seen, out = {}, {}
+    for _, c in ipairs({ base, full }) do
+        if not seen[c] then seen[c] = true; table.insert(out, c) end
+    end
+    return out
+end
+
+M.check_health = function()
+    -- Intercept vim.health to capture only warnings and errors.
+    local captured = {} -- plugin_name → { errors = [], warns = [] }
+    local current  = nil
+
+    local orig = {
+        ok    = vim.health.ok,
+        info  = vim.health.info,
+        start = vim.health.start,
+        warn  = vim.health.warn,
+        error = vim.health.error,
+    }
+
+    vim.health.ok    = function(_) end
+    vim.health.info  = function(_) end
+    vim.health.start = function(_) end
+    vim.health.warn  = function(msg)
+        if not current then return end
+        captured[current] = captured[current] or { errors = {}, warns = {} }
+        table.insert(captured[current].warns, msg)
+    end
+    vim.health.error = function(msg)
+        if not current then return end
+        captured[current] = captured[current] or { errors = {}, warns = {} }
+        table.insert(captured[current].errors, msg)
+    end
+
+    local n_checked = 0
+    for name, info in pairs(M._registry) do
+        for _, mod in ipairs(health_candidates(name)) do
+            -- Only attempt if the health file actually exists in the plugin dir.
+            local found = vim.fn.filereadable(
+                info.dir .. "/lua/" .. mod .. "/health.lua"
+            ) == 1 or vim.fn.filereadable(
+                info.dir .. "/lua/" .. mod .. "/health/init.lua"
+            ) == 1
+            if found then
+                current = name
+                local ok, health = pcall(require, mod .. ".health")
+                if ok and type(health) == "table" and type(health.check) == "function" then
+                    pcall(health.check)
+                    n_checked = n_checked + 1
+                end
+                current = nil
+                break
+            end
+        end
+    end
+
+    -- Restore vim.health.
+    for fn, fn_orig in pairs(orig) do vim.health[fn] = fn_orig end
+
+    -- Build display — only plugins with issues.
+    local issues = {}
+    for name, data in pairs(captured) do
+        if #data.errors > 0 or #data.warns > 0 then
+            table.insert(issues, { name = name, errors = data.errors, warns = data.warns })
+        end
+    end
+    table.sort(issues, function(a, b) return a.name < b.name end)
+
+    if #issues == 0 then
+        vim.notify(
+            string.format("PackCheckHealth: %d plugin(s) checked — no issues", n_checked),
+            vim.log.levels.INFO
+        )
+        return
+    end
+
+    local lines = {
+        string.format("  Checked %d plugin(s) — %d have issues:", n_checked, #issues),
+        "",
+    }
+    for _, item in ipairs(issues) do
+        local icon = #item.errors > 0 and "✗" or "⚠"
+        table.insert(lines, string.format("  %s %s", icon, item.name))
+        for _, e in ipairs(item.errors) do
+            table.insert(lines, "      error  " .. e)
+        end
+        for _, w in ipairs(item.warns) do
+            table.insert(lines, "      warn   " .. w)
+        end
+    end
+    table.insert(lines, "")
+    table.insert(lines, "  Run :checkhealth <plugin> for full details.  [q] close")
+
+    open_float("Pack Check Health", lines)
+end
+
 -- ── Commands ──────────────────────────────────────────────────────────────────
 
 vim.api.nvim_create_user_command(
@@ -277,6 +526,14 @@ vim.api.nvim_create_user_command(
 vim.api.nvim_create_user_command(
     "PackClean", M.clean,
     { desc = "Remove plugin dirs not registered via vim.pack.add" }
+)
+vim.api.nvim_create_user_command(
+    "PackCheckUpdate", M.check_update,
+    { desc = "Check which plugins have updates available (no download)" }
+)
+vim.api.nvim_create_user_command(
+    "PackCheckHealth", M.check_health,
+    { desc = "Run health checks and show only plugins with warnings or errors" }
 )
 
 return M
