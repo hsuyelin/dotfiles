@@ -1,5 +1,8 @@
 _G.utils = {}
 
+-- Must load before any vim.pack.add() call to intercept registrations.
+require("utils.pack_manager")
+
 utils.func = require("utils.func")
 setmetatable(utils, { __index = utils.func })
 
