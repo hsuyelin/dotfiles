@@ -62,7 +62,6 @@ ta() {
     tmux list-sessions -F "#{session_name}" \
       | _ta_fzf --multi --border --reverse \
             --prompt="session> " \
-            --header="ctrl-s:save  ctrl-d:drop  ctrl-x:kill  ctrl-r:rename  space:select" \
             --preview="f=\"${_rdir}/last\"; \
               if [ -f \"\$f\" ]; then \
                 rf=\$(realpath \"\$f\"); \
