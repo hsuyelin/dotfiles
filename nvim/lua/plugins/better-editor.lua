@@ -11,21 +11,36 @@ vim.pack.add({
   gh('folke/todo-comments.nvim'),
 })
 
+-- Use custom group names so we fully control the colors via hooks.
+-- RainbowDelimiterX groups from the plugin are only available after it loads
+-- and vanish on colorscheme reload — hooks.HIGHLIGHT_SETUP fires every time.
 local _rainbow_hl = {
-  "RainbowDelimiterRed",
-  "RainbowDelimiterYellow",
-  "RainbowDelimiterBlue",
-  "RainbowDelimiterOrange",
-  "RainbowDelimiterGreen",
-  "RainbowDelimiterViolet",
-  "RainbowDelimiterCyan",
+  "RainbowRed",
+  "RainbowYellow",
+  "RainbowBlue",
+  "RainbowOrange",
+  "RainbowGreen",
+  "RainbowViolet",
+  "RainbowCyan",
 }
+
+local ibl_hooks = require("ibl.hooks")
+ibl_hooks.register(ibl_hooks.type.HIGHLIGHT_SETUP, function()
+  -- Catppuccin Mocha palette
+  vim.api.nvim_set_hl(0, "RainbowRed",    { fg = "#F38BA8" })
+  vim.api.nvim_set_hl(0, "RainbowYellow", { fg = "#F9E2AF" })
+  vim.api.nvim_set_hl(0, "RainbowBlue",   { fg = "#89B4FA" })
+  vim.api.nvim_set_hl(0, "RainbowOrange", { fg = "#FAB387" })
+  vim.api.nvim_set_hl(0, "RainbowGreen",  { fg = "#A6E3A1" })
+  vim.api.nvim_set_hl(0, "RainbowViolet", { fg = "#CBA6F7" })
+  vim.api.nvim_set_hl(0, "RainbowCyan",   { fg = "#89DCEB" })
+end)
 
 require("ibl").setup({
   scope = {
-    show_end = false,
-    show_start = false,
-    highlight = _rainbow_hl,
+    show_start = true,   -- underline on the opening bracket line
+    show_end   = true,   -- underline on the closing bracket line
+    highlight  = _rainbow_hl,
   },
 })
 
