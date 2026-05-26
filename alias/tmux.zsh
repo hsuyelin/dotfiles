@@ -131,74 +131,17 @@ alias trl='tmux source "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/tmux.conf" && ech
 # tl: list sessions at a glance.
 alias tl='tmux list-sessions 2>/dev/null || echo "no tmux sessions."'
 
-# ── Session persistence (tmux-resurrect) ──────────────────────────────────────
-_RESURRECT_DIR="${HOME}/.local/share/tmux/resurrect"
-_RESURRECT_SCRIPT="${XDG_CONFIG_HOME:-$HOME/.config}/tmux/plugins/tmux-resurrect/scripts"
+# ── Session persistence hints (tmux-resurrect) ────────────────────────────────
+# Use tmux key bindings or ta() fzf picker instead of these shell commands.
 
-# tps: persist (save) the current session state to disk.
-#   Survives computer shutdown. Must be inside tmux.
-#   Equivalent to prefix + Ctrl-s inside tmux.
-tps() {
-    if [[ -z "$TMUX" ]]; then
-        echo "tps: not inside a tmux session" >&2
-        return 1
-    fi
-    if [[ ! -f "${_RESURRECT_SCRIPT}/save.sh" ]]; then
-        echo "tps: tmux-resurrect not installed — run: prefix + I" >&2
-        return 1
-    fi
-    tmux run-shell "${_RESURRECT_SCRIPT}/save.sh"
-}
+# tps: hint — save via prefix + Ctrl-s, or ctrl-s in ta() fzf picker.
+alias tps='echo "save sessions: prefix + Ctrl-s  (or ctrl-s in ta fzf picker)"'
 
-# tpr: restore all previously saved sessions.
-#   Restored sessions appear in the fzf picker (ta) without auto-switching.
-#   Must be inside tmux. Equivalent to prefix + Ctrl-r inside tmux.
-tpr() {
-    if [[ -z "$TMUX" ]]; then
-        echo "tpr: must be inside tmux to restore" >&2
-        return 1
-    fi
-    if [[ ! -f "${_RESURRECT_SCRIPT}/restore.sh" ]]; then
-        echo "tpr: tmux-resurrect not installed — run: prefix + I" >&2
-        return 1
-    fi
-    tmux run-shell "${_RESURRECT_SCRIPT}/restore.sh"
-}
+# tpr: hint — restore via prefix + Ctrl-r.
+alias tpr='echo "restore sessions: prefix + Ctrl-r"'
 
-# tpd: drop a session from the resurrect save file.
-#   Use fzf to pick which saved session to remove; it won't be restored next time.
-#   Works outside tmux too (edits the save file directly).
-tpd() {
-    local save_file="${_RESURRECT_DIR}/last"
-    if [[ ! -f "$save_file" ]]; then
-        echo "tpd: no saved state found — run tps or prefix+Ctrl-s first" >&2
-        return 1
-    fi
-
-    local actual_file
-    actual_file=$(realpath "$save_file")
-
-    local sessions
-    sessions=$(awk -F'\t' '/^(pane|window)/{print $2}' "$actual_file" | sort -u)
-    if [[ -z "$sessions" ]]; then
-        echo "tpd: save file is empty" >&2
-        return 1
-    fi
-
-    local selected
-    selected=$(
-        echo "$sessions" | fzf \
-            --prompt="drop from save > " \
-            --height=40% --border --reverse \
-            --header="select session to remove from resurrect state"
-    )
-    [[ -z "$selected" ]] && return 0
-
-    # Remove every line whose second tab-delimited field equals the session name.
-    awk -F'\t' -v s="$selected" '$2 != s' "$actual_file" > "${actual_file}.tmp" \
-        && mv "${actual_file}.tmp" "$actual_file"
-    echo "tpd: '${selected}' removed from resurrect save"
-}
+# tpd: hint — drop a session via ctrl-d in ta() fzf picker.
+alias tpd='echo "drop session from save: ctrl-d in ta fzf picker"'
 
 # thelp: print all tmux shortcuts and helper aliases.
 thelp() {
@@ -265,10 +208,9 @@ thelp() {
 
     _thelp_section "Session Persistence  (tmux-resurrect)"
     _thelp_row "prefix + Ctrl-s" "save all sessions to disk (survives shutdown)"
-    _thelp_row "prefix + Ctrl-r" "restore saved sessions (added to session list, no auto-attach)"
-    _thelp_row "tps"           "save sessions from shell  (= prefix+Ctrl-s)"
-    _thelp_row "tpr"           "restore sessions from shell  (= prefix+Ctrl-r)"
-    _thelp_row "tpd"           "drop a session from the save file (fzf picker)"
+    _thelp_row "prefix + Ctrl-r" "restore sessions (added to session list, no auto-attach)"
+    _thelp_row "ctrl-s in ta"  "save selected session(s) to resurrect file"
+    _thelp_row "ctrl-d in ta"  "drop selected session(s) from resurrect file"
 
     _thelp_section "Misc"
     _thelp_row "prefix + g"    "lazygit popup"
