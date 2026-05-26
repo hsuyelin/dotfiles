@@ -110,37 +110,13 @@ tq() {
 
 # Option+R: session picker via ta().
 _tmux_session_picker_widget() {
-    if [[ -n "$TMUX" ]]; then
-        # Inside tmux: ta() only calls switch-client (no tty takeover).
-        # zle -I hands the terminal to fzf temporarily; ZLE resumes cleanly.
-        zle push-line
-        zle -I
-        ta
-        zle reset-prompt
-    else
-        # Outside tmux: ta() calls tmux attach-session which fully takes over
-        # the tty. accept-line exits ZLE first so tmux gets a clean terminal
-        # with no ZLE signal handlers (e.g. SIGWINCH) firing during the session.
-        # _ta_suppress_echo is picked up by the preexec hook below to erase the
-        # 'ta' line before the command actually runs.
-        _ta_suppress_echo=1
-        zle push-line
-        BUFFER="ta"
-        zle accept-line
-    fi
+    zle push-line
+    zle -I
+    ta
+    zle reset-prompt
 }
 zle -N _tmux_session_picker_widget
 bindkey '\er' _tmux_session_picker_widget
-
-# Erase the 'ta' line that accept-line renders, before ta() actually runs.
-# Only fires once per outside-tmux invocation via the _ta_suppress_echo flag.
-_ta_suppress_echo_preexec() {
-    if [[ ${_ta_suppress_echo:-0} -eq 1 && "$1" == "ta" ]]; then
-        _ta_suppress_echo=0
-        print -n "\033[1A\r\033[2K"
-    fi
-}
-add-zsh-hook preexec _ta_suppress_echo_preexec
 
 # trl: reload tmux config from the shell (works inside or outside tmux).
 alias trl='tmux source "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/tmux.conf" && echo "tmux config reloaded"'
