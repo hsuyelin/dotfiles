@@ -28,6 +28,15 @@ if not vim.env.XDG_RUNTIME_DIR or not uv.fs_access(vim.env.XDG_RUNTIME_DIR, "rwx
 end
 
 local options = {
+	-- Folding: treesitter-based, all folds open on start.
+	-- Use za to toggle, zM/zR to fold/unfold all.
+	foldmethod    = "expr",
+	foldexpr      = "v:lua.vim.treesitter.foldexpr()",
+	foldlevel     = 99,
+	foldlevelstart = 99,
+	foldenable    = true,
+	foldtext      = "",   -- show the actual first line, not the default ugly summary
+
 	exrc = true,
 	clipboard = "unnamedplus",
 	termguicolors = true,
