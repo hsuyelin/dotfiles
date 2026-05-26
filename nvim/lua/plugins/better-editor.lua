@@ -15,7 +15,7 @@ vim.pack.add({
 -- RainbowDelimiterX groups from the plugin are only available after it loads
 -- and vanish on colorscheme reload — hooks.HIGHLIGHT_SETUP fires every time.
 local _rainbow_hl = {
-  "RainbowRed",
+  "RainbowFlamingo",
   "RainbowPeach",
   "RainbowYellow",
   "RainbowGreen",
@@ -27,7 +27,7 @@ local _rainbow_hl = {
 local ibl_hooks = require("ibl.hooks")
 ibl_hooks.register(ibl_hooks.type.HIGHLIGHT_SETUP, function()
   -- Catppuccin Mocha — spectral order for maximum adjacent-level contrast
-  vim.api.nvim_set_hl(0, "RainbowRed",   { fg = "#F38BA8" }) -- red
+  vim.api.nvim_set_hl(0, "RainbowFlamingo", { fg = "#F2CDCD" }) -- flamingo
   vim.api.nvim_set_hl(0, "RainbowPeach", { fg = "#FAB387" }) -- peach
   vim.api.nvim_set_hl(0, "RainbowYellow",{ fg = "#F9E2AF" }) -- yellow
   vim.api.nvim_set_hl(0, "RainbowGreen", { fg = "#A6E3A1" }) -- green
