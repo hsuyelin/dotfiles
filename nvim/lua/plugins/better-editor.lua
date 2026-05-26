@@ -16,24 +16,24 @@ vim.pack.add({
 -- and vanish on colorscheme reload — hooks.HIGHLIGHT_SETUP fires every time.
 local _rainbow_hl = {
   "RainbowRed",
+  "RainbowPeach",
   "RainbowYellow",
-  "RainbowBlue",
-  "RainbowOrange",
   "RainbowGreen",
-  "RainbowViolet",
-  "RainbowCyan",
+  "RainbowSky",
+  "RainbowBlue",
+  "RainbowMauve",
 }
 
 local ibl_hooks = require("ibl.hooks")
 ibl_hooks.register(ibl_hooks.type.HIGHLIGHT_SETUP, function()
-  -- Catppuccin Mocha palette
-  vim.api.nvim_set_hl(0, "RainbowRed",    { fg = "#F38BA8" })
-  vim.api.nvim_set_hl(0, "RainbowYellow", { fg = "#F9E2AF" })
-  vim.api.nvim_set_hl(0, "RainbowBlue",   { fg = "#89B4FA" })
-  vim.api.nvim_set_hl(0, "RainbowOrange", { fg = "#FAB387" })
-  vim.api.nvim_set_hl(0, "RainbowGreen",  { fg = "#A6E3A1" })
-  vim.api.nvim_set_hl(0, "RainbowViolet", { fg = "#CBA6F7" })
-  vim.api.nvim_set_hl(0, "RainbowCyan",   { fg = "#89DCEB" })
+  -- Catppuccin Mocha — spectral order for maximum adjacent-level contrast
+  vim.api.nvim_set_hl(0, "RainbowRed",   { fg = "#F38BA8" }) -- red
+  vim.api.nvim_set_hl(0, "RainbowPeach", { fg = "#FAB387" }) -- peach
+  vim.api.nvim_set_hl(0, "RainbowYellow",{ fg = "#F9E2AF" }) -- yellow
+  vim.api.nvim_set_hl(0, "RainbowGreen", { fg = "#A6E3A1" }) -- green
+  vim.api.nvim_set_hl(0, "RainbowSky",   { fg = "#89DCEB" }) -- sky
+  vim.api.nvim_set_hl(0, "RainbowBlue",  { fg = "#89B4FA" }) -- blue
+  vim.api.nvim_set_hl(0, "RainbowMauve", { fg = "#CBA6F7" }) -- mauve
 end)
 
 require("ibl").setup({

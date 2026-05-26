@@ -4,7 +4,6 @@ local gh = function(r) return 'https://github.com/' .. r end
 vim.pack.add({
   { src = gh('nvim-treesitter/nvim-treesitter'), version = 'master' },
   { src = gh('nvim-treesitter/nvim-treesitter-textobjects'), version = 'master' },
-  gh('HiPhish/rainbow-delimiters.nvim'),
 })
 
 local ENSURE_INSTALLED = {
@@ -91,15 +90,6 @@ vim.keymap.set({ "n", "x", "o" }, "]]", function() move.goto_next_start("@class.
 local ts_repeat = require("nvim-treesitter-textobjects.repeatable_move")
 vim.keymap.set({ "n", "x", "o" }, ";", ts_repeat.repeat_last_move_next)
 vim.keymap.set({ "n", "x", "o" }, ",", ts_repeat.repeat_last_move_previous)
-
--- Rainbow delimiters
-require("rainbow-delimiters.setup").setup({
-  highlight = {
-    "RainbowDelimiterRed", "RainbowDelimiterYellow", "RainbowDelimiterBlue",
-    "RainbowDelimiterOrange", "RainbowDelimiterGreen", "RainbowDelimiterViolet",
-    "RainbowDelimiterCyan",
-  },
-})
 
 -- Auto-install any missing parsers from ENSURE_INSTALLED on first launch.
 -- vim.pack.add() has no build hook, so ensure_installed alone is not reliable.
