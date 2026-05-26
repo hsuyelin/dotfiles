@@ -78,19 +78,22 @@ vim.filetype.add({
 })
 
 -- Treesitter fold setup -------------------------------------------------------
--- vim.treesitter.foldexpr() calls vim.treesitter.get_parser(buf) internally.
--- In Neovim 0.12, get_parser() only finds parsers explicitly started via
--- vim.treesitter.start(). nvim-treesitter's highlight module calls start()
--- but not always before foldexpr is first evaluated. Calling start() here
--- guarantees the parser is registered regardless of plugin load order.
+-- vim.treesitter.foldexpr() needs the parser attached via vim.treesitter.start().
+-- The sh → bash mapping is registered by nvim-treesitter, but its timing is not
+-- guaranteed before FileType fires. Register it here at startup so get_lang()
+-- always resolves correctly, then pass the language explicitly to start().
+vim.treesitter.language.register("bash", { "sh", "zsh" })
+
 vim.api.nvim_create_autocmd("FileType", {
 	group = vim.api.nvim_create_augroup("TsFoldSetup", { clear = true }),
 	callback = function(ev)
 		local buf = ev.buf
 		if vim.bo[buf].buftype ~= "" then return end
-		-- Attach parser (no-op if already attached by nvim-treesitter).
-		pcall(vim.treesitter.start, buf)
-		-- Recompute fold levels after the parser is live.
+		local lang = vim.treesitter.language.get_lang(vim.bo[buf].filetype)
+		if not lang then return end
+		-- Attach parser with explicit language so get_parser() can find it.
+		local ok = pcall(vim.treesitter.start, buf, lang)
+		if not ok then return end
 		vim.schedule(function()
 			if vim.api.nvim_buf_is_valid(buf) then
 				vim.api.nvim_buf_call(buf, function()
