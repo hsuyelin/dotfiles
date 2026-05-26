@@ -196,9 +196,16 @@ nvimhelp() {
     _nh_row "<space>z"          "zoxide directory jump (frecency-based)"
     _nh_row "<space>Cc"         "open config files picker"
 
+    # ── Terminal ──────────────────────────────────────────────────────────────
+    _nh_section "Terminal  (split pane, bottom)"
+    _nh_row "<space>!"          "toggle terminal — open if hidden, hide if visible"
+    _nh_note                    "inside terminal:"
+    _nh_row "<space>!"          "[TERMINAL] hide terminal (same toggle key)"
+    _nh_row "jk"                "[TERMINAL] exit to normal mode (stay in window)"
+    _nh_row "<C-c>"             "[TERMINAL] close terminal window entirely"
+
     # ── Misc ──────────────────────────────────────────────────────────────────
     _nh_section "Misc"
-    _nh_row "<space>!"          "open floating terminal"
     _nh_row "<space>aq"         "quit all windows"
     _nh_row "<space>P"          "open pack manager (PackUpdate UI)"
     _nh_row ":PackUpdate"       "update all plugins with live progress"

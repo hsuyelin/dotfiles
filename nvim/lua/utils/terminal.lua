@@ -28,10 +28,13 @@ local function buf_setup(buf)
 	-- 		-- end)
 	-- 	end,
 	-- })
-	-- map jk
 	vim.keymap.set("t", "jk", [[<C-\><C-n>]], { buffer = buf, silent = true })
-	-- close terminal window on <C-c>
 	vim.keymap.set("t", "<C-c>", [[<C-\><C-n><C-w>c]], { buffer = buf, silent = true })
+	-- toggle (hide) the terminal from inside terminal mode
+	vim.keymap.set("t", "<leader>!", function()
+		local M = require("utils.terminal")
+		M.toggle()
+	end, { buffer = buf, silent = true })
 end
 
 ---@param cmd? string
@@ -107,6 +110,24 @@ function M.select()
 		M.new() -- create a new
 	end
 	list[1]:open(nil, { auto_enter = true, auto_insert = true })
+end
+
+-- Toggle the first terminal: hide it if visible in the current tab, else show it.
+function M.toggle()
+	local list = M.list()
+	if #list == 0 then
+		M.new()
+		list = M.list()
+	end
+	local term = list[1]
+	local tab = vim.api.nvim_get_current_tabpage()
+	for _, w in ipairs(vim.api.nvim_tabpage_list_wins(tab)) do
+		if vim.api.nvim_win_is_valid(w) and vim.api.nvim_win_get_buf(w) == term.buf then
+			vim.api.nvim_win_close(w, false)
+			return
+		end
+	end
+	term:open(nil, { auto_enter = true })
 end
 
 return M

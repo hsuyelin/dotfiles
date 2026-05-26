@@ -61,7 +61,7 @@ wk.add({
 	{ "<leader>C", group = "配置 (Config)" },
 	{ "<leader>Cc", utils.config_files, desc = "编辑配置 (Edit Config)" },
 	-- Terminal
-	{ "<leader>!", utils.term.select, desc = "打开终端 (Open Terminal)" },
+	{ "<leader>!", utils.term.toggle, desc = "切换终端 (Toggle Terminal)" },
 	-- Tab
 	{ "<leader>t", group = "标签页 (Tab)" },
 	{ "<leader>tn", "<cmd>tabnew<cr>", desc = "新建标签页 (New Empty Tab)" },
