@@ -3,6 +3,7 @@ local gh = function(r) return 'https://github.com/' .. r end
 
 vim.pack.add({
   gh('lukas-reineke/indent-blankline.nvim'),
+  gh('HiPhish/rainbow-delimiters.nvim'),
   gh('folke/which-key.nvim'),
   gh('folke/trouble.nvim'),
   gh('mrjones2014/smart-splits.nvim'),
@@ -10,11 +11,26 @@ vim.pack.add({
   gh('folke/todo-comments.nvim'),
 })
 
+local _rainbow_hl = {
+  "RainbowDelimiterRed",
+  "RainbowDelimiterYellow",
+  "RainbowDelimiterBlue",
+  "RainbowDelimiterOrange",
+  "RainbowDelimiterGreen",
+  "RainbowDelimiterViolet",
+  "RainbowDelimiterCyan",
+}
+
 require("ibl").setup({
   scope = {
     show_end = false,
     show_start = false,
+    highlight = _rainbow_hl,
   },
+})
+
+require("rainbow-delimiters.setup").setup({
+  highlight = _rainbow_hl,
 })
 
 -- which-key: defer (only needed on first keypress)

@@ -17,6 +17,12 @@ require("neo-tree").setup({
       ["<tab>"] = "open",
       ["O"] = "expand_all_nodes",
       ["C"] = "close_all_subnodes",
+      [">"] = function()
+        vim.api.nvim_win_set_width(0, vim.api.nvim_win_get_width(0) + 5)
+      end,
+      ["<"] = function()
+        vim.api.nvim_win_set_width(0, math.max(15, vim.api.nvim_win_get_width(0) - 5))
+      end,
     },
   },
   filesystem = {

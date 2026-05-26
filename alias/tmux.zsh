@@ -109,6 +109,9 @@ _tmux_session_picker_widget() {
 zle -N _tmux_session_picker_widget
 bindkey '\er' _tmux_session_picker_widget
 
+# trl: reload tmux config from the shell (works inside or outside tmux).
+alias trl='tmux source "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/tmux.conf" && echo "tmux config reloaded"'
+
 # tl: list sessions at a glance.
 alias tl='tmux list-sessions 2>/dev/null || echo "no tmux sessions."'
 
@@ -176,6 +179,7 @@ thelp() {
     _thelp_section "Misc"
     _thelp_row "prefix + g"    "lazygit popup"
     _thelp_row "prefix + r"    "reload tmux config"
+    _thelp_row "trl"           "reload tmux config from shell"
     _thelp_row "Shift + Enter" "insert newline (no submit)"
 
     echo ""
