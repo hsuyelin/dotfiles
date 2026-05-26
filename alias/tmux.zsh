@@ -47,24 +47,40 @@ _ta_fzf() {
 #   ctrl-x     kill selected; if only current session selected, kill it directly;
 #              if current mixed with others, skip current (show warning) and kill the rest
 #   ctrl-r     rename focused session, reload list
+#   ctrl-s     save selected sessions to resurrect file; no selection = save all
+#   ctrl-d     drop selected sessions from resurrect file; no selection = drop focused
 #   enter      attach/switch to the last selected session in list order
 ta() {
   if ! tmux list-sessions &>/dev/null; then
     echo "no tmux sessions. use: tn [name]"
     return 1
   fi
+  local _rta="${XDG_CONFIG_HOME:-$HOME/.config}/tmux/resurrect-ta.sh"
+  local _rdir="$HOME/.local/share/tmux/resurrect"
   local session
   session=$(
     tmux list-sessions -F "#{session_name}" \
       | _ta_fzf --multi --border --reverse \
             --prompt="session> " \
-            --preview="tmux list-windows -t {} \
-              -F '  #{window_index}  #{window_name}  #{?window_active,(active),}'" \
+            --header="ctrl-s:save  ctrl-d:drop  ctrl-x:kill  ctrl-r:rename  space:select" \
+            --preview="f=\"${_rdir}/last\"; \
+              if [ -f \"\$f\" ]; then \
+                rf=\$(realpath \"\$f\"); \
+                awk -F'\t' -v s={} '\$2==s{x=1}END{exit !x}' \"\$rf\" 2>/dev/null \
+                  && echo '  [saved]' || echo '  [not saved]'; \
+              else \
+                echo '  [no save file]'; \
+              fi; \
+              echo; \
+              tmux list-windows -t {} \
+                -F '  #{window_index}  #{window_name}  #{?window_active,(active),}' 2>/dev/null" \
             --preview-window=right:45% \
             --bind="space:toggle+down" \
             --bind="ctrl-x:execute-silent(cur=\$(tmux display-message -p '#S' 2>/dev/null); set -- {+}; count=\$#; total=\$(tmux list-sessions 2>/dev/null | wc -l | xargs); if [ \"\$count\" -eq \"\$total\" ]; then for s in \"\$@\"; do [ -n \"\$s\" ] || continue; [ \"\$s\" = \"\$cur\" ] && continue; tmux kill-session -t \"\$s\"; done; tmux kill-session -t \"\$cur\"; elif [ \"\$count\" -eq 1 ] && [ \"\$1\" = \"\$cur\" ]; then tmux kill-session -t \"\$cur\"; else for s in \"\$@\"; do [ -n \"\$s\" ] || continue; if [ \"\$s\" = \"\$cur\" ]; then tmux display-message -d 3000 \"⚠  session '\$cur' is active, skipped\"; else tmux kill-session -t \"\$s\"; fi; done; fi)+reload(tmux list-sessions -F '#{session_name}' 2>/dev/null || true)" \
             --bind="ctrl-r:execute(new=\$(echo | fzf --print-query --no-info --height=5 --border --prompt='rename: ' --query='{}' 2>/dev/null | head -1); [ -n \"\$new\" ] && tmux rename-session -t '{}' \"\$new\")+reload(tmux list-sessions -F '#{session_name}' 2>/dev/null || true)+clear-screen" \
-    | tail -1
+            --bind="ctrl-s:execute-silent(set -- {+}; if [ \$# -eq 0 ]; then \"${_rta}\" save; else \"${_rta}\" save \"\$@\"; fi)+refresh-preview" \
+            --bind="ctrl-d:execute-silent(set -- {+}; if [ \$# -eq 0 ]; then \"${_rta}\" drop {}; else \"${_rta}\" drop \"\$@\"; fi)+refresh-preview" \
+      | tail -1
   )
   [[ -z "$session" ]] && return 0
   if [[ -n "$TMUX" ]]; then
@@ -235,6 +251,8 @@ thelp() {
     _thelp_row "space"         "toggle select + move down"
     _thelp_row "ctrl-x"        "kill selected session(s)"
     _thelp_row "ctrl-r"        "rename focused session"
+    _thelp_row "ctrl-s"        "save selected to resurrect file (no select = save all)"
+    _thelp_row "ctrl-d"        "drop selected from resurrect file (no select = drop focused)"
 
     _thelp_section "Copy mode"
     _thelp_row "prefix + Esc"  "enter copy mode"
