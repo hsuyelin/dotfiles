@@ -7,32 +7,16 @@ vim.pack.add({
   gh('HiPhish/rainbow-delimiters.nvim'),
 })
 
+local ENSURE_INSTALLED = {
+  "bash", "c", "cpp", "diff", "go", "gomod", "gosum", "gowork",
+  "html", "javascript", "json", "lua", "markdown", "markdown_inline",
+  "python", "query", "regex", "swift", "vim", "vimdoc", "yaml",
+}
+
 local legacy_ok, legacy_configs = pcall(require, "nvim-treesitter.configs")
 if legacy_ok then
   legacy_configs.setup({
-    ensure_installed = {
-      "bash",
-      "c",
-      "cpp",
-      "diff",
-      "go",
-      "gomod",
-      "gosum",
-      "gowork",
-      "html",
-      "javascript",
-      "json",
-      "lua",
-      "markdown",
-      "markdown_inline",
-      "python",
-      "query",
-      "regex",
-      "swift",
-      "vim",
-      "vimdoc",
-      "yaml",
-    },
+    ensure_installed = ENSURE_INSTALLED,
     auto_install = false,
     highlight = {
       enable = true,
@@ -115,4 +99,30 @@ require("rainbow-delimiters.setup").setup({
     "RainbowDelimiterOrange", "RainbowDelimiterGreen", "RainbowDelimiterViolet",
     "RainbowDelimiterCyan",
   },
+})
+
+-- Auto-install any missing parsers from ENSURE_INSTALLED on first launch.
+-- vim.pack.add() has no build hook, so ensure_installed alone is not reliable.
+vim.api.nvim_create_autocmd("VimEnter", {
+  once = true,
+  callback = function()
+    local install_ok, install = pcall(require, "nvim-treesitter.install")
+    if not install_ok then return end
+    local parsers_ok, parsers = pcall(require, "nvim-treesitter.parsers")
+    if not parsers_ok then return end
+    local missing = {}
+    for _, lang in ipairs(ENSURE_INSTALLED) do
+      local parser_path = vim.fn.stdpath("data") .. "/site/parser/" .. lang .. ".so"
+      if vim.fn.filereadable(parser_path) == 0 then
+        table.insert(missing, lang)
+      end
+    end
+    if #missing > 0 then
+      vim.notify(
+        "[treesitter] Installing missing parsers: " .. table.concat(missing, ", "),
+        vim.log.levels.INFO
+      )
+      install.install(missing)
+    end
+  end,
 })

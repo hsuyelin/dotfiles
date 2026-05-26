@@ -32,7 +32,7 @@ vim.api.nvim_create_autocmd("BufReadPost", {
 		if vim.bo.buftype == "" then
 			vim.schedule(function()
 				vim.opt_local.foldmethod = "expr"
-				vim.opt_local.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+				vim.opt_local.foldexpr = "v:lua._FoldExpr()"
 				vim.cmd("silent! normal! zx")
 			end)
 		end
