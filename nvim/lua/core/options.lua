@@ -27,11 +27,27 @@ if not vim.env.XDG_RUNTIME_DIR or not uv.fs_access(vim.env.XDG_RUNTIME_DIR, "rwx
 	vim.env.XDG_RUNTIME_DIR = runtime_dir
 end
 
+-- nvim-treesitter exposes its own foldexpr() that uses its internal parser
+-- management. vim.treesitter.foldexpr() uses a separate get_parser() path
+-- that cannot find parsers attached by nvim-treesitter (confirmed: sh files
+-- show has_ts_parser=false even when syntax highlighting works).
+-- Cache on first call so require() is not repeated for every line.
+local _fold_fn
+_G._FoldExpr = function()
+	if not _fold_fn then
+		local ok, ts = pcall(require, "nvim-treesitter")
+		_fold_fn = (ok and type(ts.foldexpr) == "function")
+			and ts.foldexpr
+			or vim.treesitter.foldexpr
+	end
+	return _fold_fn()
+end
+
 local options = {
 	-- Folding: treesitter-based, all folds open on start.
 	-- Use za to toggle, zM/zR to fold/unfold all.
 	foldmethod    = "expr",
-	foldexpr      = "v:lua.vim.treesitter.foldexpr()",
+	foldexpr      = "v:lua._FoldExpr()",
 	foldlevel     = 99,
 	foldlevelstart = 99,
 	foldenable    = true,
@@ -108,19 +124,34 @@ vim.api.nvim_create_autocmd("FileType", {
 vim.api.nvim_create_user_command("FoldDiag", function()
 	local buf  = vim.api.nvim_get_current_buf()
 	local lnum = vim.api.nvim_win_get_cursor(0)[1]
+	local ft   = vim.bo[buf].filetype
+
+	local lang = vim.treesitter.language.get_lang(ft)
+
 	local has_parser = false
+	pcall(function() has_parser = vim.treesitter.get_parser(buf) ~= nil end)
+
+	-- Also probe with explicit bash lang to distinguish "parser missing"
+	-- from "language mapping missing".
+	local has_parser_bash = false
+	pcall(function() has_parser_bash = vim.treesitter.get_parser(buf, "bash") ~= nil end)
+
+	local nvimts_foldexpr = nil
 	pcall(function()
-		has_parser = vim.treesitter.get_parser(buf) ~= nil
+		local ts = require("nvim-treesitter")
+		nvimts_foldexpr = type(ts.foldexpr) == "function" and ts.foldexpr(lnum) or "no foldexpr"
 	end)
+
 	vim.print({
-		foldmethod        = vim.wo.foldmethod,
-		foldexpr          = vim.wo.foldexpr,
-		foldenable        = vim.wo.foldenable,
-		foldlevel         = vim.wo.foldlevel,
-		foldlevel_at_line = vim.fn.foldlevel(lnum),
-		foldclosed        = vim.fn.foldclosed(lnum),
-		has_ts_parser     = has_parser,
-		ts_foldexpr_value = vim.treesitter.foldexpr(lnum),
-		filetype          = vim.bo[buf].filetype,
+		filetype              = ft,
+		lang_from_get_lang    = lang,
+		foldmethod            = vim.wo.foldmethod,
+		foldexpr              = vim.wo.foldexpr,
+		foldlevel_at_line     = vim.fn.foldlevel(lnum),
+		has_ts_parser         = has_parser,
+		has_ts_parser_bash    = has_parser_bash,
+		vim_ts_foldexpr       = vim.treesitter.foldexpr(lnum),
+		nvimts_foldexpr       = nvimts_foldexpr,
+		global_FoldExpr       = _G._FoldExpr and _G._FoldExpr() or "not defined",
 	})
 end, { desc = "Diagnose fold state at cursor" })
