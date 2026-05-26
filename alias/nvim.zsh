@@ -118,6 +118,7 @@ nhelp() {
     _nh_row "<space>fl"         "open file explorer (neo-tree)"
     _nh_row "<space>fh"         "toggle neo-tree sidebar"
     _nh_row "<space>fF"         "reveal current file in neo-tree"
+    _nh_row "> / <"             "neo-tree: widen / narrow sidebar (±5 cols, min 15)"
     _nh_row "<space>fr"         "recent files (Telescope oldfiles)"
     _nh_row "<space>fd"         "open netrw directory browser"
     _nh_row "<space>fyy"        "copy absolute path of current file to clipboard"
