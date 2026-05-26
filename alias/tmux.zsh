@@ -110,17 +110,10 @@ tq() {
 
 # Option+R: session picker via ta().
 _tmux_session_picker_widget() {
-    if [[ -n "$TMUX" ]]; then
-        zle -I
-        ta
-        zle reset-prompt
-    else
-        zle clear-screen        # clear screen + redraw prompt at top
-        zle push-line           # save any typed buffer; restored after ta exits
-        # shellcheck disable=SC2034
-        BUFFER="ta"
-        zle accept-line         # hand ta back to shell so tmux can own the tty
-    fi
+    zle push-line
+    zle -I
+    ta
+    zle reset-prompt
 }
 zle -N _tmux_session_picker_widget
 bindkey '\er' _tmux_session_picker_widget
