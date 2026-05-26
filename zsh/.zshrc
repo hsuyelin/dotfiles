@@ -160,6 +160,8 @@ unset _km
 # shellcheck disable=SC1091
 [[ -f "${XDG_CONFIG_HOME}/alias/xcode.zsh" ]] && source "${XDG_CONFIG_HOME}/alias/xcode.zsh"
 # shellcheck disable=SC1091
+[[ -f "${XDG_CONFIG_HOME}/alias/nvim.zsh" ]] && source "${XDG_CONFIG_HOME}/alias/nvim.zsh"
+# shellcheck disable=SC1091
 [[ -f "${XDG_CONFIG_HOME}/private/xcode.zsh" ]] && source "${XDG_CONFIG_HOME}/private/xcode.zsh"
 # shellcheck disable=SC1091
 [[ -f "${XDG_CONFIG_HOME}/bash/ai.zsh" ]] && source "${XDG_CONFIG_HOME}/bash/ai.zsh"
