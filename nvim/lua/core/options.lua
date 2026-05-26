@@ -76,3 +76,48 @@ vim.filetype.add({
 		[".zshrc"] = "sh",
 	},
 })
+
+-- Treesitter fold setup -------------------------------------------------------
+-- vim.treesitter.foldexpr() calls vim.treesitter.get_parser(buf) internally.
+-- In Neovim 0.12, get_parser() only finds parsers explicitly started via
+-- vim.treesitter.start(). nvim-treesitter's highlight module calls start()
+-- but not always before foldexpr is first evaluated. Calling start() here
+-- guarantees the parser is registered regardless of plugin load order.
+vim.api.nvim_create_autocmd("FileType", {
+	group = vim.api.nvim_create_augroup("TsFoldSetup", { clear = true }),
+	callback = function(ev)
+		local buf = ev.buf
+		if vim.bo[buf].buftype ~= "" then return end
+		-- Attach parser (no-op if already attached by nvim-treesitter).
+		pcall(vim.treesitter.start, buf)
+		-- Recompute fold levels after the parser is live.
+		vim.schedule(function()
+			if vim.api.nvim_buf_is_valid(buf) then
+				vim.api.nvim_buf_call(buf, function()
+					vim.cmd("silent! normal! zx")
+				end)
+			end
+		end)
+	end,
+})
+
+-- :FoldDiag — print fold state at the cursor line for debugging.
+vim.api.nvim_create_user_command("FoldDiag", function()
+	local buf  = vim.api.nvim_get_current_buf()
+	local lnum = vim.api.nvim_win_get_cursor(0)[1]
+	local has_parser = false
+	pcall(function()
+		has_parser = vim.treesitter.get_parser(buf) ~= nil
+	end)
+	vim.print({
+		foldmethod        = vim.wo.foldmethod,
+		foldexpr          = vim.wo.foldexpr,
+		foldenable        = vim.wo.foldenable,
+		foldlevel         = vim.wo.foldlevel,
+		foldlevel_at_line = vim.fn.foldlevel(lnum),
+		foldclosed        = vim.fn.foldclosed(lnum),
+		has_ts_parser     = has_parser,
+		ts_foldexpr_value = vim.treesitter.foldexpr(lnum),
+		filetype          = vim.bo[buf].filetype,
+	})
+end, { desc = "Diagnose fold state at cursor" })
