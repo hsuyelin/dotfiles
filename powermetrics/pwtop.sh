@@ -191,6 +191,21 @@ _render() {
     done <<< "$data"
 
     printf '  %b%s%b\n\n' "$_C_SURFACE" "$sep" "$_C_RESET"
+
+    # ── Legend ────────────────────────────────────────────────────────────────
+    _legend_row() { printf '  %b%-9s%b %s\n' "$1" "$2" "$_C_RESET" "$3"; }
+
+    printf '%b  Energy Impact%b — Apple composite score: CPU + GPU + disk I/O + network.\n' \
+        "$_C_OVERLAY" "$_C_RESET"
+    printf '%b  Higher = more battery drain. Unitless; only meaningful for comparison.\n%b\n' \
+        "$_C_OVERLAY" "$_C_RESET"
+    _legend_row "$_C_RED"     '≥ 100'  'very high — significant drain'
+    _legend_row "$_C_PEACH"   '≥  50'  'high'
+    _legend_row "$_C_YELLOW"  '≥  20'  'moderate'
+    _legend_row "$_C_GREEN"   '≥   5'  'low'
+    _legend_row "$_C_SUBTEXT" '<   5'  'negligible'
+    printf '\n'
+    unfunction _legend_row 2>/dev/null || unset -f _legend_row
 }
 
 main() {
