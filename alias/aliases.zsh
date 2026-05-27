@@ -98,9 +98,9 @@ alias real-rm='\rm'
 # -----------------------------
 alias dns:flush='sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder'
 
-# pwtop: show top processes sorted by average energy impact (macOS only).
-# Samples for 3 s then prints a ranked table; requires sudo.
-alias pwtop='sudo powermetrics --samplers tasks --show-process-energy -n 1 -i 3000 2>/dev/null | grep -A 100 "TASKS"'
+# pwtop: energy-sorted process monitor with Catppuccin Mocha styling.
+# See: $XDG_CONFIG_HOME/powermetrics/pwtop.sh
+alias pwtop='"${XDG_CONFIG_HOME}/powermetrics/pwtop.sh"'
 
 
 # -----------------------------
