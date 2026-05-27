@@ -20,7 +20,7 @@ _C_BOLD='\033[1m'
 _C_RESET='\033[0m'
 
 # ── Defaults ──────────────────────────────────────────────────────────────────
-_INTERVAL=3
+_INTERVAL=5
 _TOP_N=15
 _DRY_RUN=0
 _DEBUG=0
@@ -29,7 +29,8 @@ _FRAMES=('⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏')
 # ── Helpers ───────────────────────────────────────────────────────────────────
 _usage() {
     printf '%bpwtop%b — energy-sorted process monitor\n\n' "$_C_BOLD" "$_C_RESET"
-    printf 'Usage: pwtop [options]\n\n'
+    printf 'Usage: pwtop [SECONDS] [options]\n\n'
+    printf '  %-24s %s\n' 'SECONDS'          "sample duration (positional shorthand for -i)"
     printf '  %-24s %s\n' '-i, --interval N' "sample duration in seconds (default: $_INTERVAL)"
     printf '  %-24s %s\n' '-n, --top N'      "processes to display    (default: $_TOP_N)"
     printf '  %-24s %s\n' '    --dry-run'    "print a mock table without sampling"
@@ -38,6 +39,11 @@ _usage() {
 }
 
 _parse_args() {
+    # Allow a bare integer as the first argument: pwtop 10  →  -i 10
+    if [[ $# -gt 0 && "$1" =~ ^[0-9]+$ ]]; then
+        _INTERVAL="$1"
+        shift
+    fi
     while [[ $# -gt 0 ]]; do
         case "$1" in
             -i|--interval) _INTERVAL="$2"; shift 2 ;;
