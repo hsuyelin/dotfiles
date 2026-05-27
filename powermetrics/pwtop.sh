@@ -73,7 +73,7 @@ _sample() {
         --samplers tasks \
         --show-process-energy \
         -n 1 -i "$(( _INTERVAL * 1000 ))" \
-        > "$outfile" 2>/dev/null &
+        2>/dev/null | tee "$outfile" > /dev/null &
     local pm_pid=$!
     _spin "$pm_pid" "Sampling energy usage (${_INTERVAL}s)..."
     wait "$pm_pid"
