@@ -83,45 +83,33 @@ _sample() {
     wait "$pm_pid"
 }
 
-# Parse powermetrics text output → tab-delimited "energy<TAB>pid<TAB>name", sorted desc.
+# Parse powermetrics text output → tab-delimited "energy<TAB>id<TAB>name", sorted desc.
 #
-# Strategy: locate the "ALL TASKS" block, then find the header line that contains
-# both "Name" and "PID". The energy column is identified by checking, in order:
-#   "Energy Impact", "Power (mW)", "Impact", or the rightmost field of the header.
-# This handles column-name variations across macOS versions.
+# Actual section header:  *** Running tasks ***
+# Actual column header:   Name ... ID ... Energy Impact
+# DEAD_TASKS (-1) is an aggregate entry and is skipped.
 _parse() {
     awk '
-        # ── Step 1: Enter the ALL TASKS block ────────────────────────────────
-        /ALL TASKS/ {
-            in_tasks   = 1
-            found_hdr  = 0
-            pid_col    = 0
-            e_col      = 0
-            blank      = 0
+        # ── Step 1: Enter the "Running tasks" block ───────────────────────────
+        /Running tasks/ {
+            in_tasks  = 1
+            found_hdr = 0
+            id_col    = 0
+            e_col     = 0
+            blank     = 0
             next
         }
 
-        # ── Step 2: Find header line (contains Name + PID) ───────────────────
-        in_tasks && !found_hdr && /[Nn]ame/ && /PID/ {
-            pid_col = index($0, "PID")
-
-            # Try column names in order of specificity
-            if      (index($0, "Energy Impact")) e_col = index($0, "Energy Impact")
-            else if (index($0, "Power (mW)"))    e_col = index($0, "Power (mW)")
-            else if (index($0, "Impact"))         e_col = index($0, "Impact")
-            else {
-                # Fallback: estimate energy column as the last word on the header line.
-                # Walk backwards from end of line to find the start of the last token.
-                n = split($0, words)
-                e_col = length($0) - length(words[n]) + 1
-            }
-
-            if (pid_col > 0 && e_col > pid_col)
+        # ── Step 2: Find header line (Name … ID … Energy Impact) ─────────────
+        in_tasks && !found_hdr && /Name/ && /Energy Impact/ {
+            id_col = index($0, "ID")
+            e_col  = index($0, "Energy Impact")
+            if (id_col > 0 && e_col > id_col)
                 found_hdr = 1
             next
         }
 
-        # ── Step 3: Detect end of block ──────────────────────────────────────
+        # ── Step 3: Detect end of block ───────────────────────────────────────
         in_tasks && /^\*\*\*/ { in_tasks = 0; next }
         in_tasks && /^$/ {
             if (blank) in_tasks = 0
@@ -130,23 +118,23 @@ _parse() {
         }
         in_tasks { blank = 0 }
 
-        # ── Step 4: Parse data rows ───────────────────────────────────────────
-        in_tasks && found_hdr && pid_col > 0 && e_col > 0 {
-            # Accept lines that start with a word character (process name)
-            if ($0 !~ /^[A-Za-z0-9 \t]/) next
-
-            name = substr($0, 1, pid_col - 1)
+        # ── Step 4: Parse data rows ────────────────────────────────────────────
+        in_tasks && found_hdr && id_col > 0 && e_col > 0 {
+            name = substr($0, 1, id_col - 1)
             gsub(/^[[:space:]]+|[[:space:]]+$/, "", name)
 
-            pid_raw = substr($0, pid_col, e_col - pid_col)
-            gsub(/[[:space:]]/, "", pid_raw)
+            split(substr($0, id_col, e_col - id_col), id_fields)
+            id_raw = id_fields[1]
 
             split(substr($0, e_col), ef)
             energy = ef[1] + 0
 
-            # Sanity: pid must be numeric, energy must be positive
-            if (energy > 0 && name != "" && pid_raw ~ /^[0-9]+$/)
-                printf "%.2f\t%s\t%s\n", energy, pid_raw, name
+            # Skip aggregates (DEAD_TASKS has id -1) and zero-energy rows
+            if (name == "DEAD_TASKS")    next
+            if (id_raw !~ /^[0-9]+$/)   next
+            if (energy <= 0 || name == "") next
+
+            printf "%.2f\t%s\t%s\n", energy, id_raw, name
         }
     ' "$1" | sort -t$'\t' -k1 -rn
 }
@@ -185,7 +173,7 @@ _render() {
 
     printf '  %b%-*s  %-*s  %*s  %*s%b\n' \
         "$_C_OVERLAY" \
-        $R '#'  $N 'PROCESS'  $P 'PID'  $E 'ENERGY IMPACT' \
+        $R '#'  $N 'PROCESS'  $P 'ID'  $E 'ENERGY IMPACT' \
         "$_C_RESET"
     printf '  %b%s%b\n' "$_C_SURFACE" "$sep" "$_C_RESET"
 
