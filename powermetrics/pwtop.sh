@@ -3,7 +3,7 @@
 # pwtop — energy-sorted process monitor with Catppuccin Mocha styling.
 # Wraps powermetrics to produce a clean, colorized ranked table.
 #
-# Usage: pwtop [-i SECONDS] [-n COUNT] [--dry-run] [--help]
+# Usage: pwtop [-i SECONDS] [-n COUNT] [--dry-run] [--debug] [--help]
 
 # ── Catppuccin Mocha palette ──────────────────────────────────────────────────
 _C_MAUVE='\033[38;2;203;166;247m'     # #cba6f7
@@ -23,6 +23,7 @@ _C_RESET='\033[0m'
 _INTERVAL=3
 _TOP_N=15
 _DRY_RUN=0
+_DEBUG=0
 _FRAMES=('⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏')
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -32,6 +33,7 @@ _usage() {
     printf '  %-24s %s\n' '-i, --interval N' "sample duration in seconds (default: $_INTERVAL)"
     printf '  %-24s %s\n' '-n, --top N'      "processes to display    (default: $_TOP_N)"
     printf '  %-24s %s\n' '    --dry-run'    "print a mock table without sampling"
+    printf '  %-24s %s\n' '    --debug'      "dump raw powermetrics output for inspection"
     printf '  %-24s %s\n' '-h, --help'       "show this help"
 }
 
@@ -41,6 +43,7 @@ _parse_args() {
             -i|--interval) _INTERVAL="$2"; shift 2 ;;
             -n|--top)      _TOP_N="$2";    shift 2 ;;
             --dry-run)     _DRY_RUN=1;     shift   ;;
+            --debug)       _DEBUG=1;       shift   ;;
             -h|--help)     _usage; exit 0 ;;
             *) printf 'Unknown option: %s\n' "$1" >&2; _usage >&2; exit 1 ;;
         esac
@@ -69,6 +72,7 @@ _spin() {
 
 _sample() {
     local outfile="$1"
+    # tee writes to outfile; $! is tee's PID, which exits when powermetrics closes stdout.
     sudo powermetrics \
         --samplers tasks \
         --show-process-energy \
@@ -79,29 +83,69 @@ _sample() {
     wait "$pm_pid"
 }
 
-# Parse powermetrics output → tab-delimited "energy<TAB>pid<TAB>name", sorted desc.
-# Handles both "Energy Impact" and "Power (mW)" column labels across macOS versions.
+# Parse powermetrics text output → tab-delimited "energy<TAB>pid<TAB>name", sorted desc.
+#
+# Strategy: locate the "ALL TASKS" block, then find the header line that contains
+# both "Name" and "PID". The energy column is identified by checking, in order:
+#   "Energy Impact", "Power (mW)", "Impact", or the rightmost field of the header.
+# This handles column-name variations across macOS versions.
 _parse() {
     awk '
-        /^Name[[:space:]]/ && (/Energy Impact/ || /Power \(mW\)/) {
-            pid_col = index($0, "PID")
-            e_col   = (index($0, "Energy Impact")) \
-                        ? index($0, "Energy Impact") \
-                        : index($0, "Power (mW)")
-            in_sec  = 1; blank = 0
+        # ── Step 1: Enter the ALL TASKS block ────────────────────────────────
+        /ALL TASKS/ {
+            in_tasks   = 1
+            found_hdr  = 0
+            pid_col    = 0
+            e_col      = 0
+            blank      = 0
             next
         }
-        in_sec && /^\*\*\*/ { in_sec = 0; next }
-        in_sec && /^$/ { if (blank) in_sec = 0; blank = 1; next }
-        in_sec { blank = 0 }
-        in_sec && pid_col > 0 && e_col > 0 && /^[A-Za-z0-9\.]/ {
+
+        # ── Step 2: Find header line (contains Name + PID) ───────────────────
+        in_tasks && !found_hdr && /[Nn]ame/ && /PID/ {
+            pid_col = index($0, "PID")
+
+            # Try column names in order of specificity
+            if      (index($0, "Energy Impact")) e_col = index($0, "Energy Impact")
+            else if (index($0, "Power (mW)"))    e_col = index($0, "Power (mW)")
+            else if (index($0, "Impact"))         e_col = index($0, "Impact")
+            else {
+                # Fallback: estimate energy column as the last word on the header line.
+                # Walk backwards from end of line to find the start of the last token.
+                n = split($0, words)
+                e_col = length($0) - length(words[n]) + 1
+            }
+
+            if (pid_col > 0 && e_col > pid_col)
+                found_hdr = 1
+            next
+        }
+
+        # ── Step 3: Detect end of block ──────────────────────────────────────
+        in_tasks && /^\*\*\*/ { in_tasks = 0; next }
+        in_tasks && /^$/ {
+            if (blank) in_tasks = 0
+            blank = 1
+            next
+        }
+        in_tasks { blank = 0 }
+
+        # ── Step 4: Parse data rows ───────────────────────────────────────────
+        in_tasks && found_hdr && pid_col > 0 && e_col > 0 {
+            # Accept lines that start with a word character (process name)
+            if ($0 !~ /^[A-Za-z0-9 \t]/) next
+
             name = substr($0, 1, pid_col - 1)
-            sub(/[[:space:]]+$/, "", name)
+            gsub(/^[[:space:]]+|[[:space:]]+$/, "", name)
+
             pid_raw = substr($0, pid_col, e_col - pid_col)
             gsub(/[[:space:]]/, "", pid_raw)
+
             split(substr($0, e_col), ef)
             energy = ef[1] + 0
-            if (energy > 0 && name != "")
+
+            # Sanity: pid must be numeric, energy must be positive
+            if (energy > 0 && name != "" && pid_raw ~ /^[0-9]+$/)
                 printf "%.2f\t%s\t%s\n", energy, pid_raw, name
         }
     ' "$1" | sort -t$'\t' -k1 -rn
@@ -177,12 +221,19 @@ main() {
 
     _sample "$tmp"
 
+    if [[ $_DEBUG -eq 1 ]]; then
+        printf '%b── raw powermetrics output ──%b\n' "$_C_OVERLAY" "$_C_RESET"
+        cat "$tmp"
+        exit 0
+    fi
+
     local data
     data=$(_parse "$tmp")
 
     if [[ -z "$data" ]]; then
-        printf '%bwarn:%b no energy data found — try increasing the sample interval\n' \
-            "$_C_YELLOW" "$_C_RESET" >&2
+        printf '%bwarn:%b no energy data found\n' "$_C_YELLOW" "$_C_RESET" >&2
+        printf '      run with %b--debug%b to inspect the raw powermetrics output\n' \
+            "$_C_MAUVE" "$_C_RESET" >&2
         exit 1
     fi
 
