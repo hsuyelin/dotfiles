@@ -199,7 +199,14 @@ _render() {
     printf '  %b%s%b\n\n' "$_C_SURFACE" "$sep" "$_C_RESET"
 
     # ── Legend ────────────────────────────────────────────────────────────────
-    _legend_row() { printf '  %b%-9s%b %s\n' "$1" "$2" "$_C_RESET" "$3"; }
+    # %-*s width is byte-based; compensate for multi-byte chars (e.g. ≥ = 3 bytes, 1 col).
+    _legend_row() {
+        local col="$1" thr="$2" desc="$3" bytes width
+        local chars=${#thr}
+        bytes=$(( $(printf '%s' "$thr" | wc -c) + 0 ))
+        width=$(( 9 + bytes - chars ))
+        printf '  %b%-*s%b %s\n' "$col" "$width" "$thr" "$_C_RESET" "$desc"
+    }
 
     printf '%b  Energy Impact%b — Apple composite score: CPU + GPU + disk I/O + network.\n' \
         "$_C_OVERLAY" "$_C_RESET"
