@@ -44,11 +44,12 @@ _ta_fzf() {
 
 # ta: fzf picker — attach or switch to a session.
 #   space      toggle selection + move down
+#   ctrl-a     select all sessions
 #   ctrl-x     kill selected; if only current session selected, kill it directly;
 #              if current mixed with others, skip current (show warning) and kill the rest
 #   ctrl-r     rename focused session, reload list
-#   ctrl-s     save selected sessions to resurrect file; no selection = save all
-#   ctrl-d     drop selected sessions from resurrect file; no selection = drop focused
+#   ctrl-s     save selected sessions to resurrect file (no selection = no-op)
+#   ctrl-d     drop selected sessions from resurrect file (no selection = no-op)
 #   enter      attach/switch to the last selected session in list order
 ta() {
   if ! tmux list-sessions &>/dev/null; then
@@ -75,10 +76,11 @@ ta() {
                 -F '  #{window_index}  #{window_name}  #{?window_active,(active),}' 2>/dev/null" \
             --preview-window=right:45% \
             --bind="space:toggle+down" \
+            --bind="ctrl-a:select-all+refresh-preview" \
             --bind="ctrl-x:execute-silent(cur=\$(tmux display-message -p '#S' 2>/dev/null); set -- {+}; count=\$#; total=\$(tmux list-sessions 2>/dev/null | wc -l | xargs); if [ \"\$count\" -eq \"\$total\" ]; then for s in \"\$@\"; do [ -n \"\$s\" ] || continue; [ \"\$s\" = \"\$cur\" ] && continue; tmux kill-session -t \"\$s\"; done; tmux kill-session -t \"\$cur\"; elif [ \"\$count\" -eq 1 ] && [ \"\$1\" = \"\$cur\" ]; then tmux kill-session -t \"\$cur\"; else for s in \"\$@\"; do [ -n \"\$s\" ] || continue; if [ \"\$s\" = \"\$cur\" ]; then tmux display-message -d 3000 \"⚠  session '\$cur' is active, skipped\"; else tmux kill-session -t \"\$s\"; fi; done; fi)+reload(tmux list-sessions -F '#{session_name}' 2>/dev/null || true)" \
             --bind="ctrl-r:execute(new=\$(echo | fzf --print-query --no-info --height=5 --border --prompt='rename: ' --query='{}' 2>/dev/null | head -1); [ -n \"\$new\" ] && tmux rename-session -t '{}' \"\$new\")+reload(tmux list-sessions -F '#{session_name}' 2>/dev/null || true)+clear-screen" \
-            --bind="ctrl-s:execute-silent(set -- {+}; if [ \$# -eq 0 ]; then \"${_rta}\" save; else \"${_rta}\" save \"\$@\"; fi)+refresh-preview" \
-            --bind="ctrl-d:execute-silent(set -- {+}; if [ \$# -eq 0 ]; then \"${_rta}\" drop {}; else \"${_rta}\" drop \"\$@\"; fi)+refresh-preview" \
+            --bind="ctrl-s:execute-silent(set -- {+}; _f={}; if [ \$# -gt 1 ] || [ \"\$1\" != \"\$_f\" ]; then \"${_rta}\" save-merge \"\$@\"; fi)+deselect-all+refresh-preview" \
+            --bind="ctrl-d:execute-silent(set -- {+}; _f={}; if [ \$# -gt 1 ] || [ \"\$1\" != \"\$_f\" ]; then \"${_rta}\" drop \"\$@\"; fi)+deselect-all+refresh-preview" \
       | tail -1
   )
   [[ -z "$session" ]] && return 0
@@ -191,10 +193,11 @@ thelp() {
     _thelp_section "ta (fzf keys)"
     _thelp_row "enter"         "switch to focused session"
     _thelp_row "space"         "toggle select + move down"
+    _thelp_row "ctrl-a"        "select all sessions"
     _thelp_row "ctrl-x"        "kill selected session(s)"
     _thelp_row "ctrl-r"        "rename focused session"
-    _thelp_row "ctrl-s"        "save selected to resurrect file (no select = save all)"
-    _thelp_row "ctrl-d"        "drop selected from resurrect file (no select = drop focused)"
+    _thelp_row "ctrl-s"        "save selected session(s); no selection = no-op"
+    _thelp_row "ctrl-d"        "drop selected session(s); no selection = no-op"
 
     _thelp_section "Copy mode"
     _thelp_row "prefix + Esc"  "enter copy mode"
@@ -208,8 +211,8 @@ thelp() {
     _thelp_section "Session Persistence  (tmux-resurrect)"
     _thelp_row "prefix + Ctrl-s" "save all sessions to disk (survives shutdown)"
     _thelp_row "prefix + Ctrl-r" "restore sessions (added to session list, no auto-attach)"
-    _thelp_row "ctrl-s in ta"  "save selected session(s) to resurrect file"
-    _thelp_row "ctrl-d in ta"  "drop selected session(s) from resurrect file"
+    _thelp_row "ctrl-s in ta"  "save selected session(s); no select = save all"
+    _thelp_row "ctrl-d in ta"  "drop selected session(s); no select = drop all"
 
     _thelp_section "Misc"
     _thelp_row "prefix + g"    "lazygit popup"
