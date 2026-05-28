@@ -338,6 +338,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
 			{ "<leader>lgi", vim.lsp.buf.implementation, desc = "实现 (Implementation)" },
 			{ "<leader>lgo", "<cmd>Telescope lsp_dynamic_workspace_symbols<cr>", desc = "工作区符号 (Workspace Symbols)" },
 			{ "<leader>lgl", "<cmd>Telescope lsp_document_symbols<cr>", desc = "文档符号 (Document Symbols)" },
+			{ "<leader>lr", "<cmd>LspRestart<cr>", desc = "重启 LSP (Restart LSP)" },
 			{ "<leader>lt", group = "切换 (Toggle)", buffer = buf },
 			{ "<leader>lti", utils.toggles.toggle_inlay_hint, desc = "切换内嵌提示 (Toggle Inlay Hint)" },
 		})
