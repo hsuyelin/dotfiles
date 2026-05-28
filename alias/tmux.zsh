@@ -54,23 +54,17 @@ _ta_fzf() {
 ta() {
   local _rta="${XDG_CONFIG_HOME:-$HOME/.config}/tmux/resurrect-ta.sh"
   local _rdir="$HOME/.local/share/tmux/resurrect"
-  local _marker='/tmp/.ta_auto_restored'
 
-  # Auto-restore saved sessions after reboot:
-  #   - no tmux server running  (new boot or user killed every session)
-  #   - marker absent           (/tmp is cleared on reboot; present = already restored this boot)
-  #   - resurrect save exists
-  # Starts the tmux server, fakes $TMUX so resurrect's restore.sh can find the socket,
-  # then runs a full restore (sessions + windows + panes). Errors (display-message,
-  # switch-client) are suppressed — they need a client and fail silently here.
+  # Auto-restore when no server is running and a resurrect save exists.
+  # Starts the server, fakes $TMUX so restore.sh can locate the socket,
+  # then runs a full restore (sessions + windows + panes). Errors from
+  # display-message / switch-client are suppressed — they need a client.
   if ! tmux list-sessions &>/dev/null 2>&1 && \
-     [[ ! -f "$_marker" ]] && \
      [[ -L "${_rdir}/last" && -f "${_rdir}/last" ]]; then
     local _sock="/tmp/tmux-$(id -u)/default"
     local _rsc="${HOME}/.config/tmux/plugins/tmux-resurrect/scripts/restore.sh"
     tmux start-server 2>/dev/null
     TMUX="${_sock},0,0" bash "$_rsc" 2>/dev/null
-    touch "$_marker"
   fi
 
   if ! tmux list-sessions &>/dev/null; then
