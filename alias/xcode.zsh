@@ -565,7 +565,8 @@ xindex() {
             --configuration) configuration="$2"; shift 2 ;;
             --help|-h)
                 printf 'Usage: xindex --workspace <path> --scheme <name> [--configuration <name>]\n'
-                printf '  --workspace      path without .xcworkspace, e.g. Example/ZeppDevice\n'
+                printf '  --workspace      dir containing .xcworkspace, or path without extension\n'
+                printf '                   e.g. Example  or  Example/ZeppDevice\n'
                 printf '  --scheme         Xcode scheme name\n'
                 printf '  --configuration  Debug (default) or Release\n'
                 return 0 ;;
@@ -580,7 +581,16 @@ xindex() {
     [ -z "$scheme" ]    && _xerr "Missing --scheme"    && return 1
 
     local ws_path="${workspace}.xcworkspace"
-    [ ! -d "$ws_path" ] && _xerr "Workspace not found: $ws_path" && return 1
+    if [ ! -d "$ws_path" ]; then
+        if [ -d "$workspace" ]; then
+            local found
+            found="$(find "$workspace" -maxdepth 1 -name "*.xcworkspace" -type d | head -1)"
+            [ -n "$found" ] && ws_path="$found" || { _xerr "No .xcworkspace found in: $workspace"; return 1; }
+        else
+            _xerr "Workspace not found: $ws_path"
+            return 1
+        fi
+    fi
 
     # ── Step 1: build (generic simulator, no device selection needed) ─────────
     _xlog "Building" "${scheme} (${configuration})"
