@@ -37,15 +37,20 @@ require("blink.cmp").setup({
   cmdline = {
     enabled = true,
     keymap = {
-      ["<C-k>"] = { "accept" },
-      ["<TAB>"] = { "accept", "fallback" },
-      ["<CR>"] = { "accept_and_enter", "fallback" },
+      ["<TAB>"]   = { "select_next", "fallback" },
+      ["<S-TAB>"] = { "select_prev", "fallback" },
+      ["<CR>"]    = { "accept_and_enter", "fallback" },
+      ["<Up>"]    = { "select_prev", "fallback" },
+      ["<Down>"]  = { "select_next", "fallback" },
     },
     sources = { "buffer", "cmdline" },
     completion = {
       menu = { auto_show = true },
       list = {
-        selection = { preselect = true, auto_insert = true },
+        -- preselect = false: nothing is auto-highlighted, so <CR> always
+        -- runs the literal input unless the user explicitly navigates to
+        -- a suggestion with <Up>/<Down> first.
+        selection = { preselect = false, auto_insert = false },
       },
       ghost_text = { enabled = true },
     },
