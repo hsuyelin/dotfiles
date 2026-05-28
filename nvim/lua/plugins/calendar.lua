@@ -156,6 +156,11 @@ local function load_holiday_set()
     return _holiday_set
 end
 
+-- ── Calendar state (must be declared before popup helpers that reference it) ─
+
+local _today = os.date('*t')
+local _cal   = { year = _today.year, month = _today.month, day = _today.day, win = -1 }
+
 -- ── Quick preview popup ──────────────────────────────────────────────────────
 
 local _popup_win = -1
@@ -172,8 +177,8 @@ local function close_popup()
 end
 
 -- show_holiday_popup: always shows a popup (non-holiday → "无假期").
--- Positioned relative to the calendar window (bottom-left) so it's always visible
--- regardless of where the text cursor happens to be inside the buffer.
+-- Appears to the right of the calendar floating window when possible;
+-- falls back to bottom-left of screen if the calendar win is gone.
 local function show_holiday_popup(year, month, day, name)
     close_popup()
     local date_line = string.format(' %d年%d月%d日 ', year, month, day)
@@ -189,14 +194,23 @@ local function show_holiday_popup(year, month, day, name)
     local hl = name == '（无假期）' and 'Comment' or 'DiagnosticError'
     vim.api.nvim_buf_add_highlight(_popup_buf, -1, hl, 1, 0, -1)
 
-    -- Use relative='editor' so the popup is always on-screen, anchored near
-    -- the bottom of the screen (independent of cursor position in the buffer).
-    local screen_row = math.max(0, vim.o.lines - 6)
-    local screen_col = 2
+    -- Compute position: right of the calendar window, same top row.
+    local pop_row, pop_col
+    if vim.api.nvim_win_is_valid(_cal.win) then
+        local cfg = vim.api.nvim_win_get_config(_cal.win)
+        pop_row = cfg.row
+        pop_col = cfg.col + cfg.width + 2   -- 2-column gap between calendar and popup
+        -- Clamp so the popup never exceeds the right edge of the screen
+        pop_col = math.min(pop_col, vim.o.columns - width - 2)
+    else
+        pop_row = math.max(0, vim.o.lines - 6)
+        pop_col = 2
+    end
+
     _popup_win = vim.api.nvim_open_win(_popup_buf, false, {
         relative  = 'editor',
-        row       = screen_row,
-        col       = screen_col,
+        row       = pop_row,
+        col       = pop_col,
         width     = width,
         height    = 2,
         style     = 'minimal',
@@ -341,9 +355,6 @@ require('calendar.extensions').register('chinese_days', chinese_days_ext)
 
 -- ── Patch view ──────────────────────────────────────────────────────────────
 
-local _today = os.date('*t')
-local _cal   = { year = _today.year, month = _today.month, day = _today.day }
-
 local _view = require('calendar.view')
 if not _view._patched then
     _view._patched = true
@@ -360,6 +371,7 @@ if not _view._patched then
     _view.open = function(y, m, d)
         _cal.year, _cal.month, _cal.day = y, m, d or _cal.day
         local b, w = _orig_open(y, m, d)
+        _cal.win = w
 
         if not _buf_patched then
             _buf_patched = true
