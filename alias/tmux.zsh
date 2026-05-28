@@ -129,7 +129,6 @@ _tmux_session_picker_widget() {
         ta
         zle reset-prompt
     else
-        zle clear-screen        # clear screen + redraw prompt at top
         zle push-line           # save any typed buffer; restored after ta exits
         # shellcheck disable=SC2034
         BUFFER="ta"
