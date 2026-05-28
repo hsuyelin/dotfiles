@@ -48,6 +48,9 @@ require("plugins.lua")
 -- Notes
 require("plugins.notes")
 
+-- Calendar
+require("plugins.calendar")
+
 -- Misc
 require("plugins.competitive")
 require("plugins.collaborative")

@@ -13,6 +13,10 @@
       "rev": "655133c3b4c3e5e05ec549b9f8cc2894ac6f51b3",
       "src": "https://github.com/akinsho/bufferline.nvim"
     },
+    "calendar.nvim": {
+      "rev": "1c7dbc9a4c06537639c87e3061ac271077f3f5ac",
+      "src": "https://github.com/wsdjeg/calendar.nvim"
+    },
     "competitest.nvim": {
       "rev": "b42c06ca308906f07912ba9aff015ac2c0831f85",
       "src": "https://github.com/xeluxee/competitest.nvim"
