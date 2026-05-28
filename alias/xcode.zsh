@@ -544,6 +544,97 @@ xinstall() {
 }
 
 # ---------------------------------------------------------------------------
+# xindex — generate buildServer.json + compile_commands.json for Neovim LSP
+#   buildServer.json  → sourcekit-lsp  (Swift / ObjC gd / gr)
+#   compile_commands.json → clangd     (ObjC / C / C++ gd / gr)
+# ---------------------------------------------------------------------------
+
+xindex() {
+    if ! command -v xcode-build-server >/dev/null 2>&1; then
+        _xerr "xcode-build-server not found"
+        _xhint "Install with: brew install xcode-build-server"
+        return 1
+    fi
+    _xcode_require || return 1
+
+    local workspace="" scheme="" configuration="Debug"
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            --workspace)     workspace="$2";     shift 2 ;;
+            --scheme)        scheme="$2";        shift 2 ;;
+            --configuration) configuration="$2"; shift 2 ;;
+            --help|-h)
+                printf 'Usage: xindex --workspace <path> --scheme <name> [--configuration <name>]\n'
+                printf '  --workspace      path without .xcworkspace, e.g. Example/ZeppDevice\n'
+                printf '  --scheme         Xcode scheme name\n'
+                printf '  --configuration  Debug (default) or Release\n'
+                return 0 ;;
+            *)
+                _xerr "Unknown option: $1"
+                _xhint "Usage: xindex --workspace <path> --scheme <name> [--configuration <name>]"
+                return 1 ;;
+        esac
+    done
+
+    [ -z "$workspace" ] && _xerr "Missing --workspace" && return 1
+    [ -z "$scheme" ]    && _xerr "Missing --scheme"    && return 1
+
+    local ws_path="${workspace}.xcworkspace"
+    [ ! -d "$ws_path" ] && _xerr "Workspace not found: $ws_path" && return 1
+
+    # ── Step 1: build (generic simulator, no device selection needed) ─────────
+    _xlog "Building" "${scheme} (${configuration})"
+    local build_cmd=(xcodebuild -workspace "$ws_path" -scheme "$scheme"
+        -configuration "$configuration"
+        -destination "generic/platform=iOS Simulator"
+        build)
+    "${build_cmd[@]}" | xcbeautify
+    local build_rc="${pipestatus[1]}"
+    if (( build_rc != 0 )); then
+        _xerr "Build failed (exit $build_rc) — index not generated"
+        return 1
+    fi
+    _xlog "Built" "${scheme}"
+
+    # ── Step 2: buildServer.json (sourcekit-lsp — Swift / ObjC gd/gr) ─────────
+    _xlog "Generating" "buildServer.json"
+    if ! xcode-build-server config -workspace "$ws_path" -scheme "$scheme"; then
+        _xerr "xcode-build-server config failed"
+        return 1
+    fi
+    _xlog "Generated" "buildServer.json"
+
+    # ── Step 3: compile_commands.json from the just-produced build log ─────────
+    local ws_name dd_base log log_dir info
+    ws_name="$(basename "$ws_path" .xcworkspace)"
+    dd_base="$HOME/Library/Developer/Xcode/DerivedData"
+    log=""
+    for info in "$dd_base"/*/info.plist; do
+        [ -f "$info" ] || continue
+        grep -q "$ws_name" "$info" 2>/dev/null || continue
+        log_dir="$(dirname "$info")/Logs/Build"
+        [ -d "$log_dir" ] || continue
+        log="$(ls -t "$log_dir"/*.xcactivitylog 2>/dev/null | head -1)"
+        [ -n "$log" ] && break
+    done
+
+    if [ -z "$log" ]; then
+        _xwarn "Skipped" "build log not found in DerivedData"
+        _xhint "compile_commands.json was NOT generated"
+    else
+        _xlog "Parsing" "$(basename "$log")"
+        if xcode-build-server parse -logArchive "$log" > compile_commands.json; then
+            _xlog "Generated" "compile_commands.json"
+        else
+            _xwarn "Failed" "xcode-build-server parse returned error"
+            _xhint "compile_commands.json may be incomplete"
+        fi
+    fi
+
+    _xlog "Done" "run :LspRestart in Neovim"
+}
+
+# ---------------------------------------------------------------------------
 # xhelp — cheatsheet for all x* functions
 # ---------------------------------------------------------------------------
 
@@ -586,6 +677,14 @@ xhelp() {
     _xhelp_note "Interactively pick a device or simulator (↑↓ + Enter),"
     _xhelp_note "build the app, and install it — no Xcode required."
     _xhelp_note "Device install uses devicectl (Xcode 15+) or ios-deploy."
+
+    _xhelp_section "xindex"
+    _xhelp_synopsis "xindex" \
+        "--workspace <path> --scheme <name>"
+    _xhelp_note "Generate buildServer.json (sourcekit-lsp) and compile_commands.json (clangd)"
+    _xhelp_note "to enable gd / gr in Neovim for Swift, ObjC, C, C++ files."
+    _xhelp_note "Run once per project, re-run only if project structure changes."
+    _xhelp_note "Requires a prior build (xbuild) for compile_commands.json."
 
     echo ""
     echo "$sep"
