@@ -52,12 +52,36 @@ _ta_fzf() {
 #   ctrl-d     drop selected sessions from resurrect file (no selection = no-op)
 #   enter      attach/switch to the last selected session in list order
 ta() {
+  local _rta="${XDG_CONFIG_HOME:-$HOME/.config}/tmux/resurrect-ta.sh"
+  local _rdir="$HOME/.local/share/tmux/resurrect"
+  local _marker='/tmp/.ta_auto_restored'
+
+  # Auto-restore saved sessions after reboot:
+  #   - no tmux server running  (new boot or user killed every session)
+  #   - marker absent           (/tmp is cleared on reboot; present = already restored this boot)
+  #   - resurrect save exists
+  # Creates bare sessions at their saved CWDs so they appear in the fzf picker immediately.
+  if ! tmux list-sessions &>/dev/null 2>&1 && \
+     [[ ! -f "$_marker" ]] && \
+     [[ -L "${_rdir}/last" && -f "${_rdir}/last" ]]; then
+    local _sess _dir
+    while IFS=$'\t' read -r _sess _dir; do
+      [[ -d "$_dir" ]] || _dir="$HOME"
+      tmux has-session -t "=$_sess" 2>/dev/null || \
+        tmux new-session -d -s "$_sess" -c "$_dir"
+    done < <(awk -F'\t' '
+      $1 == "pane" && !seen[$2]++ {
+        dir = $8; sub(/^:/, "", dir)
+        print $2 "\t" dir
+      }
+    ' "${_rdir}/last")
+    touch "$_marker"
+  fi
+
   if ! tmux list-sessions &>/dev/null; then
     echo "no tmux sessions. use: tn [name]"
     return 1
   fi
-  local _rta="${XDG_CONFIG_HOME:-$HOME/.config}/tmux/resurrect-ta.sh"
-  local _rdir="$HOME/.local/share/tmux/resurrect"
   local session
   session=$(
     tmux list-sessions -F "#{session_name}" \
