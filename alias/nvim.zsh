@@ -85,6 +85,7 @@ nhelp() {
     _nh_row "ca"                "code action (quick fix, refactor, etc.)"
     _nh_row "<space>rn"         "rename symbol under cursor"
     _nh_row "<space>lti"        "toggle inlay hints (type annotations)"
+    _nh_row "<space>lr"         "restart LSP (after xindex / project changes)"
 
     # ── Diagnostics / Trouble ─────────────────────────────────────────────────
     _nh_section "Diagnostics  (<space>x…)"
