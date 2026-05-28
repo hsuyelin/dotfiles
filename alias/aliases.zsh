@@ -315,3 +315,80 @@ yy() {
 # SSH
 # -----------------------------
 alias ssh='TERM=xterm-256color ssh'
+
+# -----------------------------
+# shelp: zsh line-editing cheatsheet (Emacs mode)
+# -----------------------------
+shelp() {
+    local bold=$'\033[1m'
+    local cyan=$'\033[0;36m'
+    local yellow=$'\033[0;33m'
+    local dim=$'\033[2m'
+    local reset=$'\033[0m'
+    local sep='──────────────────────────────────────────────'
+
+    _sh_section() { printf '\n%s  %s%s\n' "$yellow" "$1" "$reset"; }
+    _sh_row()     { printf '  %s%-22s%s  %s\n' "$cyan" "$1" "$reset" "$2"; }
+    _sh_note()    { printf '  %s%-22s  %s%s\n' "$dim" "" "$1" "$reset"; }
+
+    echo ""
+    printf '%sZsh Line-Editing Cheatsheet%s' "$bold" "$reset"
+    printf '  %s(Emacs mode — default zsh bindkey)%s\n' "$dim" "$reset"
+    echo "$sep"
+
+    # ── Cursor Movement ────────────────────────────────────────────────────────
+    _sh_section "Cursor Movement"
+    _sh_row "Ctrl+A"          "jump to beginning of line"
+    _sh_row "Ctrl+E"          "jump to end of line"
+    _sh_row "Ctrl+F"          "move forward one character"
+    _sh_row "Ctrl+B"          "move backward one character"
+    _sh_row "Alt+F"           "move forward one word"
+    _sh_row "Alt+B"           "move backward one word"
+
+    # ── Deletion ──────────────────────────────────────────────────────────────
+    _sh_section "Deletion"
+    _sh_row "Ctrl+D"          "delete character forward (or exit shell if line empty)"
+    _sh_row "Ctrl+H"          "delete character backward (= Backspace)"
+    _sh_row "Ctrl+W"          "delete word backward (stops at whitespace)"
+    _sh_row "Alt+D"           "delete word forward"
+    _sh_row "Ctrl+K"          "kill (cut) from cursor to end of line"
+    _sh_row "Ctrl+U"          "kill from cursor to beginning of line"
+    _sh_note                  "killed text is saved to kill-ring; paste with Ctrl+Y"
+
+    # ── Yank (Paste) ──────────────────────────────────────────────────────────
+    _sh_section "Yank / Paste"
+    _sh_row "Ctrl+Y"          "yank (paste) last killed text"
+    _sh_row "Alt+Y"           "cycle through kill-ring entries (after Ctrl+Y)"
+
+    # ── Undo / Transpose ──────────────────────────────────────────────────────
+    _sh_section "Undo / Transform"
+    _sh_row "Ctrl+_"          "undo last edit"
+    _sh_row "Ctrl+T"          "transpose current and previous character"
+    _sh_row "Alt+T"           "transpose current and previous word"
+    _sh_row "Alt+U"           "uppercase from cursor to end of word"
+    _sh_row "Alt+L"           "lowercase from cursor to end of word"
+    _sh_row "Alt+C"           "capitalize current word"
+
+    # ── History ───────────────────────────────────────────────────────────────
+    _sh_section "History"
+    _sh_row "Ctrl+R"          "reverse incremental history search"
+    _sh_row "Ctrl+S"          "forward incremental history search"
+    _sh_row "Ctrl+P"          "previous command in history (= Up)"
+    _sh_row "Ctrl+N"          "next command in history (= Down)"
+    _sh_row "Alt+."           "insert last argument of previous command"
+    _sh_row "Alt+_"           "same as Alt+. (alternate binding)"
+    _sh_note                  "press Alt+. repeatedly to cycle through history arguments"
+
+    # ── Screen / Process ──────────────────────────────────────────────────────
+    _sh_section "Screen / Process"
+    _sh_row "Ctrl+L"          "clear screen (keep current line)"
+    _sh_row "Ctrl+C"          "cancel / interrupt current command"
+    _sh_row "Ctrl+Z"          "suspend foreground process (resume with 'fg')"
+    _sh_row "Ctrl+Q"          "resume output if stopped by Ctrl+S"
+
+    echo ""
+    echo "$sep"
+    echo ""
+
+    unfunction _sh_section _sh_row _sh_note
+}
