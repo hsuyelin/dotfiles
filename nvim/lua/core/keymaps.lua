@@ -316,6 +316,7 @@ vim.keymap.set("n", "go", "<cmd>Telescope lsp_dynamic_workspace_symbols<cr>", ls
 vim.keymap.set("n", "gl", "<cmd>Telescope lsp_document_symbols<cr>", lsp_opts)
 vim.keymap.set("n", "ca", vim.lsp.buf.code_action, lsp_opts)
 vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, lsp_opts)
+vim.keymap.set("n", "<leader>lr", "<cmd>LspRestart<cr>", lsp_opts)
 
 -- inlay hint and which-key registration still need the client; keep LspAttach for those.
 local augroup = vim.api.nvim_create_augroup("lsp_keymaps", { clear = true })
@@ -338,7 +339,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
 			{ "<leader>lgi", vim.lsp.buf.implementation, desc = "实现 (Implementation)" },
 			{ "<leader>lgo", "<cmd>Telescope lsp_dynamic_workspace_symbols<cr>", desc = "工作区符号 (Workspace Symbols)" },
 			{ "<leader>lgl", "<cmd>Telescope lsp_document_symbols<cr>", desc = "文档符号 (Document Symbols)" },
-			{ "<leader>lr", "<cmd>LspRestart<cr>", desc = "重启 LSP (Restart LSP)" },
 			{ "<leader>lt", group = "切换 (Toggle)", buffer = buf },
 			{ "<leader>lti", utils.toggles.toggle_inlay_hint, desc = "切换内嵌提示 (Toggle Inlay Hint)" },
 		})
