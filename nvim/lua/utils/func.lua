@@ -42,8 +42,9 @@ function M.grep_lines_to_tab()
     local all_lines = vim.api.nvim_buf_get_lines(src_buf, 0, -1, false)
 
     local matches = {}
+    local lpat = pattern:lower()
     for lnum, line in ipairs(all_lines) do
-        if vim.fn.match(line, pattern) >= 0 then
+        if tostring(line):lower():find(lpat, 1, true) then
             table.insert(matches, string.format("%5d │ %s", lnum, line))
         end
     end
