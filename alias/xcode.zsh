@@ -557,22 +557,24 @@ xindex() {
     fi
     _xcode_require || return 1
 
-    local workspace="" scheme="" configuration="Debug"
+    local workspace="" scheme="" configuration="Debug" skip_build=0
     while [ $# -gt 0 ]; do
         case "$1" in
             --workspace)     workspace="$2";     shift 2 ;;
             --scheme)        scheme="$2";        shift 2 ;;
             --configuration) configuration="$2"; shift 2 ;;
+            --skip-build)    skip_build=1;        shift   ;;
             --help|-h)
-                printf 'Usage: xindex --workspace <path> --scheme <name> [--configuration <name>]\n'
+                printf 'Usage: xindex --workspace <path> --scheme <name> [--configuration <name>] [--skip-build]\n'
                 printf '  --workspace      dir containing .xcworkspace, or path without extension\n'
                 printf '                   e.g. Example  or  Example/ZeppDevice\n'
                 printf '  --scheme         Xcode scheme name\n'
                 printf '  --configuration  Debug (default) or Release\n'
+                printf '  --skip-build     skip xcodebuild, reuse existing DerivedData\n'
                 return 0 ;;
             *)
                 _xerr "Unknown option: $1"
-                _xhint "Usage: xindex --workspace <path> --scheme <name> [--configuration <name>]"
+                _xhint "Usage: xindex --workspace <path> --scheme <name> [--configuration <name>] [--skip-build]"
                 return 1 ;;
         esac
     done
@@ -593,18 +595,22 @@ xindex() {
     fi
 
     # ── Step 1: build (generic simulator, no device selection needed) ─────────
-    _xlog "Building" "${scheme} (${configuration})"
-    local build_cmd=(xcodebuild -workspace "$ws_path" -scheme "$scheme"
-        -configuration "$configuration"
-        -destination "generic/platform=iOS Simulator"
-        build)
-    "${build_cmd[@]}" | xcbeautify
-    local build_rc="${pipestatus[1]}"
-    if (( build_rc != 0 )); then
-        _xerr "Build failed (exit $build_rc) — index not generated"
-        return 1
+    if (( skip_build )); then
+        _xlog "Skipped" "build — reusing existing DerivedData"
+    else
+        _xlog "Building" "${scheme} (${configuration})"
+        local build_cmd=(xcodebuild -workspace "$ws_path" -scheme "$scheme"
+            -configuration "$configuration"
+            -destination "generic/platform=iOS Simulator"
+            build)
+        "${build_cmd[@]}" | xcbeautify
+        local build_rc="${pipestatus[1]}"
+        if (( build_rc != 0 )); then
+            _xerr "Build failed (exit $build_rc) — index not generated"
+            return 1
+        fi
+        _xlog "Built" "${scheme}"
     fi
-    _xlog "Built" "${scheme}"
 
     # ── Step 2: buildServer.json (sourcekit-lsp — Swift / ObjC gd/gr) ─────────
     _xlog "Generating" "buildServer.json"
