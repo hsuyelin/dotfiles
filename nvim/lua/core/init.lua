@@ -34,4 +34,3 @@ core.configs = {
 
 require("core.options")
 require("core.instances")
-require("core.lsp")

@@ -306,50 +306,34 @@ utils.map_on_filetype("dart", {
 	},
 })
 
+-- LSP keymaps registered globally; vim.lsp.buf.* silently no-ops when no LSP is attached.
+local lsp_opts = { noremap = true, silent = true }
+vim.keymap.set("n", "gd", vim.lsp.buf.definition, lsp_opts)
+vim.keymap.set("n", "gD", vim.lsp.buf.type_definition, lsp_opts)
+vim.keymap.set("n", "gr", "<cmd>Telescope lsp_references<cr>", lsp_opts)
+vim.keymap.set("n", "gi", vim.lsp.buf.implementation, lsp_opts)
+vim.keymap.set("n", "go", "<cmd>Telescope lsp_dynamic_workspace_symbols<cr>", lsp_opts)
+vim.keymap.set("n", "gl", "<cmd>Telescope lsp_document_symbols<cr>", lsp_opts)
+vim.keymap.set("n", "ca", vim.lsp.buf.code_action, lsp_opts)
+vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, lsp_opts)
+
+-- inlay hint and which-key registration still need the client; keep LspAttach for those.
 local augroup = vim.api.nvim_create_augroup("lsp_keymaps", { clear = true })
 vim.api.nvim_create_autocmd("LspAttach", {
 	group = augroup,
 	callback = function(data)
 		local client = vim.lsp.get_client_by_id(data.data.client_id)
 		if not client then
-			vim.notify("Failed to get LSP Client by Id: " .. data.id, vim.log.levels.WARN)
 			return
 		end
-
 		local buf = data.buf
 		if client:supports_method("textDocument/inlayHint", buf) then
 			vim.lsp.inlay_hint.enable(false, { bufnr = buf })
 		end
-		-- shortcuts
-		local bufopts = { noremap = true, silent = true, buffer = buf }
-		vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, bufopts)
-		vim.keymap.set("n", "ca", vim.lsp.buf.code_action, bufopts)
-		vim.keymap.set("n", "gd", vim.lsp.buf.definition, bufopts)
-		vim.keymap.set("n", "gD", vim.lsp.buf.type_definition, bufopts)
-		vim.keymap.set("n", "gr", "<cmd>Telescope lsp_references<cr>", bufopts)
-		vim.keymap.set("n", "gi", vim.lsp.buf.implementation, bufopts)
-		vim.keymap.set("n", "K", vim.lsp.buf.hover, bufopts)
-		vim.api.nvim_buf_set_keymap(
-			0,
-			"n",
-			"go",
-			":Telescope lsp_dynamic_workspace_symbols<CR>",
-			{ noremap = true, silent = true }
-		)
-		vim.api.nvim_buf_set_keymap(
-			0,
-			"n",
-			"gl",
-			":Telescope lsp_document_symbols<CR>",
-			{ noremap = true, silent = true }
-		)
-
-		-- register keymaps using which-key
 		require("which-key").add({
-			{ "<leader>l", group = "LSP" }, -- group for LSP
+			{ "<leader>l", group = "LSP" },
 			{ "<leader>ln", vim.lsp.buf.rename, desc = "重命名 (Rename)", buffer = buf },
 			{ "<leader>la", vim.lsp.buf.code_action, desc = "代码操作 (Code Action)" },
-			{ "<leader>l", group = "跳转 (Goto)" },
 			{ "<leader>lgD", vim.lsp.buf.type_definition, desc = "类型定义 (Type Definition)" },
 			{ "<leader>lgi", vim.lsp.buf.implementation, desc = "实现 (Implementation)" },
 			{ "<leader>lgo", "<cmd>Telescope lsp_dynamic_workspace_symbols<cr>", desc = "工作区符号 (Workspace Symbols)" },
