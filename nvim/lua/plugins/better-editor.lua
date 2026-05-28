@@ -74,7 +74,7 @@ end, { desc = "Next Diagnostics" })
 -- neoscroll: defer (only needed when scrolling)
 vim.schedule(function()
   require("neoscroll").setup({
-    mappings = { "<C-u>", "<C-d>", "<C-b>", "<C-f>", "zt", "zz", "zb" },
+    mappings = { "<C-u>", "<C-d>", "zt", "zz", "zb" },
     easing = "quadratic",
     duration_multiplier = 0.4,
   })
