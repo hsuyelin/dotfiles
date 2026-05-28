@@ -60,21 +60,16 @@ ta() {
   #   - no tmux server running  (new boot or user killed every session)
   #   - marker absent           (/tmp is cleared on reboot; present = already restored this boot)
   #   - resurrect save exists
-  # Creates bare sessions at their saved CWDs so they appear in the fzf picker immediately.
+  # Starts the tmux server, fakes $TMUX so resurrect's restore.sh can find the socket,
+  # then runs a full restore (sessions + windows + panes). Errors (display-message,
+  # switch-client) are suppressed — they need a client and fail silently here.
   if ! tmux list-sessions &>/dev/null 2>&1 && \
      [[ ! -f "$_marker" ]] && \
      [[ -L "${_rdir}/last" && -f "${_rdir}/last" ]]; then
-    local _sess _dir
-    while IFS=$'\t' read -r _sess _dir; do
-      [[ -d "$_dir" ]] || _dir="$HOME"
-      tmux has-session -t "=$_sess" 2>/dev/null || \
-        tmux new-session -d -s "$_sess" -c "$_dir"
-    done < <(awk -F'\t' '
-      $1 == "pane" && !seen[$2]++ {
-        dir = $8; sub(/^:/, "", dir)
-        print $2 "\t" dir
-      }
-    ' "${_rdir}/last")
+    local _sock="/tmp/tmux-$(id -u)/default"
+    local _rsc="${HOME}/.config/tmux/plugins/tmux-resurrect/scripts/restore.sh"
+    tmux start-server 2>/dev/null
+    TMUX="${_sock},0,0" bash "$_rsc" 2>/dev/null
     touch "$_marker"
   fi
 
