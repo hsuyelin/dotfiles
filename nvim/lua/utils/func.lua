@@ -33,11 +33,11 @@ end
 -- then open them in a new tab as a read-only scratch buffer.
 -- Line numbers are shown as a prefix so you can jump back to the source.
 function M.grep_lines_to_tab()
-    local pattern = vim.fn.input("/ ")
-    if pattern == "" then return end
-
     local src_buf  = vim.api.nvim_get_current_buf()
     local src_name = vim.api.nvim_buf_get_name(src_buf)
+
+    local pattern = vim.fn.input("/ ")
+    if pattern == "" then return end
     local filetype = vim.bo[src_buf].filetype
     local all_lines = vim.api.nvim_buf_get_lines(src_buf, 0, -1, false)
 
