@@ -6,6 +6,7 @@ vim.pack.add({ gh('wsdjeg/calendar.nvim') })
 
 local cache_dir  = vim.fn.stdpath('data') .. '/calendar-chinese-days'
 local cache_file = cache_dir .. '/holidays.json'
+local obs_file   = cache_dir .. '/observances.json'
 local state_file = cache_dir .. '/state.json'
 local todos_dir  = cache_dir .. '/todos'
 local json_url   = 'https://raw.githubusercontent.com/lanceliao/china-holiday-calender/master/holidayAPI.json'
@@ -108,6 +109,10 @@ end
 
 if data_stale() or should_retry() then async_fetch() end
 
+-- Forward declaration so load_holiday_set can call load_obs_set even though the
+-- full Observances section appears later in the file.
+local load_obs_set
+
 -- ── Load holiday set ─────────────────────────────────────────────────────────
 -- "YYYY-MM-DD" → { name = "节日名", memo = "详细说明" }
 -- EndDate is INCLUSIVE in this API.
@@ -153,7 +158,153 @@ local function load_holiday_set()
         end
     end
 
+    -- Merge observances; public holidays (from JSON) take precedence.
+    for k, v in pairs(load_obs_set()) do
+        if not _holiday_set[k] then _holiday_set[k] = v end
+    end
+
     return _holiday_set
+end
+
+-- ── Observances ──────────────────────────────────────────────────────────────
+-- Three categories merged into _holiday_set (public holidays take precedence).
+--
+--  FIXED_OBS      – fixed international/Chinese dates every year
+--  VARIABLE_WEST  – Western holidays on the Nth weekday of a month
+--  LUNAR_HOLIDAYS – Chinese traditional holidays, precomputed 2020-2041
+--                   (generated from lunardate; laba2 = rare double 腊八 year)
+
+local FIXED_OBS = {
+    { m = 2,  d = 14, name = '情人节'    },
+    { m = 3,  d =  8, name = '三八妇女节' },
+    { m = 3,  d = 12, name = '植树节'    },
+    { m = 4,  d =  1, name = '愚人节'    },
+    { m = 5,  d =  4, name = '五四青年节' },
+    { m = 6,  d =  1, name = '六一儿童节' },
+    { m = 8,  d =  1, name = '八一建军节' },
+    { m = 9,  d = 10, name = '教师节'    },
+    { m = 10, d = 31, name = '万圣节'    },
+    { m = 11, d = 11, name = '光棍节'    },
+    { m = 12, d = 24, name = '平安夜'    },
+    { m = 12, d = 25, name = '圣诞节'    },
+}
+
+-- nth: 1-indexed occurrence; wday: 1=Sun … 7=Sat (matches os.date)
+local VARIABLE_WEST = {
+    { m = 5,  nth = 2, wday = 1, name = '母亲节' },  -- 2nd Sunday of May
+    { m = 6,  nth = 3, wday = 1, name = '父亲节' },  -- 3rd Sunday of June
+    { m = 11, nth = 4, wday = 5, name = '感恩节' },  -- 4th Thursday of November
+}
+
+-- Gregorian dates of Chinese traditional holidays, derived from lunardate.
+-- Organised by the Gregorian year in which each holiday falls.
+-- Positional order: { yuanxiao, qixi, zhongyuan, chongyang [, laba [, laba2]] }
+-- laba is absent in years where lunar 12/8 falls outside this Gregorian year.
+-- laba2: rare case where two 腊八节 fall in the same Gregorian year.
+local LUNAR_HOLIDAYS = {
+    [2020] = {'02-08','08-25','09-02','10-25','01-02'},
+    [2021] = {'02-26','08-14','08-22','10-14','01-20'},
+    [2022] = {'02-15','08-04','08-12','10-04','01-10','12-30'},
+    [2023] = {'02-05','08-22','08-30','10-23'},
+    [2024] = {'02-24','08-10','08-18','10-11','01-18'},
+    [2025] = {'02-12','08-29','09-06','10-29','01-07'},
+    [2026] = {'03-03','08-19','08-27','10-18','01-26'},
+    [2027] = {'02-20','08-08','08-16','10-08','01-15'},
+    [2028] = {'02-09','08-26','09-03','10-26','01-04'},
+    [2029] = {'02-27','08-16','08-24','10-16','01-22'},
+    [2030] = {'02-17','08-05','08-13','10-05','01-11'},
+    [2031] = {'02-06','08-24','09-01','10-24','01-01'},
+    [2032] = {'02-25','08-12','08-20','10-12','01-20'},
+    [2033] = {'02-14','08-01','08-09','10-01','01-08'},
+    [2034] = {'03-05','08-20','08-28','10-20','01-27'},
+    [2035] = {'02-22','08-10','08-18','10-09','01-16'},
+    [2036] = {'02-11','08-28','09-05','10-27','01-05'},
+    [2037] = {'03-01','08-17','08-25','10-17','01-23'},
+    [2038] = {'02-18','08-07','08-15','10-07','01-12'},
+    [2039] = {'02-07','08-26','09-03','10-26','01-02'},
+    [2040] = {'02-26','08-14','08-22','10-14','01-21'},
+    [2041] = {'02-15','08-03','08-11','10-03','01-10','12-30'},
+}
+
+-- Names matching the positional order in LUNAR_HOLIDAYS rows.
+local _LUNAR_NAMES = { '元宵节', '七夕', '中元节', '重阳节', '腊八节', '腊八节' }
+
+-- Returns which calendar-day the Nth occurrence of wday falls on in (year, month).
+local function nth_weekday_day(year, month, nth, wday)
+    local first = os.date(
+        '*t', os.time({ year = year, month = month, day = 1, hour = 12 })
+    ).wday
+    local offset = (wday - first + 7) % 7
+    return 1 + offset + (nth - 1) * 7
+end
+
+-- Build flat { ["YYYY-MM-DD"] = { name, kind='obs', memo='' } } for one year.
+local function build_year_obs(year)
+    local t = {}
+    for _, v in ipairs(FIXED_OBS) do
+        local key = string.format('%04d-%02d-%02d', year, v.m, v.d)
+        t[key] = { name = v.name, kind = 'obs', memo = '' }
+    end
+    for _, v in ipairs(VARIABLE_WEST) do
+        local day = nth_weekday_day(year, v.m, v.nth, v.wday)
+        local key = string.format('%04d-%02d-%02d', year, v.m, day)
+        t[key] = { name = v.name, kind = 'obs', memo = '' }
+    end
+    local lunar = LUNAR_HOLIDAYS[year]
+    if lunar then
+        for i, name in ipairs(_LUNAR_NAMES) do
+            if lunar[i] then
+                local key = string.format('%04d-%s', year, lunar[i])
+                t[key] = { name = name, kind = 'obs', memo = '' }
+            end
+        end
+    end
+    return t
+end
+
+-- _obs_set: flat merged table, populated once per session.
+-- Cache file covers current year + next year; recomputed when either is missing.
+local _obs_set = nil
+
+load_obs_set = function()
+    if _obs_set then return _obs_set end
+
+    local today_y = os.date('*t').year
+    local need    = { tostring(today_y), tostring(today_y + 1) }
+
+    local from_file, covered = {}, false
+    local f = io.open(obs_file, 'r')
+    if f then
+        local raw = f:read('*a'); f:close()
+        local ok, data = pcall(vim.json.decode, raw)
+        if ok and type(data) == 'table'
+                and data[need[1]] ~= nil and data[need[2]] ~= nil then
+            covered = true
+            for _, yr_data in pairs(data) do
+                for k, v in pairs(yr_data) do from_file[k] = v end
+            end
+        end
+    end
+
+    if covered then
+        _obs_set = from_file
+        return _obs_set
+    end
+
+    -- Compute both years and persist synchronously (pure arithmetic, fast).
+    local computed = {}
+    for _, ys in ipairs(need) do
+        computed[ys] = build_year_obs(tonumber(ys))
+    end
+    vim.fn.mkdir(cache_dir, 'p')
+    local out = io.open(obs_file, 'w')
+    if out then out:write(vim.json.encode(computed)); out:close() end
+
+    _obs_set = {}
+    for _, yr_data in pairs(computed) do
+        for k, v in pairs(yr_data) do _obs_set[k] = v end
+    end
+    return _obs_set
 end
 
 -- ── Calendar state (must be declared before popup helpers that reference it) ─
