@@ -31,10 +31,13 @@ nhelp() {
 
     # ── Folding ────────────────────────────────────────────────────────────────
     _nh_section "Folding  (treesitter-based)"
-    _nh_row "<tab>"             "toggle 当前光标处折叠（= za）"
-    _nh_row "<space>za"        "折叠所有函数体（treesitter-aware，if/for 保持展开）"
-    _nh_row "<space>zo"        "展开当前 buffer 所有折叠"
-    _nh_row "za"                "toggle 折叠开/关"
+    _nh_row "<tab>"             "智能折叠："
+    _nh_row ""                  "  在 extension/class/struct 行 → toggle 所有成员折叠"
+    _nh_row ""                  "  在 func/init/computed 行    → toggle 该函数折叠"
+    _nh_row ""                  "  其他                        → toggle 当前折叠（= za）"
+    _nh_row "<space>za"        "折叠全文件所有函数体（显示结构，不显示函数内容）"
+    _nh_row "<space>zo"        "展开全部"
+    _nh_row "<space>zz"        "全折叠 / 全展开 toggle（代码很长时用）"
     _nh_row "zo / zc"          "打开 / 关闭折叠"
     _nh_row "zO / zC"          "递归打开 / 关闭折叠"
     _nh_row "zR / zM"          "展开 / 折叠全部（vim 原生）"
