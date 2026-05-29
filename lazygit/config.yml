@@ -335,7 +335,7 @@ keybinding:
     select: <space>
     goInto: <enter>
     confirm: <enter>
-    confirmInEditor: <cmd-enter>
+    confirmInEditor: <disabled>
     remove: d
     new: "n"
     edit: e
