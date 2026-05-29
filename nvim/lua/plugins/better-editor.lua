@@ -73,11 +73,28 @@ end, { desc = "Next Diagnostics" })
 
 -- neoscroll: defer (only needed when scrolling)
 vim.schedule(function()
-  require("neoscroll").setup({
-    mappings = { "<C-u>", "<C-d>", "zt", "zz", "zb" },
-    easing = "quadratic",
+  local scroll_lines = 12 -- lines per <C-u>/<C-d>, change to taste
+  local scroll_lines_short = 5 -- lines per <C-e>/<C-y>, change to taste
+
+  local neoscroll = require("neoscroll")
+  neoscroll.setup({
+    easing = "sine",
     duration_multiplier = 0.4,
   })
+
+  local scroll = function(delta)
+    return function()
+      neoscroll.scroll(delta, { move_cursor = true, duration = 200 })
+    end
+  end
+
+  vim.keymap.set({ "n", "v", "x" }, "<C-u>", scroll(-scroll_lines))
+  vim.keymap.set({ "n", "v", "x" }, "<C-d>", scroll(scroll_lines))
+  vim.keymap.set({ "n", "v", "x" }, "<C-e>", scroll(scroll_lines_short))
+  vim.keymap.set({ "n", "v", "x" }, "<C-y>", scroll(-scroll_lines_short))
+  vim.keymap.set({ "n", "v", "x" }, "zt", function() neoscroll.zt({ duration = 150 }) end)
+  vim.keymap.set({ "n", "v", "x" }, "zz", function() neoscroll.zz({ duration = 150 }) end)
+  vim.keymap.set({ "n", "v", "x" }, "zb", function() neoscroll.zb({ duration = 150 }) end)
 end)
 
 require("todo-comments").setup()
