@@ -1,3 +1,29 @@
+local gh = function(r) return 'https://github.com/' .. r end
+
+vim.pack.add({ gh("monkoose/neocodeium") })
+
+-- neocodeium: disabled by default; toggle with :NeoCodeium enable
+vim.schedule(function()
+  local neocodeium = require("neocodeium")
+  neocodeium.setup({
+    enabled = false,
+    silent = true,
+    filetypes = {
+      help = false,
+      gitrebase = false,
+      ["."] = false,
+      ["cpp"] = false,
+    },
+  })
+  vim.keymap.set("i", "<Tab>", function()
+    if neocodeium.visible() then
+      neocodeium.accept()
+    else
+      return "<Tab>"
+    end
+  end, { expr = true, silent = true })
+end)
+
 local function cmd_is_available(cmd)
   if type(cmd) == "table" then
     return vim.fn.executable(cmd[1]) == 1
