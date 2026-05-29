@@ -335,7 +335,7 @@ keybinding:
     select: <space>
     goInto: <enter>
     confirm: <enter>
-    confirmInEditor: <disabled>
+    confirmInEditor: <a-enter>
     remove: d
     new: "n"
     edit: e
