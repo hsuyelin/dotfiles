@@ -8,6 +8,7 @@ setmetatable(utils, { __index = utils.func })
 
 utils.toggles = require("utils.toggles")
 utils.bufdelete = require("utils.bufdelete")
+utils.fold = require("utils.fold")
 utils.term = require("utils.terminal")
 utils.dashboard = require("utils.dashboard")
 utils.filter = require("utils.filter")

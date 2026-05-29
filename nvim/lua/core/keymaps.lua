@@ -9,7 +9,7 @@ vim.keymap.set("n", "<C-i>", "<C-]>")
 
 -- Fold
 vim.keymap.set("n", "<tab>",       "za")
-vim.keymap.set("n", "<leader>za",  "zM", { desc = "折叠全部 (Fold All)" })
+vim.keymap.set("n", "<leader>za",  utils.fold.fold_functions, { desc = "折叠函数 (Fold Functions)" })
 vim.keymap.set("n", "<leader>zo",  "zR", { desc = "展开全部 (Unfold All)" })
 require("which-key").add({ { "<leader>z", group = "折叠 (Fold)" } })
 

@@ -32,7 +32,7 @@ nhelp() {
     # ── Folding ────────────────────────────────────────────────────────────────
     _nh_section "Folding  (treesitter-based)"
     _nh_row "<tab>"             "toggle fold under cursor  (= za)"
-    _nh_row "<space>za"        "close ALL folds in buffer  (fold by function)"
+    _nh_row "<space>za"        "fold all function bodies  (treesitter-aware, leaves if/for open)"
     _nh_row "<space>zo"        "open ALL folds in buffer"
     _nh_row "za"                "toggle fold open / closed"
     _nh_row "zo / zc"          "open / close fold"
