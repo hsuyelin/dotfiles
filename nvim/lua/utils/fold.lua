@@ -16,6 +16,18 @@ local _fn_types = {
     subscript_declaration     = true,  -- Swift subscript
 }
 
+-- Return the row (0-indexed) of the opening `{` of a function body.
+-- For C-style languages the fold is created at `{`, not at the `func` keyword.
+-- Falls back to the node's own start row when no `{` child exists (Python).
+local function block_open_row(node)
+    for child in node:iter_children() do
+        if child:type() == "{" then
+            return child:start()
+        end
+    end
+    return node:start()
+end
+
 --- Fold only function/method bodies in the current buffer.
 --- Uses treesitter to identify function nodes; falls back to zM when
 --- treesitter is unavailable for the current filetype.
@@ -36,7 +48,7 @@ function M.fold_functions()
 
     local function visit(node)
         if _fn_types[node:type()] then
-            local sr = node:start()
+            local sr = block_open_row(node)
             local er = node:end_()
             if er > sr then
                 vim.api.nvim_win_set_cursor(0, { sr + 1, 0 })
