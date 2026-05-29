@@ -1,56 +1,13 @@
-local gh = function(r) return 'https://github.com/' .. r end
-
-local function has_env(name)
-  local value = vim.env[name]
-  return type(value) == "string" and value ~= ""
-end
-
-local has_openai_key = has_env("AICOMMITS_NVIM_OPENAI_API_KEY") or has_env("OPENAI_API_KEY")
-local has_gemini_key = has_env("AICOMMITS_NVIM_GEMINI_API_KEY") or has_env("GEMINI_API_KEY")
-local load_aicommits = has_openai_key or has_gemini_key
-
-local plugins = {
-  gh("monkoose/neocodeium"),
-}
-
-if load_aicommits then
-  table.insert(plugins, gh("404pilo/aicommits.nvim"))
-end
-
-vim.pack.add(plugins)
-
--- neocodeium: defer to after startup
-vim.schedule(function()
-  local neocodeium = require("neocodeium")
-  neocodeium.setup({
-    enabled = true,
-    silent = true,
-    filetypes = {
-      help = false,
-      gitrebase = false,
-      ["."] = false,
-      ["cpp"] = false,
-    },
-  })
-  vim.keymap.set("i", "<Tab>", function()
-    if neocodeium.visible() then
-      neocodeium.accept()
-    else
-      return "<Tab>"
-    end
-  end, { expr = true, silent = true })
-end)
-
----@type table<string, terminal.Term>
-local ai_terminals = {}
-local last_terminal
-
 local function cmd_is_available(cmd)
   if type(cmd) == "table" then
     return vim.fn.executable(cmd[1]) == 1
   end
   return vim.fn.executable(cmd) == 1
 end
+
+---@type table<string, terminal.Term>
+local ai_terminals = {}
+local last_terminal
 
 local function visible_window_for(buf)
   for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
@@ -133,41 +90,3 @@ vim.keymap.set({ "n", "v" }, "<leader>ap", function()
     toggle_terminal("prompt:" .. input, input)
   end)
 end, { desc = "AI Prompt Terminal" })
-
-if load_aicommits then
-  local config = {
-    integrations = {
-      neogit = {
-        enabled = true,
-        mappings = {
-          enabled = true,
-          key = "C",
-        },
-      },
-    },
-  }
-
-  if has_openai_key then
-    config.active_provider = "openai"
-    config.providers = {
-      openai = {
-        enabled = true,
-      },
-      ["gemini-api"] = {
-        enabled = false,
-      },
-    }
-  else
-    config.active_provider = "gemini-api"
-    config.providers = {
-      openai = {
-        enabled = false,
-      },
-      ["gemini-api"] = {
-        enabled = true,
-      },
-    }
-  end
-
-  require("aicommits").setup(config)
-end
