@@ -1,5 +1,9 @@
 {
   "plugins": {
+    "aerial.nvim": {
+      "rev": "585db11015abccf673dc5bd6502714d5655554be",
+      "src": "https://github.com/stevearc/aerial.nvim"
+    },
     "aicommits.nvim": {
       "rev": "86504279a0855953b8481d231520f9b67b03ad36",
       "src": "https://github.com/404pilo/aicommits.nvim"
