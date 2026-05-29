@@ -1,0 +1,313 @@
+{
+  "title": { "en": "Neovim Keymaps", "zh": "Neovim 快捷键" },
+  "subtitle": { "en": "leader = <space>   localleader = ,", "zh": "leader = <space>   localleader = ," },
+  "modules": [
+    {
+      "id": "global",
+      "title": { "en": "Global (Normal mode unless marked)", "zh": "全局（普通模式，特殊标注除外）" },
+      "entries": [
+        { "type": "row", "key": "jk",             "en": "[INSERT] exit insert mode (alias for <Esc>)",  "zh": "[插入] 退出插入模式（<Esc> 别名）" },
+        { "type": "row", "key": "<C-h/j/k/l>",    "en": "navigate between splits (smart-splits)",       "zh": "在分割窗口间导航（smart-splits）" },
+        { "type": "row", "key": "<C-f>",           "en": "find files (Telescope)",                       "zh": "查找文件（Telescope）" },
+        { "type": "row", "key": "<C-b>",           "en": "buffer picker (Telescope)",                    "zh": "buffer 选择器（Telescope）" },
+        { "type": "row", "key": "<C-c>",           "en": "close current buffer",                         "zh": "关闭当前 buffer" },
+        { "type": "row", "key": "{ / }",           "en": "previous / next buffer tab",                   "zh": "上 / 下一个 buffer 标签" },
+        { "type": "row", "key": "<C-[> / <C-]>",   "en": "previous / next vim tab",                      "zh": "上 / 下一个 vim 标签" },
+        { "type": "row", "key": "<C-i>",           "en": "jump forward in jump list",                    "zh": "在跳转列表中向前跳转" },
+        { "type": "row", "key": "<C-e>",           "en": "[INSERT] open emoji picker",                   "zh": "[插入] 打开 emoji 选择器" }
+      ]
+    },
+    {
+      "id": "folding",
+      "title": { "en": "Folding  (treesitter-based)", "zh": "折叠（基于 treesitter）" },
+      "entries": [
+        { "type": "row", "key": "<tab>",       "en": "smart fold: container line → toggle all members; func line → toggle func body; else → za", "zh": "智能折叠：容器行→toggle所有成员；函数行→toggle函数体；其他→za" },
+        { "type": "row", "key": "<space>za",   "en": "fold all function bodies in buffer (show structure)",       "zh": "折叠全文件所有函数体（显示结构）" },
+        { "type": "row", "key": "<space>zz",   "en": "toggle all: zM (fold everything) ↔ zR (expand everything)","zh": "全折叠/全展开 toggle（代码很长时用）" },
+        { "type": "row", "key": "za",          "en": "toggle fold open/closed",                                   "zh": "切换折叠开/关" },
+        { "type": "row", "key": "zo / zc",     "en": "open / close fold",                                         "zh": "打开 / 关闭折叠" },
+        { "type": "row", "key": "zO / zC",     "en": "recursively open / close fold",                            "zh": "递归打开 / 关闭折叠" },
+        { "type": "row", "key": "zR / zM",     "en": "unfold / fold all (vim native)",                           "zh": "展开 / 折叠全部（vim 原生）" },
+        { "type": "row", "key": "zj / zk",     "en": "jump to next / previous fold",                             "zh": "跳到下一个 / 上一个折叠" },
+        { "type": "row", "key": "[z / ]z",     "en": "jump to start / end of current fold",                      "zh": "跳到当前折叠的起点 / 终点" }
+      ]
+    },
+    {
+      "id": "flash",
+      "title": { "en": "Flash  (jump / search)", "zh": "Flash（跳转 / 搜索）" },
+      "entries": [
+        { "type": "row", "key": "r",    "en": "flash jump — type 2-char label to teleport cursor", "zh": "Flash 跳转 — 输入 2 字符标签直达目标" },
+        { "type": "row", "key": "R",    "en": "flash treesitter — jump by treesitter node",        "zh": "Flash treesitter — 按节点跳转" },
+        { "type": "row", "key": "<C-r>","en": "flash treesitter — highlight entire syntax tree",  "zh": "Flash treesitter — 高亮整个语法树" }
+      ]
+    },
+    {
+      "id": "mini-move",
+      "title": { "en": "mini.move  (move code blocks)", "zh": "mini.move（移动代码块）" },
+      "entries": [
+        { "type": "row", "key": "<M-h/j/k/l>", "en": "[VISUAL] move selection left / down / up / right",      "zh": "[可视] 向左/下/上/右移动选区" },
+        { "type": "row", "key": "<M-h/j/k/l>", "en": "[NORMAL] move current line left / down / up / right",   "zh": "[普通] 向左/下/上/右移动当前行" }
+      ]
+    },
+    {
+      "id": "surround",
+      "title": { "en": "Surround  (nvim-surround)", "zh": "包围符（nvim-surround）" },
+      "entries": [
+        { "type": "row", "key": "ys{motion}{char}", "en": "add surrounding around motion  e.g. ysiw(",   "zh": "为 motion 添加包围符，如 ysiw(" },
+        { "type": "row", "key": "yss{char}",        "en": "add surrounding around current line",         "zh": "为当前行添加包围符" },
+        { "type": "row", "key": "ds{char}",         "en": "delete surrounding  e.g. ds( removes parens", "zh": "删除包围符，如 ds( 删除括号" },
+        { "type": "row", "key": "cs{old}{new}",     "en": "change surrounding  e.g. cs'\" swaps quotes", "zh": "替换包围符，如 cs'\" 换引号" },
+        { "type": "row", "key": "S{char}",          "en": "[VISUAL] surround selection",                 "zh": "[可视] 为选区添加包围符" }
+      ]
+    },
+    {
+      "id": "marks",
+      "title": { "en": "Marks  (marks.nvim)", "zh": "书签（marks.nvim）" },
+      "entries": [
+        { "type": "row", "key": "m,",    "en": "set next available mark on current line",    "zh": "在当前行设置下一个可用标记" },
+        { "type": "row", "key": "m;",    "en": "toggle mark on current line",                "zh": "在当前行切换标记" },
+        { "type": "row", "key": "m] / m[","en": "jump to next / previous mark",              "zh": "跳到下一个 / 上一个标记" },
+        { "type": "row", "key": "m:",    "en": "preview mark in floating window",            "zh": "在浮动窗口预览标记" },
+        { "type": "row", "key": "dm-",   "en": "delete all marks in current buffer",         "zh": "删除当前 buffer 的所有标记" }
+      ]
+    },
+    {
+      "id": "comments",
+      "title": { "en": "Comments  (ts-comments)", "zh": "注释（ts-comments）" },
+      "entries": [
+        { "type": "row", "key": "gcc",          "en": "toggle comment on current line",                          "zh": "切换当前行注释" },
+        { "type": "row", "key": "gc{motion}",   "en": "toggle comment over motion  e.g. gcap",                  "zh": "在 motion 范围内切换注释，如 gcap" },
+        { "type": "row", "key": "gc",           "en": "[VISUAL] toggle comment on selection",                   "zh": "[可视] 切换选区注释" }
+      ]
+    },
+    {
+      "id": "lsp",
+      "title": { "en": "LSP  (active when language server attaches)", "zh": "LSP（语言服务器加载后生效）" },
+      "entries": [
+        { "type": "row", "key": "gd",          "en": "jump to definition",                                      "zh": "跳转到定义" },
+        { "type": "row", "key": "gD",          "en": "jump to type definition",                                 "zh": "跳转到类型定义" },
+        { "type": "row", "key": "gr",          "en": "find all references (Telescope)",                         "zh": "查找所有引用（Telescope）" },
+        { "type": "row", "key": "gi",          "en": "jump to implementation",                                  "zh": "跳转到实现" },
+        { "type": "row", "key": "go",          "en": "workspace symbol search (entire project)",                "zh": "工作区符号搜索（全项目）" },
+        { "type": "row", "key": "gl",          "en": "fuzzy symbol search in file (aerial + Telescope)",        "zh": "当前文件符号模糊搜索（aerial + Telescope）" },
+        { "type": "row", "key": "<space>lo",   "en": "toggle aerial outline sidebar",                           "zh": "切换 aerial 大纲侧边栏" },
+        { "type": "row", "key": "K",           "en": "hover documentation popup",                               "zh": "hover 文档弹窗" },
+        { "type": "row", "key": "ca",          "en": "Code Action (quick fix / refactor)",                      "zh": "代码操作（快速修复 / 重构）" },
+        { "type": "row", "key": "<space>rn",   "en": "rename symbol",                                           "zh": "重命名符号" },
+        { "type": "row", "key": "<space>lti",  "en": "toggle inlay hints (type annotations)",                   "zh": "切换 inlay hints（类型标注）" },
+        { "type": "row", "key": "<space>lr",   "en": "restart LSP (use after xindex)",                          "zh": "重启 LSP（xindex 后用）" }
+      ]
+    },
+    {
+      "id": "diagnostics",
+      "title": { "en": "Diagnostics  (<space>x…)", "zh": "诊断（<space>x…）" },
+      "entries": [
+        { "type": "row", "key": "<space>xx",      "en": "toggle diagnostics panel (Trouble)",          "zh": "切换诊断面板（Trouble）" },
+        { "type": "row", "key": "<space>xf",      "en": "buffer diagnostics only",                     "zh": "仅当前 buffer 诊断" },
+        { "type": "row", "key": "<space>xs",      "en": "LSP references / definitions panel",          "zh": "LSP 引用 / 定义面板" },
+        { "type": "row", "key": "<C-S-n> / <C-S-p>", "en": "jump to next / previous diagnostic",      "zh": "跳到下 / 上一个诊断并聚焦" }
+      ]
+    },
+    {
+      "id": "git",
+      "title": { "en": "Git  (<space>g…)", "zh": "Git（<space>g…）" },
+      "entries": [
+        { "type": "row", "key": "<space>gg",   "en": "open Neogit (full git UI)",                       "zh": "打开 Neogit（完整 git UI）" },
+        { "type": "row", "key": "<space>gG",   "en": "open Lazygit in a terminal tab",                  "zh": "在终端标签中打开 Lazygit" },
+        { "type": "row", "key": "<space>gs",   "en": "stage hunk under cursor",                         "zh": "暂存光标处的代码块" },
+        { "type": "row", "key": "<space>gS",   "en": "stage entire buffer",                             "zh": "暂存整个 buffer" },
+        { "type": "row", "key": "<space>gu",   "en": "undo last staged hunk",                           "zh": "撤销最后一次暂存的代码块" },
+        { "type": "row", "key": "<space>gx",   "en": "reset hunk under cursor (discard changes)",       "zh": "重置光标处代码块（丢弃改动）" },
+        { "type": "row", "key": "<space>gj / gk","en": "jump to next / previous hunk",                  "zh": "跳到下 / 上一个代码块" },
+        { "type": "row", "key": "<space>gh",   "en": "preview hunk inline",                             "zh": "内联预览代码块" },
+        { "type": "row", "key": "<space>gH",   "en": "preview hunk in popup window",                    "zh": "在弹窗中预览代码块" },
+        { "type": "row", "key": "<space>gb",   "en": "git blame for entire file",                       "zh": "整个文件的 git blame" },
+        { "type": "row", "key": "<space>gB",   "en": "git blame for current line (popup)",              "zh": "当前行 git blame（弹窗）" },
+        { "type": "row", "key": "<space>gl",   "en": "git status in neo-tree sidebar",                  "zh": "neo-tree 侧边栏显示 git 状态" },
+        { "type": "row", "key": "<space>gdd",  "en": "diff current file against HEAD",                  "zh": "当前文件与 HEAD 对比" },
+        { "type": "row", "key": "<space>gdf",  "en": "file commit history (DiffviewFileHistory)",       "zh": "文件提交历史" },
+        { "type": "row", "key": "<space>gdc",  "en": "close diffview",                                  "zh": "关闭 diffview" },
+        { "type": "row", "key": "<space>gdt",  "en": "toggle diffview file list",                       "zh": "切换 diffview 文件列表" }
+      ]
+    },
+    {
+      "id": "file",
+      "title": { "en": "File  (<space>f…)", "zh": "文件（<space>f…）" },
+      "entries": [
+        { "type": "row", "key": "<space>fw",   "en": "save all open files",                             "zh": "保存所有打开的文件" },
+        { "type": "row", "key": "<space>fl",   "en": "open file explorer (neo-tree)",                   "zh": "打开文件浏览器（neo-tree）" },
+        { "type": "row", "key": "<space>fh",   "en": "toggle neo-tree sidebar",                         "zh": "切换 neo-tree 侧边栏" },
+        { "type": "row", "key": "<space>fF",   "en": "reveal current file in neo-tree",                 "zh": "在 neo-tree 中定位当前文件" },
+        { "type": "row", "key": "> / <",       "en": "neo-tree: widen / narrow sidebar (±5 cols)",      "zh": "neo-tree：宽 / 窄侧边栏（±5 列）" },
+        { "type": "row", "key": "<space>fr",   "en": "recent files (Telescope oldfiles)",               "zh": "最近文件（Telescope oldfiles）" },
+        { "type": "row", "key": "<space>fd",   "en": "open netrw directory browser",                    "zh": "打开 netrw 目录浏览器" },
+        { "type": "row", "key": "<space>fyy",  "en": "copy absolute path to clipboard",                 "zh": "复制当前文件绝对路径到剪贴板" },
+        { "type": "row", "key": "<space>fyr",  "en": "copy relative path to clipboard",                 "zh": "复制相对路径到剪贴板" },
+        { "type": "row", "key": "<space>fyn",  "en": "copy filename only to clipboard",                 "zh": "复制文件名到剪贴板" }
+      ]
+    },
+    {
+      "id": "neo-tree",
+      "title": { "en": "Neo-tree  (keys inside the sidebar)", "zh": "Neo-tree（侧边栏内的按键）" },
+      "entries": [
+        { "type": "row", "key": "<tab>",    "en": "open file or expand directory",              "zh": "打开文件或展开目录" },
+        { "type": "row", "key": "l / h",    "en": "open (expand) / close node",                "zh": "展开 / 折叠节点" },
+        { "type": "row", "key": "<space>",  "en": "toggle node open/closed",                   "zh": "切换节点展开/折叠" },
+        { "type": "row", "key": "H",        "en": "navigate to parent directory",               "zh": "导航到父目录" },
+        { "type": "row", "key": "c",        "en": "set directory as root (cd into it)",         "zh": "将目录设为根（进入该目录）" },
+        { "type": "row", "key": "O",        "en": "expand all child nodes recursively",         "zh": "递归展开所有子节点" },
+        { "type": "row", "key": "C",        "en": "close all child nodes",                      "zh": "关闭所有子节点" },
+        { "type": "row", "key": "> / <",    "en": "widen / narrow the sidebar (±5 cols)",       "zh": "宽 / 窄侧边栏（±5 列）" },
+        { "type": "row", "key": "f / /",    "en": "fuzzy finder inside the tree",               "zh": "在文件树内模糊查找" },
+        { "type": "row", "key": ".",        "en": "toggle hidden files",                        "zh": "切换显示隐藏文件" },
+        { "type": "row", "key": "A",        "en": "create new file",                            "zh": "创建新文件" },
+        { "type": "row", "key": "Ctrl+A",   "en": "create new directory",                      "zh": "创建新目录" },
+        { "type": "row", "key": "R",        "en": "rename node",                                "zh": "重命名节点" },
+        { "type": "row", "key": "D",        "en": "delete node",                                "zh": "删除节点" },
+        { "type": "row", "key": "M",        "en": "move node",                                  "zh": "移动节点" },
+        { "type": "row", "key": "Y",        "en": "copy to clipboard",                          "zh": "复制到剪贴板" },
+        { "type": "row", "key": "P",        "en": "paste from clipboard",                       "zh": "从剪贴板粘贴" }
+      ]
+    },
+    {
+      "id": "buffer",
+      "title": { "en": "Buffer  (<space>b…)", "zh": "Buffer（<space>b…）" },
+      "entries": [
+        { "type": "note", "en": "fast: { / } = prev/next   <C-c> = close   <C-b> = picker", "zh": "快捷：{ / } = 上/下   <C-c> = 关闭   <C-b> = 选择器" },
+        { "type": "row", "key": "<space>bb",    "en": "buffer picker (Telescope)",                   "zh": "buffer 选择器（Telescope）" },
+        { "type": "row", "key": "<space>bh / bl","en": "previous / next buffer",                     "zh": "上 / 下一个 buffer" },
+        { "type": "row", "key": "<space>bH / bL","en": "move buffer left / right in tab bar",        "zh": "在标签栏中左 / 右移动 buffer" },
+        { "type": "row", "key": "<space>bo",    "en": "close all other buffers",                     "zh": "关闭其他所有 buffer" },
+        { "type": "row", "key": "<space>bp",    "en": "pin / unpin buffer",                          "zh": "固定 / 取消固定 buffer" },
+        { "type": "row", "key": "<space>bP",    "en": "visually pick buffer by letter",              "zh": "字母选择 buffer（可视化）" },
+        { "type": "row", "key": "<space>bn",    "en": "new empty buffer",                            "zh": "新建空 buffer" },
+        { "type": "row", "key": "<space>bc",    "en": "close current buffer",                        "zh": "关闭当前 buffer" }
+      ]
+    },
+    {
+      "id": "tabs",
+      "title": { "en": "Tabs  (<space>t…)", "zh": "标签（<space>t…）" },
+      "entries": [
+        { "type": "row", "key": "<space>tn",    "en": "new empty tab",                    "zh": "新建空标签" },
+        { "type": "row", "key": "<space>tc",    "en": "close current tab",                "zh": "关闭当前标签" },
+        { "type": "row", "key": "<space>tt",    "en": "tab picker (telescope-tabs)",      "zh": "标签选择器（telescope-tabs）" },
+        { "type": "row", "key": "<space>t1-9",  "en": "jump to tab by number",            "zh": "按数字跳转到标签" }
+      ]
+    },
+    {
+      "id": "search",
+      "title": { "en": "Search  (<space>a…)", "zh": "搜索（<space>a…）" },
+      "entries": [
+        { "type": "row", "key": "<space><space>",      "en": "command palette (Telescope commands)",        "zh": "命令面板（Telescope 命令）" },
+        { "type": "row", "key": "<space>as",           "en": "live grep — search text across project",     "zh": "实时搜索 — 全项目文本搜索" },
+        { "type": "row", "key": "<space>al / <space>/","en": "filter lines by keyword → open in new tab",  "zh": "按关键词过滤行 → 在新标签中打开" },
+        { "type": "note", "en": "tip: great for grep-ing log files — matching lines open in a new tab", "zh": "技巧：用于 grep 日志 — 匹配行在新标签中打开" },
+        { "type": "row", "key": "<space>aj",           "en": "jump list — recent cursor locations",        "zh": "跳转列表 — 最近光标位置" },
+        { "type": "row", "key": "<space>ah",           "en": "help tags search",                           "zh": "帮助标签搜索" },
+        { "type": "row", "key": "<space>ak",           "en": "keymap browser",                             "zh": "快捷键浏览器" },
+        { "type": "row", "key": "<space>at",           "en": "TODO / FIXME / HACK list",                   "zh": "TODO / FIXME / HACK 列表" },
+        { "type": "row", "key": "<space>ae",           "en": "emoji picker",                               "zh": "emoji 选择器" },
+        { "type": "row", "key": "<space>am",           "en": "notification history",                       "zh": "通知历史" },
+        { "type": "row", "key": "<space>ac",           "en": "colorscheme switcher",                       "zh": "配色方案切换器" },
+        { "type": "row", "key": "<space>an",           "en": "clear search highlight",                     "zh": "清除搜索高亮" }
+      ]
+    },
+    {
+      "id": "debug",
+      "title": { "en": "Debug  (<space>d…)", "zh": "调试（<space>d…）" },
+      "entries": [
+        { "type": "row", "key": "<space>db",  "en": "toggle breakpoint on current line",              "zh": "在当前行切换断点" },
+        { "type": "row", "key": "<space>du",  "en": "toggle DAP UI panel",                            "zh": "切换 DAP UI 面板" },
+        { "type": "row", "key": "<space>dc",  "en": "start debug session or continue",                "zh": "开始调试会话或继续" },
+        { "type": "row", "key": "<space>dn",  "en": "step over (next line, skip calls)",              "zh": "单步跳过（下一行，不进入调用）" },
+        { "type": "row", "key": "<space>di",  "en": "step into function call",                        "zh": "单步进入函数调用" },
+        { "type": "row", "key": "<space>do",  "en": "step out of current function",                   "zh": "单步跳出当前函数" },
+        { "type": "row", "key": "<space>dq",  "en": "terminate debug session",                        "zh": "终止调试会话" },
+        { "type": "row", "key": "<space>dl",  "en": "toggle REPL",                                    "zh": "切换 REPL" },
+        { "type": "row", "key": "<space>dL",  "en": "clear REPL",                                     "zh": "清空 REPL" }
+      ]
+    },
+    {
+      "id": "project",
+      "title": { "en": "Project & Navigation  (<space>p / z / C)", "zh": "项目与导航（<space>p / z / C）" },
+      "entries": [
+        { "type": "row", "key": "<space>pp",  "en": "switch project (telescope-project)",    "zh": "切换项目（telescope-project）" },
+        { "type": "row", "key": "<space>pP",  "en": "reset project root directory",          "zh": "重置项目根目录" },
+        { "type": "row", "key": "<space>pa",  "en": "add current directory as project",      "zh": "将当前目录添加为项目" },
+        { "type": "row", "key": "<space>z",   "en": "zoxide directory jump (frecency-based)","zh": "zoxide 目录跳转（基于使用频率）" },
+        { "type": "row", "key": "<space>Cc",  "en": "open config files picker",              "zh": "打开配置文件选择器" }
+      ]
+    },
+    {
+      "id": "terminal",
+      "title": { "en": "Terminal  (split pane, bottom)", "zh": "终端（底部分割面板）" },
+      "entries": [
+        { "type": "row", "key": "<space>!",  "en": "toggle terminal — open if hidden, hide if visible", "zh": "切换终端 — 隐藏时打开，可见时隐藏" },
+        { "type": "note", "en": "inside terminal:", "zh": "在终端内：" },
+        { "type": "row", "key": "<space>!",  "en": "[TERMINAL] hide terminal (same toggle key)",         "zh": "[终端] 隐藏终端（同一切换键）" },
+        { "type": "row", "key": "jk",        "en": "[TERMINAL] exit to normal mode (stay in window)",   "zh": "[终端] 退出到普通模式（留在窗口）" },
+        { "type": "row", "key": "<C-c>",     "en": "[TERMINAL] close terminal window entirely",         "zh": "[终端] 完全关闭终端窗口" }
+      ]
+    },
+    {
+      "id": "cursor-motion",
+      "title": { "en": "Cursor Motion  (Normal mode)", "zh": "光标移动（普通模式）" },
+      "entries": [
+        { "type": "row", "key": "0 / ^",      "en": "line start / first non-blank character",                        "zh": "行首 / 第一个非空字符" },
+        { "type": "row", "key": "$ / g_",     "en": "line end / last non-blank character",                           "zh": "行尾 / 最后一个非空字符" },
+        { "type": "row", "key": "gg / G",     "en": "file start / file end",                                         "zh": "文件起始 / 文件末尾" },
+        { "type": "row", "key": "w / b",      "en": "word start: forward / backward",                                "zh": "单词开头：前进 / 后退" },
+        { "type": "row", "key": "e / ge",     "en": "word end: forward / backward",                                  "zh": "单词结尾：前进 / 后退" },
+        { "type": "row", "key": "W / B / E",  "en": "same as w/b/e but WORD (whitespace-delimited)",                 "zh": "同 w/b/e，但以空白符分隔" },
+        { "type": "row", "key": "f{c} / F{c}","en": "find char forward / backward on current line",                  "zh": "在当前行正 / 反向查找字符" },
+        { "type": "row", "key": "t{c} / T{c}","en": "till char forward / backward (stops before c)",                 "zh": "移到字符前（正 / 反向，停在字符之前）" },
+        { "type": "row", "key": ";",          "en": "repeat last f/t/F/T in same direction",                         "zh": "重复上次 f/t/F/T（同方向）" },
+        { "type": "note", "en": "note: r is remapped to Flash jump; use f/t for on-line navigation", "zh": "注意：r 已重映射为 Flash 跳转，行内导航请用 f/t" },
+        { "type": "row", "key": "H / M / L",  "en": "cursor to top / middle / bottom of screen",                    "zh": "光标移到屏幕顶 / 中 / 底" },
+        { "type": "row", "key": "%",          "en": "jump to matching bracket / paren / brace",                      "zh": "跳到匹配的括号 / 圆括号 / 大括号" },
+        { "type": "row", "key": "( / )",      "en": "jump to previous / next sentence",                              "zh": "跳到上 / 下一个句子" },
+        { "type": "note", "en": "note: { } are remapped to buffer prev/next — paragraph jump unavailable", "zh": "注意：{ } 已重映射为 buffer 上/下，段落跳转不可用" },
+        { "type": "row", "key": "[[ / ]]",    "en": "jump to previous / next function / section",                    "zh": "跳到上 / 下一个函数 / 章节" },
+        { "type": "row", "key": "<C-u> / <C-d>","en": "scroll half page up / down",                                  "zh": "上 / 下滚动半页" }
+      ]
+    },
+    {
+      "id": "text-editing",
+      "title": { "en": "Text Editing  (Normal mode)", "zh": "文本编辑（普通模式）" },
+      "entries": [
+        { "type": "row", "key": "x / X",         "en": "delete char forward / backward",                      "zh": "向前 / 向后删除字符" },
+        { "type": "row", "key": "dw / db",        "en": "delete to next / previous word start",                "zh": "删除到下 / 上一个单词开头" },
+        { "type": "row", "key": "de / dge",       "en": "delete to next / previous word end",                  "zh": "删除到下 / 上一个单词结尾" },
+        { "type": "row", "key": "diw / daw",      "en": "delete inner word / around word (includes spaces)",   "zh": "删除内部单词 / 整个单词（含空格）" },
+        { "type": "row", "key": "d0 / D",         "en": "delete to line start / to line end",                  "zh": "删除到行首 / 行尾" },
+        { "type": "row", "key": "dd",             "en": "delete entire line",                                   "zh": "删除整行" },
+        { "type": "row", "key": "cw / cb",        "en": "change to next / previous word start",                "zh": "修改到下 / 上一个单词开头" },
+        { "type": "row", "key": "ciw / caw",      "en": "change inner word / around word",                     "zh": "修改内部单词 / 整个单词" },
+        { "type": "row", "key": "cc / C",         "en": "change entire line / change to end of line",          "zh": "修改整行 / 修改到行尾" },
+        { "type": "row", "key": "s",              "en": "substitute char under cursor (delete + insert)",       "zh": "替换光标处字符（删除 + 插入）" },
+        { "type": "row", "key": "J",              "en": "join current line with the line below",                "zh": "将当前行与下一行合并" },
+        { "type": "row", "key": "u / <C-r>",      "en": "undo / redo",                                          "zh": "撤销 / 重做" },
+        { "type": "row", "key": "p / P",          "en": "paste after / before cursor",                         "zh": "在光标后 / 前粘贴" },
+        { "type": "row", "key": "yy / Y",         "en": "yank (copy) current line",                            "zh": "复制当前行" },
+        { "type": "row", "key": "yiw / yaw",      "en": "yank inner word / around word",                       "zh": "复制内部单词 / 整个单词" },
+        { "type": "row", "key": ">> / <<",        "en": "indent / dedent current line",                        "zh": "缩进 / 取消缩进当前行" },
+        { "type": "row", "key": "> / <",          "en": "[VISUAL] indent / dedent selection",                  "zh": "[可视] 缩进 / 取消缩进选区" },
+        { "type": "row", "key": "~ / g~{motion}", "en": "toggle case of char / motion",                        "zh": "切换字符 / motion 的大小写" },
+        { "type": "row", "key": "gu{motion}",     "en": "lowercase over motion  e.g. guiw",                   "zh": "将 motion 范围内字母转为小写，如 guiw" },
+        { "type": "row", "key": "gU{motion}",     "en": "uppercase over motion  e.g. gUiw",                   "zh": "将 motion 范围内字母转为大写，如 gUiw" }
+      ]
+    },
+    {
+      "id": "misc",
+      "title": { "en": "Misc", "zh": "杂项" },
+      "entries": [
+        { "type": "row", "key": "<space>aq",      "en": "quit all windows",                             "zh": "退出所有窗口" },
+        { "type": "row", "key": "<space>P",       "en": "open pack manager (PackUpdate UI)",            "zh": "打开插件管理器（PackUpdate UI）" },
+        { "type": "row", "key": ":PackUpdate",    "en": "update all plugins with live progress",        "zh": "更新所有插件（实时进度）" },
+        { "type": "row", "key": ":PackClean",     "en": "remove unused plugin directories",             "zh": "清理未使用的插件目录" },
+        { "type": "row", "key": ":PackCheckUpdate","en": "check which plugins have updates (no download)","zh": "检查哪些插件有更新（不下载）" },
+        { "type": "row", "key": ":PackCheckHealth","en": "run health checks, show only issues",         "zh": "运行健康检查，仅显示问题" }
+      ]
+    }
+  ]
+}
