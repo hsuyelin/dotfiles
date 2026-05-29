@@ -1,10 +1,11 @@
 local gh = function(r) return 'https://github.com/' .. r end
 
-vim.pack.add({ gh("monkoose/neocodeium") })
+vim.pack.add({ src = gh("monkoose/neocodeium"), enabled = false })
 
 -- neocodeium: disabled by default; toggle with :NeoCodeium enable
 vim.schedule(function()
-  local neocodeium = require("neocodeium")
+  local ok, neocodeium = pcall(require, "neocodeium")
+  if not ok then return end
   neocodeium.setup({
     enabled = false,
     silent = true,

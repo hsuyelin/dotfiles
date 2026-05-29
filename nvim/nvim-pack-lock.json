@@ -4,10 +4,6 @@
       "rev": "585db11015abccf673dc5bd6502714d5655554be",
       "src": "https://github.com/stevearc/aerial.nvim"
     },
-    "aicommits.nvim": {
-      "rev": "86504279a0855953b8481d231520f9b67b03ad36",
-      "src": "https://github.com/404pilo/aicommits.nvim"
-    },
     "blink.cmp": {
       "rev": "78336bc89ee5365633bcf754d93df01678b5c08f",
       "src": "https://github.com/saghen/blink.cmp",
@@ -48,14 +44,6 @@
     "gitsigns.nvim": {
       "rev": "6d808f99bd63303646794406e270bd553ad7792e",
       "src": "https://github.com/lewis6991/gitsigns.nvim"
-    },
-    "go.nvim": {
-      "rev": "ed77921e3f0bdf9e52cf9fab2e0f4c69ef2a7e04",
-      "src": "https://github.com/ray-x/go.nvim"
-    },
-    "guihua.lua": {
-      "rev": "d178056728548ed8a99cce94de47b7500bd6889a",
-      "src": "https://github.com/ray-x/guihua.lua"
     },
     "heirline.nvim": {
       "rev": "fae936abb5e0345b85c3a03ecf38525b0828b992",
@@ -113,10 +101,6 @@
       "rev": "84c75e7a7e443586f60508d12fc50f90d9aee14e",
       "src": "https://github.com/nvim-neo-tree/neo-tree.nvim",
       "version": ">=3.0.0"
-    },
-    "neocodeium": {
-      "rev": "bfe790d78e66adaa95cb50a8c75c64a752336e9c",
-      "src": "https://github.com/monkoose/neocodeium"
     },
     "neogit": {
       "rev": "2d94da0032e201865a5b65a6bc008dd6fce8f52e",
@@ -220,14 +204,6 @@
       "rev": "08783ec022e7ddefe0f12a16f1ac4968f55478b0",
       "src": "https://github.com/HiPhish/rainbow-delimiters.nvim"
     },
-    "render-markdown.nvim": {
-      "rev": "d67113f11384c0dad96fced2f7b91f1fc811e97f",
-      "src": "https://github.com/MeanderingProgrammer/render-markdown.nvim"
-    },
-    "sidekick.nvim": {
-      "rev": "208e1c5b8170c01fd1d07df0139322a76479b235",
-      "src": "https://github.com/folke/sidekick.nvim"
-    },
     "smart-splits.nvim": {
       "rev": "78b9d3bd21fe479690ae5e08a1bf3602698466d8",
       "src": "https://github.com/mrjones2014/smart-splits.nvim"
@@ -235,10 +211,6 @@
     "smear-cursor.nvim": {
       "rev": "9e9378d6ee34bb3782e0e8c63d9ec8ca618b479b",
       "src": "https://github.com/sphamba/smear-cursor.nvim"
-    },
-    "snacks.nvim": {
-      "rev": "ad9ede6a9cddf16cedbd31b8932d6dcdee9b716e",
-      "src": "https://github.com/folke/snacks.nvim"
     },
     "telescope-tabs": {
       "rev": "62c127346c04c698c0cbd1c1ba945609a0ad10db",

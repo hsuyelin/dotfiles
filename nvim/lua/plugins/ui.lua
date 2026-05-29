@@ -36,7 +36,7 @@ notify.setup({
   top_down = false,
   max_width = 60,
   timeout = 1500,
-  level = vim.log.levels.WARN,
+  level = vim.log.levels.INFO,
   render = "minimal",
   stages = "static",
   background_colour = "#000000",

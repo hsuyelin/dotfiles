@@ -32,19 +32,43 @@ end
 local _real_add = vim.pack.add
 ---@diagnostic disable-next-line: duplicate-set-field
 vim.pack.add = function(specs, opts)
-    -- Install first so find_dir() locates the real directory afterwards.
-    local result = _real_add(specs, opts)
     local list = (type(specs) == "table" and vim.islist(specs)) and specs or { specs }
+
+    -- Partition into enabled / disabled.
+    -- A spec is disabled only when it is a table with enabled == false.
+    local enabled = {}
     for _, spec in ipairs(list) do
+        if not (type(spec) == "table" and spec.enabled == false) then
+            table.insert(enabled, spec)
+        end
+    end
+
+    -- Always pass a list to _real_add: Neovim 0.12+ requires list format.
+    local result
+    if #enabled > 0 then
+        result = _real_add(enabled, opts)
+    end
+
+    -- Register only enabled plugins so PackClean treats disabled ones as orphans.
+    for _, spec in ipairs(enabled) do
         local src     = type(spec) == "string" and spec or (type(spec) == "table" and spec.src)
         local version = type(spec) == "table"  and spec.version or nil
         if src then
             local name = src:match("([^/]+)$")
             if name then
-                M._registry[name] = { src = src, dir = find_dir(name), version = version }
+                -- version may already be a parsed range object (e.g. vim.version.range(...))
+                -- or a raw string; normalise to a range object in either case.
+                local version_range
+                if version ~= nil then
+                    version_range = (type(version) == "table" and type(version.has) == "function")
+                        and version
+                        or vim.version.range(tostring(version))
+                end
+                M._registry[name] = { src = src, dir = find_dir(name), version = version_range }
             end
         end
     end
+
     return result
 end
 
@@ -181,28 +205,74 @@ M.update = function()
     local HEADER = 2
 
     local done, n_ok, n_skip, n_fail = 0, 0, 0, 0
+    local bg_mode      = false
+    local spinner_timer -- assigned below; declared here so go_background can close over it
+
+    local function go_background()
+        if not vim.api.nvim_win_is_valid(win) then return end
+        bg_mode = true
+        if spinner_timer then spinner_timer:stop() end
+        vim.api.nvim_win_close(win, true)
+        vim.notify("PackUpdate: running in background…", vim.log.levels.INFO)
+    end
+    -- Override the default q / <Esc> close set by open_float.
+    vim.keymap.set("n", "q",     go_background, { buffer = buf, nowait = true })
+    vim.keymap.set("n", "<Esc>", go_background, { buffer = buf, nowait = true })
 
     local function on_all_done()
-        local last = vim.api.nvim_buf_line_count(buf) - 1
-        set_line(buf, last, string.format(
-            "  Done — ✓ %d  ↩ %d  ✗ %d    [q] close",
-            n_ok, n_skip, n_fail
-        ))
+        if spinner_timer then
+            spinner_timer:stop()
+            spinner_timer:close()
+        end
+        if not bg_mode and vim.api.nvim_buf_is_valid(buf) then
+            local last = vim.api.nvim_buf_line_count(buf) - 1
+            set_line(buf, last, string.format(
+                "  Done — ✓ %d  ↩ %d  ✗ %d    [q] close",
+                n_ok, n_skip, n_fail
+            ))
+        end
+        vim.notify(
+            string.format("PackUpdate: done — ✓ %d updated  ↩ %d skipped  ✗ %d failed",
+                n_ok, n_skip, n_fail),
+            n_fail > 0 and vim.log.levels.WARN or vim.log.levels.INFO
+        )
     end
 
+    local spinner_frames = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" }
+    local spinner_frame  = 0
+    local in_progress    = {} -- index → true while git op is running
+
+    local uv = vim.uv or vim.loop
+    spinner_timer = uv.new_timer()
+    spinner_timer:start(0, 80, vim.schedule_wrap(function()
+        if bg_mode then return end
+        spinner_frame = (spinner_frame % #spinner_frames) + 1
+        local fr = spinner_frames[spinner_frame]
+        for idx in pairs(in_progress) do
+            local it  = items[idx]
+            local tag = it.version and " [pinned]" or ""
+            set_line(buf, HEADER + idx - 1,
+                string.format("  %s %s%s", fr, it.name, tag))
+        end
+    end))
+
     for i, item in ipairs(items) do
+        in_progress[i] = true
         local strategy = item.version and update_versioned or update_unversioned
         strategy(item, function(icon, detail)
             vim.schedule(function()
+                in_progress[i] = nil
                 done = done + 1
                 if icon == "✓" then n_ok   = n_ok   + 1
                 elseif icon == "↩" then n_skip = n_skip + 1
                 else n_fail = n_fail + 1 end
-                local suffix = detail and ("  " .. detail) or ""
-                set_line(buf, HEADER + i - 1, string.format(
-                    "  %s %-34s%s  [%d/%d]",
-                    icon, item.name, suffix, done, #items
-                ))
+                if not bg_mode and vim.api.nvim_buf_is_valid(buf) then
+                    local suffix = detail and ("  " .. detail) or ""
+                    set_line(buf, HEADER + i - 1, string.format(
+                        "  %s %-34s%s  [%d/%d]",
+                        icon, item.name, suffix, done, #items
+                    ))
+                end
                 if done == #items then on_all_done() end
             end)
         end)
@@ -258,8 +328,15 @@ M.clean = function()
 
     vim.keymap.set("n", "y", function()
         close()
+        local names = vim.tbl_map(function(p) return p.name end, orphans)
+        -- vim.pack.del removes the directory AND clears the lockfile entry,
+        -- preventing Neovim from prompting to reinstall on next startup.
+        pcall(vim.pack.del, names)
+        -- Fallback: delete any directories not tracked by vim.pack (e.g. manually cloned).
         for _, p in ipairs(orphans) do
-            vim.fn.delete(p.dir, "rf")
+            if vim.fn.isdirectory(p.dir) == 1 then
+                vim.fn.delete(p.dir, "rf")
+            end
         end
         vim.notify(string.format("PackClean: removed %d plugin(s)", #orphans),
             vim.log.levels.INFO)
