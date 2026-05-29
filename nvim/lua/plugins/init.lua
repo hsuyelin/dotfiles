@@ -19,6 +19,7 @@ require("plugins.telescope")
 require("plugins.fzf")
 require("plugins.neo-tree")
 require("plugins.filesystem")
+require("plugins.aerial")
 
 -- Git
 require("plugins.git")

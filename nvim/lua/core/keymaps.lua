@@ -8,7 +8,10 @@ vim.keymap.set("i", "jk", "<esc>")
 vim.keymap.set("n", "<C-i>", "<C-]>")
 
 -- Fold
-vim.keymap.set("n", "<tab>", "za")
+vim.keymap.set("n", "<tab>",       "za")
+vim.keymap.set("n", "<leader>za",  "zM", { desc = "折叠全部 (Fold All)" })
+vim.keymap.set("n", "<leader>zo",  "zR", { desc = "展开全部 (Unfold All)" })
+require("which-key").add({ { "<leader>z", group = "折叠 (Fold)" } })
 
 -- Buffers
 vim.keymap.set("n", "<C-c>", utils.bufdelete.delete)
@@ -313,7 +316,8 @@ vim.keymap.set("n", "gD", vim.lsp.buf.type_definition, lsp_opts)
 vim.keymap.set("n", "gr", "<cmd>Telescope lsp_references<cr>", lsp_opts)
 vim.keymap.set("n", "gi", vim.lsp.buf.implementation, lsp_opts)
 vim.keymap.set("n", "go", "<cmd>Telescope lsp_dynamic_workspace_symbols<cr>", lsp_opts)
-vim.keymap.set("n", "gl", "<cmd>Telescope lsp_document_symbols<cr>", lsp_opts)
+vim.keymap.set("n", "gl", "<cmd>Telescope aerial<cr>", lsp_opts)
+vim.keymap.set("n", "<leader>lo", "<cmd>AerialToggle<cr>", lsp_opts)
 vim.keymap.set("n", "ca", vim.lsp.buf.code_action, lsp_opts)
 vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, lsp_opts)
 vim.keymap.set("n", "<leader>lr", "<cmd>LspRestart<cr>", lsp_opts)
@@ -337,8 +341,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
 			{ "<leader>la", vim.lsp.buf.code_action, desc = "代码操作 (Code Action)" },
 			{ "<leader>lgD", vim.lsp.buf.type_definition, desc = "类型定义 (Type Definition)" },
 			{ "<leader>lgi", vim.lsp.buf.implementation, desc = "实现 (Implementation)" },
+			{ "<leader>lo",  "<cmd>AerialToggle<cr>",                              desc = "大纲侧边栏 (Outline)" },
 			{ "<leader>lgo", "<cmd>Telescope lsp_dynamic_workspace_symbols<cr>", desc = "工作区符号 (Workspace Symbols)" },
-			{ "<leader>lgl", "<cmd>Telescope lsp_document_symbols<cr>", desc = "文档符号 (Document Symbols)" },
+			{ "<leader>lgl", "<cmd>Telescope aerial<cr>",                        desc = "文档符号 (Document Symbols)" },
 			{ "<leader>lt", group = "切换 (Toggle)", buffer = buf },
 			{ "<leader>lti", utils.toggles.toggle_inlay_hint, desc = "切换内嵌提示 (Toggle Inlay Hint)" },
 		})
