@@ -5,7 +5,7 @@
 # ── Shell ─────────────────────────────────────────────────────────────────────
 # Keep explicit zsh (not "detect") since entire config is zsh-specific
 shell-integration = zsh
-shell-integration-features = cursor,sudo,title
+shell-integration-features = sudo,title
 working-directory = home
 tab-inherit-working-directory = false
 

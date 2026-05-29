@@ -254,4 +254,4 @@ zstyle ':fzf-tab:*' fzf-flags '--bind=ctrl-d:preview-page-down,ctrl-u:preview-pa
 # Starship Prompt
 # ============================================================
 export STARSHIP_CONFIG="${XDG_CONFIG_HOME}/starship/starship.toml"
-eval "$(starship init zsh)"
+[[ -z "$STARSHIP_SHELL" ]] && eval "$(starship init zsh)"
