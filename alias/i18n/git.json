@@ -1,0 +1,140 @@
+{
+  "title": { "en": "Git Aliases", "zh": "Git 别名" },
+  "modules": [
+    {
+      "id": "status",
+      "title": { "en": "Status", "zh": "状态" },
+      "entries": [
+        { "type": "row", "key": "gst",  "en": "git status",    "zh": "git status" },
+        { "type": "row", "key": "gss",  "en": "git status -s", "zh": "git status -s（简洁）" }
+      ]
+    },
+    {
+      "id": "commit",
+      "title": { "en": "Add / Reset / Commit", "zh": "暂存 / 重置 / 提交" },
+      "entries": [
+        { "type": "row", "key": "ga",     "en": "git add <file>",                       "zh": "git add <文件>" },
+        { "type": "row", "key": "gaa",    "en": "git add .",                             "zh": "git add .（全部暂存）" },
+        { "type": "row", "key": "gam",    "en": "git add -p  (interactive patch)",       "zh": "git add -p（交互式选块）" },
+        { "type": "row", "key": "grh",    "en": "git reset HEAD",                        "zh": "git reset HEAD" },
+        { "type": "row", "key": "gcm",    "en": "git commit -m <msg>",                  "zh": "git commit -m <消息>" },
+        { "type": "row", "key": "gca",    "en": "git commit --amend",                   "zh": "git commit --amend" },
+        { "type": "row", "key": "gcane",  "en": "git commit --amend --no-edit",         "zh": "git commit --amend --no-edit" },
+        { "type": "row", "key": "gcam",   "en": "git commit -a -m <msg>",               "zh": "git commit -a -m <消息>" }
+      ]
+    },
+    {
+      "id": "wip",
+      "title": { "en": "WIP", "zh": "WIP 提交" },
+      "entries": [
+        { "type": "row", "key": "gwip",   "en": "git add -A && commit 'WIP [skip ci]'", "zh": "暂存全部并提交 WIP" },
+        { "type": "row", "key": "gunwip", "en": "undo last commit if it is a WIP",      "zh": "撤销最后一次 WIP 提交" }
+      ]
+    },
+    {
+      "id": "branch",
+      "title": { "en": "Branch", "zh": "分支" },
+      "entries": [
+        { "type": "row", "key": "gco",    "en": "git checkout <branch>",      "zh": "git checkout <分支>" },
+        { "type": "row", "key": "gcb",    "en": "git checkout -b <branch>",   "zh": "git checkout -b <分支>（新建）" },
+        { "type": "row", "key": "gcmain", "en": "git checkout main",          "zh": "git checkout main" },
+        { "type": "row", "key": "gcf",    "en": "git checkout -f",            "zh": "git checkout -f（强制）" },
+        { "type": "row", "key": "gbr",    "en": "git branch",                 "zh": "git branch（列出分支）" },
+        { "type": "row", "key": "gbd",    "en": "git branch -d <branch>",     "zh": "git branch -d（安全删除）" },
+        { "type": "row", "key": "gbD",    "en": "git branch -D <branch>",     "zh": "git branch -D（强制删除）" },
+        { "type": "row", "key": "gbmv",   "en": "git branch -m <old> <new>",  "zh": "git branch -m（重命名）" },
+        { "type": "row", "key": "gba",    "en": "fzf branch picker → checkout","zh": "fzf 分支选择器 → checkout" }
+      ]
+    },
+    {
+      "id": "fetch",
+      "title": { "en": "Fetch", "zh": "拉取" },
+      "entries": [
+        { "type": "row", "key": "gf",   "en": "git fetch",               "zh": "git fetch" },
+        { "type": "row", "key": "gfa",  "en": "git fetch --all --prune", "zh": "git fetch --all --prune（全部拉取并清理）" }
+      ]
+    },
+    {
+      "id": "merge-rebase",
+      "title": { "en": "Merge / Rebase", "zh": "合并 / 变基" },
+      "entries": [
+        { "type": "row", "key": "gm",    "en": "git merge <branch>",        "zh": "git merge <分支>" },
+        { "type": "row", "key": "gma",   "en": "git merge --abort",         "zh": "git merge --abort" },
+        { "type": "row", "key": "gmt",   "en": "git mergetool",             "zh": "git mergetool（合并工具）" },
+        { "type": "row", "key": "grb",   "en": "git rebase <branch>",       "zh": "git rebase <分支>" },
+        { "type": "row", "key": "grbi",  "en": "git rebase -i <base>",      "zh": "git rebase -i（交互式）" },
+        { "type": "row", "key": "grba",  "en": "git rebase --abort",        "zh": "git rebase --abort" },
+        { "type": "row", "key": "grbc",  "en": "git rebase --continue",     "zh": "git rebase --continue" },
+        { "type": "row", "key": "grbs",  "en": "git rebase --skip",         "zh": "git rebase --skip" }
+      ]
+    },
+    {
+      "id": "cherry-pick",
+      "title": { "en": "Cherry-pick", "zh": "Cherry-pick" },
+      "entries": [
+        { "type": "row", "key": "gcp",   "en": "git cherry-pick <commit>",   "zh": "git cherry-pick <提交>" },
+        { "type": "row", "key": "gcpa",  "en": "git cherry-pick --abort",    "zh": "git cherry-pick --abort" },
+        { "type": "row", "key": "gcpc",  "en": "git cherry-pick --continue", "zh": "git cherry-pick --continue" }
+      ]
+    },
+    {
+      "id": "conflict",
+      "title": { "en": "Conflict Resolution", "zh": "冲突解决" },
+      "entries": [
+        { "type": "row", "key": "gcrf",    "en": "mark file as resolved  (git add <file>)",            "zh": "标记文件已解决（git add <文件>）" },
+        { "type": "row", "key": "gcrall",  "en": "mark all conflicts resolved  (git add -u)",          "zh": "标记所有冲突已解决（git add -u）" },
+        { "type": "row", "key": "gours",   "en": "keep ours version  (git checkout --ours <file>)",    "zh": "保留我方版本" },
+        { "type": "row", "key": "gtheirs", "en": "keep theirs version  (git checkout --theirs <file>)","zh": "保留对方版本" }
+      ]
+    },
+    {
+      "id": "pull-push",
+      "title": { "en": "Pull / Push", "zh": "拉取 / 推送" },
+      "entries": [
+        { "type": "row", "key": "gpl",   "en": "git pull",                                                     "zh": "git pull" },
+        { "type": "row", "key": "gpr",   "en": "git pull --rebase",                                            "zh": "git pull --rebase" },
+        { "type": "row", "key": "gps",   "en": "git push",                                                     "zh": "git push" },
+        { "type": "row", "key": "gpf",   "en": "git push --force",                                             "zh": "git push --force（⚠ 危险）" },
+        { "type": "row", "key": "gpo",   "en": "git push origin",                                              "zh": "git push origin" },
+        { "type": "row", "key": "gpgnv", "en": "push HEAD:refs/for/<branch> --no-verify  (Gerrit)",           "zh": "推送到 Gerrit refs/for/<分支>" }
+      ]
+    },
+    {
+      "id": "log-diff",
+      "title": { "en": "Log / Diff", "zh": "日志 / 差异" },
+      "entries": [
+        { "type": "row", "key": "gl",   "en": "git log --oneline --graph --decorate",       "zh": "单行图形日志" },
+        { "type": "row", "key": "gloa", "en": "git log --oneline --graph --decorate --all", "zh": "单行图形日志（全部分支）" },
+        { "type": "row", "key": "glg",  "en": "git log --stat",                             "zh": "git log --stat（含文件统计）" },
+        { "type": "row", "key": "gd",   "en": "git diff",                                   "zh": "git diff" },
+        { "type": "row", "key": "gds",  "en": "git diff --staged",                          "zh": "git diff --staged（已暂存）" },
+        { "type": "row", "key": "gdc",  "en": "git diff --cached",                          "zh": "git diff --cached" },
+        { "type": "row", "key": "gdt",  "en": "git difftool",                               "zh": "git difftool（外部工具）" }
+      ]
+    },
+    {
+      "id": "stash",
+      "title": { "en": "Stash", "zh": "储藏" },
+      "entries": [
+        { "type": "row", "key": "gsta",  "en": "git stash",      "zh": "git stash（储藏）" },
+        { "type": "row", "key": "gstp",  "en": "git stash pop",  "zh": "git stash pop（弹出）" },
+        { "type": "row", "key": "gstl",  "en": "git stash list", "zh": "git stash list（列出）" }
+      ]
+    },
+    {
+      "id": "reset-clean",
+      "title": { "en": "Reset / Clean", "zh": "重置 / 清理" },
+      "entries": [
+        { "type": "row", "key": "gbl",    "en": "git blame <file>",                                    "zh": "git blame <文件>" },
+        { "type": "row", "key": "gcl",    "en": "git clone <url>",                                     "zh": "git clone <地址>" },
+        { "type": "row", "key": "gsh",    "en": "git show",                                            "zh": "git show" },
+        { "type": "row", "key": "gtag",   "en": "git tag",                                             "zh": "git tag（标签）" },
+        { "type": "row", "key": "grhs",   "en": "git reset --soft HEAD~1  (undo last commit)",         "zh": "git reset --soft HEAD~1（软回退）" },
+        { "type": "row", "key": "grhh",   "en": "git reset --hard",                                    "zh": "git reset --hard（⚠ 硬重置）" },
+        { "type": "row", "key": "gclean", "en": "git clean -dfx",                                      "zh": "git clean -dfx（清理未追踪文件）" },
+        { "type": "row", "key": "gnuke",  "en": "reset --hard + clean + nuke all submodules",          "zh": "硬重置 + 清理 + 递归清理所有子模块" },
+        { "type": "row", "key": "gsnuke", "en": "nuke all submodules only",                            "zh": "仅递归清理所有子模块" }
+      ]
+    }
+  ]
+}

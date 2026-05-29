@@ -1,0 +1,32 @@
+{
+  "title": { "en": "Note-Taking Keymaps", "zh": "笔记快捷键" },
+  "subtitle": { "en": "workspace = ~/notes   inbox = ~/notes/inbox", "zh": "工作区 = ~/notes   收件箱 = ~/notes/inbox" },
+  "modules": [
+    {
+      "id": "obsidian",
+      "title": { "en": "Obsidian  (<space>n…)", "zh": "Obsidian（<space>n…）" },
+      "entries": [
+        { "type": "row", "key": "<space>nn",  "en": "new note (saved to inbox/)",                       "zh": "新建笔记（保存到 inbox/）" },
+        { "type": "row", "key": "<space>no",  "en": "quick switch — fuzzy open any note",               "zh": "快速切换 — 模糊打开任意笔记" },
+        { "type": "row", "key": "<space>ns",  "en": "full-text search across notes (Telescope)",        "zh": "全文搜索笔记内容（Telescope）" },
+        { "type": "row", "key": "<space>nd",  "en": "open today's daily note (daily/YYYY-MM-DD.md)",    "zh": "打开今日日记（daily/YYYY-MM-DD.md）" },
+        { "type": "row", "key": "<space>ny",  "en": "open yesterday's daily note",                     "zh": "打开昨日日记" },
+        { "type": "row", "key": "<space>nt",  "en": "insert template (from templates/ directory)",     "zh": "插入模板（来自 templates/ 目录）" },
+        { "type": "row", "key": "<space>nb",  "en": "view backlinks for current note",                 "zh": "查看当前笔记的反向链接" },
+        { "type": "row", "key": "<space>nT",  "en": "browse all notes by tag",                        "zh": "按标签浏览所有笔记" }
+      ]
+    },
+    {
+      "id": "markdown",
+      "title": { "en": "Markdown  (<space>m…)", "zh": "Markdown（<space>m…）" },
+      "entries": [
+        { "type": "note", "en": "markview: renders in normal mode, reveals raw text in insert mode", "zh": "markview：普通模式渲染，插入模式自动还原原文" },
+        { "type": "row", "key": "<space>mt",  "en": "toggle markview rendering on/off",              "zh": "切换 markview 渲染开/关" },
+        { "type": "row", "key": "<space>mh",  "en": "toggle hybrid mode (cursor line raw, rest rendered)", "zh": "切换 hybrid 模式（光标行显示原文，其余渲染）" },
+        { "type": "row", "key": "<space>ms",  "en": "split preview (markview split)",                "zh": "分屏预览（markview split）" },
+        { "type": "row", "key": "<space>mp",  "en": "browser live preview (peek.nvim)",              "zh": "在浏览器中实时预览（peek.nvim）" },
+        { "type": "row", "key": "<space>mc",  "en": "close browser preview",                        "zh": "关闭浏览器预览" }
+      ]
+    }
+  ]
+}

@@ -651,60 +651,16 @@ xindex() {
 }
 
 # ---------------------------------------------------------------------------
-# xhelp — cheatsheet for all x* functions
+# xhelp — Xcode helpers reference.
+# Usage: xhelp [list | show [--module <id>] [--lang zh]] [--help]
 # ---------------------------------------------------------------------------
 
 xhelp() {
-    local bold=$'\033[1m'
-    local cyan=$'\033[0;36m'
-    local yellow=$'\033[0;33m'
-    local reset=$'\033[0m'
-    local sep='────────────────────────────'
-
-    echo ""
-    printf '%sXcode Helpers Cheatsheet%s\n' "$bold" "$reset"
-    echo "$sep"
-
-    _xhelp_section()  { printf '\n%s  %s%s\n'       "$yellow" "$1" "$reset"; }
-    _xhelp_synopsis() { printf '  %s%-12s%s  %s\n'  "$cyan"   "$1" "$reset" "$2"; }
-    _xhelp_note()     { printf "    %s\n" "$1"; }
-
-    _xhelp_section "xclean"
-    _xhelp_synopsis "xclean" \
-        "[--workspace <name>] --scheme <name> --configuration <name>"
-    _xhelp_note "Clean build artifacts for the scheme."
-
-    _xhelp_section "xbuild"
-    _xhelp_synopsis "xbuild" \
-        "[--workspace <name>] --scheme <name> --configuration <name>"
-    _xhelp_note "Interactively pick a device or simulator, then build."
-    _xhelp_note "Output piped through xcbeautify."
-
-    _xhelp_section "xarchive"
-    _xhelp_synopsis "xarchive" \
-        "[--workspace <name>] --scheme <name>"
-    _xhelp_synopsis "" \
-        "--configuration <name> --archive-path <path>"
-    _xhelp_note "Archive the scheme to the given path."
-
-    _xhelp_section "xinstall"
-    _xhelp_synopsis "xinstall" \
-        "[--workspace <name>] --scheme <name> --configuration <name>"
-    _xhelp_note "Interactively pick a device or simulator (↑↓ + Enter),"
-    _xhelp_note "build the app, and install it — no Xcode required."
-    _xhelp_note "Device install uses devicectl (Xcode 15+) or ios-deploy."
-
-    _xhelp_section "xindex"
-    _xhelp_synopsis "xindex" \
-        "--workspace <path> --scheme <name>"
-    _xhelp_note "Generate buildServer.json (sourcekit-lsp) and compile_commands.json (clangd)"
-    _xhelp_note "to enable gd / gr in Neovim for Swift, ObjC, C, C++ files."
-    _xhelp_note "Run once per project, re-run only if project structure changes."
-    _xhelp_note "Requires a prior build (xbuild) for compile_commands.json."
-
-    echo ""
-    echo "$sep"
-    echo ""
-
-    unfunction _xhelp_section _xhelp_synopsis _xhelp_note
+    local _i18n="${XDG_CONFIG_HOME}/alias/i18n/xcode.json"
+    case "$1" in
+        list)      shift; _help_list "$_i18n" "$@" ;;
+        --help|-h) _help_usage "xhelp" ;;
+        show)      shift; _help_show "$_i18n" "$@" ;;
+        *)         _help_show "$_i18n" "$@" ;;
+    esac
 }

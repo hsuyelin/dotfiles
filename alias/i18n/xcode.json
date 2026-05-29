@@ -1,0 +1,60 @@
+{
+  "title": { "en": "Xcode Helpers", "zh": "Xcode 辅助工具" },
+  "modules": [
+    {
+      "id": "xclean",
+      "title": { "en": "xclean  — clean build artifacts", "zh": "xclean — 清理构建产物" },
+      "entries": [
+        { "type": "row", "key": "--workspace",    "en": "<name>  (optional)",       "zh": "<名称>（可选）" },
+        { "type": "row", "key": "--scheme",       "en": "<name>  (required)",       "zh": "<名称>（必填）" },
+        { "type": "row", "key": "--configuration","en": "<name>  (required)",       "zh": "<名称>（必填）" },
+        { "type": "note", "en": "Clean build artifacts for the scheme.", "zh": "清理指定 scheme 的构建产物。" }
+      ]
+    },
+    {
+      "id": "xbuild",
+      "title": { "en": "xbuild  — build for device / simulator", "zh": "xbuild — 构建到设备或模拟器" },
+      "entries": [
+        { "type": "row", "key": "--workspace",    "en": "<name>  (optional)",       "zh": "<名称>（可选）" },
+        { "type": "row", "key": "--scheme",       "en": "<name>  (required)",       "zh": "<名称>（必填）" },
+        { "type": "row", "key": "--configuration","en": "<name>  (required)",       "zh": "<名称>（必填）" },
+        { "type": "note", "en": "Interactively pick a device or simulator, then build.", "zh": "交互式选择设备或模拟器后构建。" },
+        { "type": "note", "en": "Output is piped through xcbeautify.", "zh": "输出通过 xcbeautify 美化。" }
+      ]
+    },
+    {
+      "id": "xarchive",
+      "title": { "en": "xarchive  — archive the scheme", "zh": "xarchive — 归档 scheme" },
+      "entries": [
+        { "type": "row", "key": "--workspace",    "en": "<name>  (optional)",       "zh": "<名称>（可选）" },
+        { "type": "row", "key": "--scheme",       "en": "<name>  (required)",       "zh": "<名称>（必填）" },
+        { "type": "row", "key": "--configuration","en": "<name>  (required)",       "zh": "<名称>（必填）" },
+        { "type": "row", "key": "--archive-path", "en": "<path>  (required)",       "zh": "<路径>（必填）" },
+        { "type": "note", "en": "Archive the scheme to the given path.", "zh": "将 scheme 归档到指定路径。" }
+      ]
+    },
+    {
+      "id": "xinstall",
+      "title": { "en": "xinstall  — build and install on device", "zh": "xinstall — 构建并安装到设备" },
+      "entries": [
+        { "type": "row", "key": "--workspace",    "en": "<name>  (optional)",       "zh": "<名称>（可选）" },
+        { "type": "row", "key": "--scheme",       "en": "<name>  (required)",       "zh": "<名称>（必填）" },
+        { "type": "row", "key": "--configuration","en": "<name>  (required)",       "zh": "<名称>（必填）" },
+        { "type": "note", "en": "Interactively pick device/simulator (↑↓ + Enter), build, and install.", "zh": "交互选择设备/模拟器（↑↓ + Enter），构建并安装。" },
+        { "type": "note", "en": "Device install uses devicectl (Xcode 15+) or ios-deploy.", "zh": "真机安装使用 devicectl（Xcode 15+）或 ios-deploy。" }
+      ]
+    },
+    {
+      "id": "xindex",
+      "title": { "en": "xindex  — generate LSP index files", "zh": "xindex — 生成 LSP 索引文件" },
+      "entries": [
+        { "type": "row", "key": "--workspace",  "en": "<path>  (required)",    "zh": "<路径>（必填）" },
+        { "type": "row", "key": "--scheme",     "en": "<name>  (required)",    "zh": "<名称>（必填）" },
+        { "type": "note", "en": "Generates buildServer.json (sourcekit-lsp) and compile_commands.json (clangd).", "zh": "生成 buildServer.json（sourcekit-lsp）和 compile_commands.json（clangd）。" },
+        { "type": "note", "en": "Enables gd / gr in Neovim for Swift, ObjC, C, C++ files.", "zh": "使 Neovim 中的 gd / gr 对 Swift、ObjC、C、C++ 生效。" },
+        { "type": "note", "en": "Run once per project; re-run if project structure changes.", "zh": "每个项目运行一次；项目结构改变时重新运行。" },
+        { "type": "note", "en": "Requires a prior build (xbuild) for compile_commands.json.", "zh": "需要先执行 xbuild 才能生成 compile_commands.json。" }
+      ]
+    }
+  ]
+}

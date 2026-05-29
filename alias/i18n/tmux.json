@@ -1,0 +1,91 @@
+{
+  "title": { "en": "Tmux Cheatsheet", "zh": "Tmux 快捷键" },
+  "subtitle": { "en": "prefix = Ctrl+a", "zh": "prefix = Ctrl+a" },
+  "modules": [
+    {
+      "id": "panes",
+      "title": { "en": "Panes", "zh": "面板" },
+      "entries": [
+        { "type": "row", "key": "prefix + |",        "en": "split right (vertical divider)",     "zh": "向右分割（竖分隔）" },
+        { "type": "row", "key": "prefix + -",        "en": "split down (horizontal divider)",    "zh": "向下分割（横分隔）" },
+        { "type": "row", "key": "prefix + q",        "en": "close current pane (no confirm)",    "zh": "关闭当前面板（无确认）" },
+        { "type": "row", "key": "Ctrl + h/j/k/l",   "en": "navigate left/down/up/right",        "zh": "在面板间导航" },
+        { "type": "row", "key": "prefix + H/J/K/L", "en": "resize pane",                        "zh": "调整面板大小" },
+        { "type": "row", "key": "prefix + =",        "en": "tile all panes evenly",              "zh": "平铺所有面板" },
+        { "type": "row", "key": "prefix + P",        "en": "rename current pane",                "zh": "重命名当前面板" }
+      ]
+    },
+    {
+      "id": "windows",
+      "title": { "en": "Windows (tabs)", "zh": "窗口（标签）" },
+      "entries": [
+        { "type": "row", "key": "prefix + c",    "en": "new window",                "zh": "新建窗口" },
+        { "type": "row", "key": "prefix + Q",    "en": "close window (no confirm)", "zh": "关闭窗口（无确认）" },
+        { "type": "row", "key": "prefix + 1-9",  "en": "jump to window by number",  "zh": "按数字跳转到窗口" },
+        { "type": "row", "key": "prefix + n",    "en": "next window",               "zh": "下一个窗口" },
+        { "type": "row", "key": "prefix + p",    "en": "previous window",           "zh": "上一个窗口" },
+        { "type": "row", "key": "prefix + T",    "en": "toggle status bar",         "zh": "切换状态栏" }
+      ]
+    },
+    {
+      "id": "sessions",
+      "title": { "en": "Sessions", "zh": "会话" },
+      "entries": [
+        { "type": "row", "key": "prefix + s",  "en": "session tree (built-in chooser)",          "zh": "会话树（内置选择器）" },
+        { "type": "row", "key": "Option + R",  "en": "fzf session picker (= ta)",                "zh": "fzf 会话选择器（= ta）" },
+        { "type": "row", "key": "tn",          "en": "new session (named after cwd)",             "zh": "新建会话（以当前目录命名）" },
+        { "type": "row", "key": "tn <name>",   "en": "new session with name",                    "zh": "新建指定名称的会话" },
+        { "type": "row", "key": "ta",          "en": "fzf picker — switch / attach",             "zh": "fzf 选择器 — 切换 / 附加" },
+        { "type": "row", "key": "tl",          "en": "list all sessions",                        "zh": "列出所有会话" },
+        { "type": "row", "key": "tk",          "en": "detach (keep session running)",             "zh": "断开连接（保持会话运行）" },
+        { "type": "row", "key": "tq",          "en": "kill current session",                     "zh": "终止当前会话" }
+      ]
+    },
+    {
+      "id": "ta-fzf",
+      "title": { "en": "ta  (fzf keys)", "zh": "ta（fzf 内的按键）" },
+      "entries": [
+        { "type": "row", "key": "enter",    "en": "switch to focused session",                          "zh": "切换到当前聚焦的会话" },
+        { "type": "row", "key": "space",    "en": "toggle select + move down",                          "zh": "切换选择 + 向下移动" },
+        { "type": "row", "key": "ctrl-a",   "en": "select all sessions",                                "zh": "全选所有会话" },
+        { "type": "row", "key": "ctrl-x",   "en": "kill selected session(s)",                           "zh": "终止选中的会话" },
+        { "type": "row", "key": "ctrl-r",   "en": "rename focused session",                             "zh": "重命名当前聚焦的会话" },
+        { "type": "row", "key": "ctrl-s",   "en": "save selected session(s); no selection = no-op",    "zh": "保存选中会话；未选 = 无操作" },
+        { "type": "row", "key": "ctrl-d",   "en": "drop selected session(s); no selection = no-op",    "zh": "从保存中移除选中会话；未选 = 无操作" }
+      ]
+    },
+    {
+      "id": "copy-mode",
+      "title": { "en": "Copy mode", "zh": "复制模式" },
+      "entries": [
+        { "type": "row", "key": "prefix + Esc",    "en": "enter copy mode",                    "zh": "进入复制模式" },
+        { "type": "row", "key": "v",               "en": "begin selection",                    "zh": "开始选择" },
+        { "type": "row", "key": "V",               "en": "select line",                        "zh": "选择整行" },
+        { "type": "row", "key": "Ctrl + v",        "en": "rectangle selection",               "zh": "矩形选择" },
+        { "type": "row", "key": "y",               "en": "copy to system clipboard",           "zh": "复制到系统剪贴板" },
+        { "type": "row", "key": "drag / dblclick", "en": "mouse select → auto copy",           "zh": "鼠标选择 → 自动复制" },
+        { "type": "row", "key": "prefix + p",      "en": "paste",                              "zh": "粘贴" }
+      ]
+    },
+    {
+      "id": "persistence",
+      "title": { "en": "Session Persistence  (tmux-resurrect)", "zh": "会话持久化（tmux-resurrect）" },
+      "entries": [
+        { "type": "row", "key": "prefix + Ctrl-s", "en": "save all sessions to disk (survives shutdown)",          "zh": "保存所有会话到磁盘（重启后恢复）" },
+        { "type": "row", "key": "prefix + Ctrl-r", "en": "restore sessions (added to list, no auto-attach)",       "zh": "恢复会话（加入列表，不自动附加）" },
+        { "type": "row", "key": "ctrl-s in ta",    "en": "save selected sessions; no select = save all",          "zh": "保存选中会话；未选 = 保存全部" },
+        { "type": "row", "key": "ctrl-d in ta",    "en": "drop selected sessions; no select = drop all",          "zh": "移除选中会话；未选 = 移除全部" }
+      ]
+    },
+    {
+      "id": "misc",
+      "title": { "en": "Misc", "zh": "杂项" },
+      "entries": [
+        { "type": "row", "key": "prefix + g",    "en": "lazygit popup",              "zh": "lazygit 弹窗" },
+        { "type": "row", "key": "prefix + r",    "en": "reload tmux config",         "zh": "重载 tmux 配置" },
+        { "type": "row", "key": "trl",           "en": "reload tmux config from shell","zh": "从 shell 重载 tmux 配置" },
+        { "type": "row", "key": "Shift + Enter", "en": "insert newline (no submit)", "zh": "插入换行（不提交）" }
+      ]
+    }
+  ]
+}

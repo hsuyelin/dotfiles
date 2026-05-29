@@ -156,85 +156,14 @@ alias tpr='echo "restore sessions: prefix + Ctrl-r"'
 # tpd: hint — drop a session via ctrl-d in ta() fzf picker.
 alias tpd='echo "drop session from save: ctrl-d in ta fzf picker"'
 
-# thelp: print all tmux shortcuts and helper aliases.
+# thelp: Tmux keymap reference.
+# Usage: thelp [list | show [--module <id>] [--lang zh]] [--help]
 thelp() {
-    local bold=$'\033[1m'
-    local cyan=$'\033[0;36m'
-    local yellow=$'\033[0;33m'
-    local dim=$'\033[2m'
-    local reset=$'\033[0m'
-    local sep='────────────────────────────'
-
-    _thelp_section() { printf '\n%s  %-16s%s\n' "$yellow" "$1" "$reset"; }
-    _thelp_row()     { printf '  %s%-16s%s  %s\n' "$cyan" "$1" "$reset" "$2"; }
-    # shellcheck disable=SC2329
-    _thelp_note()    { printf '  %s%-16s  %s%s\n' "$dim" "" "$1" "$reset"; }
-
-    echo ""
-    printf '%sTmux Cheatsheet%s  ' "$bold" "$reset"
-    printf '%sprefix = Ctrl+a%s\n' "$dim" "$reset"
-    echo "$sep"
-
-    _thelp_section "Panes"
-    _thelp_row "prefix + |"    "split right (vertical divider)"
-    _thelp_row "prefix + -"    "split down (horizontal divider)"
-    _thelp_row "prefix + q"    "close current pane (no confirm)"
-    _thelp_row "Ctrl + h/j/k/l" "navigate left/down/up/right"
-    _thelp_row "prefix + H/J/K/L" "resize pane"
-    _thelp_row "prefix + ="    "tile all panes evenly"
-    _thelp_row "prefix + P"    "rename current pane"
-
-    _thelp_section "Windows (tabs)"
-    _thelp_row "prefix + c"    "new window"
-    _thelp_row "prefix + Q"    "close window (no confirm)"
-    _thelp_row "prefix + 1-9"  "jump to window by number"
-    _thelp_row "prefix + n"    "next window"
-    _thelp_row "prefix + p"    "previous window"
-    _thelp_row "prefix + T"    "toggle status bar"
-
-    _thelp_section "Sessions"
-    _thelp_row "prefix + s"    "session tree (built-in chooser)"
-    _thelp_row "Option + R"    "fzf session picker (= ta)"
-    _thelp_row "tn"            "new session (named after cwd)"
-    _thelp_row "tn <name>"     "new session with name"
-    _thelp_row "ta"            "fzf picker — switch / attach"
-    _thelp_row "tl"            "list all sessions"
-    _thelp_row "tk"            "detach (keep session running)"
-    _thelp_row "tq"            "kill current session"
-
-    _thelp_section "ta (fzf keys)"
-    _thelp_row "enter"         "switch to focused session"
-    _thelp_row "space"         "toggle select + move down"
-    _thelp_row "ctrl-a"        "select all sessions"
-    _thelp_row "ctrl-x"        "kill selected session(s)"
-    _thelp_row "ctrl-r"        "rename focused session"
-    _thelp_row "ctrl-s"        "save selected session(s); no selection = no-op"
-    _thelp_row "ctrl-d"        "drop selected session(s); no selection = no-op"
-
-    _thelp_section "Copy mode"
-    _thelp_row "prefix + Esc"  "enter copy mode"
-    _thelp_row "v"             "begin selection"
-    _thelp_row "V"             "select line"
-    _thelp_row "Ctrl + v"      "rectangle selection"
-    _thelp_row "y"             "copy to system clipboard"
-    _thelp_row "drag / dblclick" "mouse select → auto copy"
-    _thelp_row "prefix + p"    "paste"
-
-    _thelp_section "Session Persistence  (tmux-resurrect)"
-    _thelp_row "prefix + Ctrl-s" "save all sessions to disk (survives shutdown)"
-    _thelp_row "prefix + Ctrl-r" "restore sessions (added to session list, no auto-attach)"
-    _thelp_row "ctrl-s in ta"  "save selected session(s); no select = save all"
-    _thelp_row "ctrl-d in ta"  "drop selected session(s); no select = drop all"
-
-    _thelp_section "Misc"
-    _thelp_row "prefix + g"    "lazygit popup"
-    _thelp_row "prefix + r"    "reload tmux config"
-    _thelp_row "trl"           "reload tmux config from shell"
-    _thelp_row "Shift + Enter" "insert newline (no submit)"
-
-    echo ""
-    echo "$sep"
-    echo ""
-
-    unfunction _thelp_section _thelp_row _thelp_note
+    local _i18n="${XDG_CONFIG_HOME}/alias/i18n/tmux.json"
+    case "$1" in
+        list)      shift; _help_list "$_i18n" "$@" ;;
+        --help|-h) _help_usage "thelp" ;;
+        show)      shift; _help_show "$_i18n" "$@" ;;
+        *)         _help_show "$_i18n" "$@" ;;
+    esac
 }

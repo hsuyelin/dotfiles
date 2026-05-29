@@ -1,0 +1,135 @@
+{
+  "title": { "en": "Shell Cheatsheet", "zh": "Shell 快捷键与工具" },
+  "subtitle": { "en": "zsh Emacs mode + common tool aliases", "zh": "zsh Emacs 模式 + 常用工具别名" },
+  "modules": [
+    {
+      "id": "cursor-movement",
+      "title": { "en": "Cursor Movement  (zsh line editing)", "zh": "光标移动（zsh 行编辑）" },
+      "entries": [
+        { "type": "row", "key": "Ctrl+A",  "en": "jump to beginning of line",      "zh": "跳到行首" },
+        { "type": "row", "key": "Ctrl+E",  "en": "jump to end of line",            "zh": "跳到行尾" },
+        { "type": "row", "key": "Ctrl+F",  "en": "move forward one character",     "zh": "向前移动一个字符" },
+        { "type": "row", "key": "Ctrl+B",  "en": "move backward one character",    "zh": "向后移动一个字符" },
+        { "type": "row", "key": "Alt+F",   "en": "move forward one word",          "zh": "向前移动一个单词" },
+        { "type": "row", "key": "Alt+B",   "en": "move backward one word",         "zh": "向后移动一个单词" }
+      ]
+    },
+    {
+      "id": "deletion",
+      "title": { "en": "Deletion", "zh": "删除" },
+      "entries": [
+        { "type": "row", "key": "Ctrl+D",  "en": "delete char forward (or exit shell if line empty)", "zh": "向前删除字符（行空时退出 shell）" },
+        { "type": "row", "key": "Ctrl+H",  "en": "delete char backward (= Backspace)",               "zh": "向后删除字符（同 Backspace）" },
+        { "type": "row", "key": "Ctrl+W",  "en": "delete word backward (stops at whitespace)",        "zh": "向后删除一个单词（以空格为界）" },
+        { "type": "row", "key": "Alt+D",   "en": "delete word forward",                               "zh": "向前删除一个单词" },
+        { "type": "row", "key": "Ctrl+K",  "en": "kill (cut) from cursor to end of line",             "zh": "剪切从光标到行尾" },
+        { "type": "row", "key": "Ctrl+U",  "en": "kill from cursor to beginning of line",             "zh": "剪切从光标到行首" },
+        { "type": "note", "en": "killed text is saved to kill-ring; paste with Ctrl+Y", "zh": "被剪切的内容存入 kill-ring，用 Ctrl+Y 粘贴" }
+      ]
+    },
+    {
+      "id": "yank",
+      "title": { "en": "Yank / Paste", "zh": "粘贴" },
+      "entries": [
+        { "type": "row", "key": "Ctrl+Y",  "en": "yank (paste) last killed text",                      "zh": "粘贴最后剪切的内容" },
+        { "type": "row", "key": "Alt+Y",   "en": "cycle through kill-ring entries (after Ctrl+Y)",     "zh": "循环切换 kill-ring 条目（在 Ctrl+Y 后）" }
+      ]
+    },
+    {
+      "id": "undo-transform",
+      "title": { "en": "Undo / Transform", "zh": "撤销 / 转换" },
+      "entries": [
+        { "type": "row", "key": "Ctrl+_",  "en": "undo last edit",                          "zh": "撤销上一次编辑" },
+        { "type": "row", "key": "Ctrl+T",  "en": "transpose current and previous character","zh": "交换当前字符与前一字符" },
+        { "type": "row", "key": "Alt+T",   "en": "transpose current and previous word",     "zh": "交换当前单词与前一单词" },
+        { "type": "row", "key": "Alt+U",   "en": "uppercase from cursor to end of word",    "zh": "将光标到词尾转为大写" },
+        { "type": "row", "key": "Alt+L",   "en": "lowercase from cursor to end of word",    "zh": "将光标到词尾转为小写" },
+        { "type": "row", "key": "Alt+C",   "en": "capitalize current word",                 "zh": "将当前单词首字母大写" }
+      ]
+    },
+    {
+      "id": "history",
+      "title": { "en": "History", "zh": "历史记录" },
+      "entries": [
+        { "type": "row", "key": "Ctrl+R",  "en": "reverse incremental history search",                    "zh": "逆向增量历史搜索" },
+        { "type": "row", "key": "Ctrl+S",  "en": "forward incremental history search",                    "zh": "正向增量历史搜索" },
+        { "type": "row", "key": "Ctrl+P",  "en": "previous command in history (= Up)",                   "zh": "历史中的上一条命令（= ↑）" },
+        { "type": "row", "key": "Ctrl+N",  "en": "next command in history (= Down)",                     "zh": "历史中的下一条命令（= ↓）" },
+        { "type": "row", "key": "Alt+.",   "en": "insert last argument of previous command",              "zh": "插入上一条命令的最后一个参数" },
+        { "type": "row", "key": "Alt+_",   "en": "same as Alt+. (alternate binding)",                    "zh": "同 Alt+.（备用绑定）" },
+        { "type": "note", "en": "press Alt+. repeatedly to cycle through history arguments", "zh": "反复按 Alt+. 可循环浏览历史参数" }
+      ]
+    },
+    {
+      "id": "screen-process",
+      "title": { "en": "Screen / Process", "zh": "屏幕 / 进程" },
+      "entries": [
+        { "type": "row", "key": "Ctrl+L",  "en": "clear screen (keep current line)",              "zh": "清屏（保留当前行）" },
+        { "type": "row", "key": "Ctrl+C",  "en": "cancel / interrupt current command",             "zh": "取消 / 中断当前命令" },
+        { "type": "row", "key": "Ctrl+Z",  "en": "suspend foreground process (resume with 'fg')", "zh": "挂起前台进程（用 fg 恢复）" },
+        { "type": "row", "key": "Ctrl+Q",  "en": "resume output if stopped by Ctrl+S",            "zh": "恢复被 Ctrl+S 停止的输出" }
+      ]
+    },
+    {
+      "id": "eza",
+      "title": { "en": "eza  (ls replacement)", "zh": "eza（ls 替代品）" },
+      "entries": [
+        { "type": "row", "key": "ls",   "en": "eza --icons --group-directories-first",                   "zh": "带图标列出文件，目录优先" },
+        { "type": "row", "key": "l",    "en": "eza -l --icons --git --header --color-scale",             "zh": "详细列表，含 git 状态" },
+        { "type": "row", "key": "ll",   "en": "eza -la --icons --git --header --color-scale",            "zh": "详细列表含隐藏文件，含 git 状态" },
+        { "type": "row", "key": "la",   "en": "eza -a --icons (include hidden)",                         "zh": "列出全部文件（含隐藏）" },
+        { "type": "row", "key": "lr",   "en": "eza -l --sort=modified (sort by date)",                   "zh": "按修改时间排序" },
+        { "type": "row", "key": "lb",   "en": "eza -l --sort=size (sort by size)",                       "zh": "按文件大小排序" },
+        { "type": "row", "key": "lt",   "en": "eza --tree --level=2 (tree view)",                        "zh": "树形视图（深度 2）" },
+        { "type": "row", "key": "lta",  "en": "eza --tree -a --level=2 (tree with hidden)",              "zh": "树形视图（含隐藏文件）" }
+      ]
+    },
+    {
+      "id": "bat",
+      "title": { "en": "bat  (cat replacement)", "zh": "bat（cat 替代品）" },
+      "entries": [
+        { "type": "row", "key": "batp",   "en": "bat -p    (plain style, no decorations)",   "zh": "纯文本模式，无边框装饰" },
+        { "type": "row", "key": "batP",   "en": "bat -P    (no paging)",                     "zh": "无分页器" },
+        { "type": "row", "key": "batpp",  "en": "bat -p -P (plain + no paging, cat-like)",   "zh": "纯文本 + 无分页，类似 cat" }
+      ]
+    },
+    {
+      "id": "proxy",
+      "title": { "en": "Proxy helpers", "zh": "代理工具" },
+      "entries": [
+        { "type": "row", "key": "proxy_on",     "en": "enable HTTP + SOCKS5 proxy (ports from env)", "zh": "启用 HTTP + SOCKS5 代理（端口来自环境变量）" },
+        { "type": "row", "key": "proxy_off",    "en": "disable proxy (unset env vars)",               "zh": "禁用代理（清除环境变量）" },
+        { "type": "row", "key": "proxy_status", "en": "print current proxy env vars",                 "zh": "打印当前代理环境变量" },
+        { "type": "note", "en": "env: PROXY_PORT_HTTP (default 6152)  PROXY_PORT_SOCKS (default 6153)", "zh": "环境变量：PROXY_PORT_HTTP（默认 6152）  PROXY_PORT_SOCKS（默认 6153）" }
+      ]
+    },
+    {
+      "id": "tools",
+      "title": { "en": "Tools", "zh": "实用工具" },
+      "entries": [
+        { "type": "row", "key": "yy",          "en": "open Yazi file manager; cd to last dir on exit",  "zh": "打开 Yazi 文件管理器，退出后自动 cd 到最后目录" },
+        { "type": "row", "key": "rd",          "en": "ratatui directory picker → cd",                   "zh": "ratatui 目录选择器 → cd" },
+        { "type": "row", "key": "ipshow",      "en": "show LAN + WAN IP addresses",                     "zh": "显示局域网 + 公网 IP" },
+        { "type": "row", "key": "ipshow -l",   "en": "show LAN IP only",                                "zh": "仅显示局域网 IP" },
+        { "type": "row", "key": "ipshow -p",   "en": "show public (WAN) IP only",                       "zh": "仅显示公网 IP" },
+        { "type": "row", "key": "fix",         "en": "convert backtick `cmd` → $(cmd) in clipboard",    "zh": "将剪贴板中的反引号命令转换为 $(cmd) 形式" },
+        { "type": "row", "key": "lg",          "en": "lazygit (alias)",                                  "zh": "lazygit（别名）" },
+        { "type": "row", "key": "pwtop",       "en": "energy-sorted process monitor (Catppuccin theme)", "zh": "按能耗排序的进程监控（Catppuccin 主题）" }
+      ]
+    },
+    {
+      "id": "system",
+      "title": { "en": "System", "zh": "系统" },
+      "entries": [
+        { "type": "row", "key": "sign_app <name>",  "en": "strip quarantine & re-sign macOS .app bundle",  "zh": "清除隔离属性并重新签名 macOS .app" },
+        { "type": "note", "en": "accepts: /path/to/App.app  |  App.app  |  app (searches /Applications)", "zh": "接受：绝对路径 | App.app | app 名称（在 /Applications 中搜索）" },
+        { "type": "row", "key": "rm",              "en": "safer rm — moves to Trash via safe-trash",       "zh": "安全 rm — 通过 safe-trash 移入废纸篓" },
+        { "type": "row", "key": "real-rm",         "en": "raw /bin/rm (bypass the safe wrapper)",          "zh": "原始 /bin/rm（绕过安全封装）" },
+        { "type": "row", "key": "dns:flush",       "en": "flush macOS DNS cache",                         "zh": "刷新 macOS DNS 缓存" },
+        { "type": "row", "key": "ssh",             "en": "ssh with TERM=xterm-256color",                  "zh": "ssh（自动设置 TERM=xterm-256color）" },
+        { "type": "row", "key": "bash-reload",     "en": "re-source bash profile",                        "zh": "重新加载 bash profile" },
+        { "type": "row", "key": "chrome",          "en": "open Google Chrome with US region override",    "zh": "打开 Google Chrome（强制美国区域）" }
+      ]
+    }
+  ]
+}

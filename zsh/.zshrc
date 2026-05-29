@@ -150,6 +150,8 @@ unset _km
 # shellcheck disable=SC1091
 [[ -f "${XDG_CONFIG_HOME}/bash/.bash_profile" ]] && source "${XDG_CONFIG_HOME}/bash/.bash_profile"
 # shellcheck disable=SC1091
+[[ -f "${XDG_CONFIG_HOME}/alias/help_lib.zsh" ]] && source "${XDG_CONFIG_HOME}/alias/help_lib.zsh"
+# shellcheck disable=SC1091
 [[ -f "${XDG_CONFIG_HOME}/alias/aliases.zsh" ]] && source "${XDG_CONFIG_HOME}/alias/aliases.zsh"
 # shellcheck disable=SC1091
 [[ -f "${XDG_CONFIG_HOME}/alias/git.zsh" ]] && source "${XDG_CONFIG_HOME}/alias/git.zsh"
@@ -161,6 +163,8 @@ unset _km
 [[ -f "${XDG_CONFIG_HOME}/alias/xcode.zsh" ]] && source "${XDG_CONFIG_HOME}/alias/xcode.zsh"
 # shellcheck disable=SC1091
 [[ -f "${XDG_CONFIG_HOME}/alias/nvim.zsh" ]] && source "${XDG_CONFIG_HOME}/alias/nvim.zsh"
+# shellcheck disable=SC1091
+[[ -f "${XDG_CONFIG_HOME}/alias/note.zsh" ]] && source "${XDG_CONFIG_HOME}/alias/note.zsh"
 # shellcheck disable=SC1091
 [[ -f "${XDG_CONFIG_HOME}/private/xcode.zsh" ]] && source "${XDG_CONFIG_HOME}/private/xcode.zsh"
 # shellcheck disable=SC1091
