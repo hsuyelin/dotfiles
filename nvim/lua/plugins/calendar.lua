@@ -150,7 +150,9 @@ local function load_holiday_set()
                         while t <= te do
                             local dt  = os.date('*t', t)
                             local key = string.format('%04d-%02d-%02d', dt.year, dt.month, dt.day)
-                            _holiday_set[key] = { name = name, memo = memo }
+                            _holiday_set[key] = {
+                                name = name, memo = memo, kind = 'public',
+                            }
                             t = t + 86400
                         end
                     end
@@ -159,9 +161,16 @@ local function load_holiday_set()
         end
     end
 
-    -- Merge observances; public holidays (from JSON) take precedence.
+    -- Merge observances. Public holidays take precedence on conflict.
+    -- When both fall on the same day, keep the public entry and tag it
+    -- with kind='both' plus the observance name for display purposes.
     for k, v in pairs(load_obs_set()) do
-        if not _holiday_set[k] then _holiday_set[k] = v end
+        if _holiday_set[k] then
+            _holiday_set[k].kind     = 'both'
+            _holiday_set[k].obs_name = v.name
+        else
+            _holiday_set[k] = v
+        end
     end
 
     return _holiday_set
@@ -311,7 +320,13 @@ end
 -- ── Calendar state (must be declared before popup helpers that reference it) ─
 
 local _today = os.date('*t')
-local _cal   = { year = _today.year, month = _today.month, day = _today.day, win = -1 }
+local _cal   = {
+    year  = _today.year,
+    month = _today.month,
+    day   = _today.day,
+    win   = -1,
+    buf   = -1,   -- set after first view.open; used by highlight_day recolor hook
+}
 
 -- ── Quick preview popup ──────────────────────────────────────────────────────
 
@@ -393,11 +408,18 @@ local function open_day_detail(year, month, day)
     table.insert(lines, title)
     table.insert(lines, sep)
     if holiday then
-        table.insert(lines, '假期：' .. holiday.name)
+        if holiday.kind == 'both' then
+            table.insert(lines, '假期：' .. holiday.name)
+            table.insert(lines, '节日：' .. holiday.obs_name)
+        elseif holiday.kind == 'obs' then
+            table.insert(lines, '节日：' .. holiday.name)
+        else
+            table.insert(lines, '假期：' .. holiday.name)
+        end
         if holiday.memo ~= '' then
             table.insert(lines, '')
-            for _, mline in ipairs(vim.split(holiday.memo, '\n', { plain = true })) do
-                if mline ~= '' then table.insert(lines, mline) end
+            for _, ml in ipairs(vim.split(holiday.memo, '\n', { plain = true })) do
+                if ml ~= '' then table.insert(lines, ml) end
             end
         end
     else
@@ -505,6 +527,79 @@ end
 chinese_days_ext.actions = {}
 require('calendar.extensions').register('chinese_days', chinese_days_ext)
 
+-- ── Observance mark colours ──────────────────────────────────────────────────
+-- kind='obs'  → yellow   (international observance only)
+-- kind='both' → orange   (public holiday + observance on the same day)
+-- kind='public' keeps the default DiagnosticError (red) mark from calendar.nvim.
+
+vim.api.nvim_set_hl(0, 'CalendarObs',  { fg = '#FFD700', bold = true })
+vim.api.nvim_set_hl(0, 'CalendarBoth', { fg = '#FF8C00', bold = true })
+
+-- Runs after calendar.nvim's set_mark() to recolour obs/both day marks.
+-- Uses the same grid-position formula as view.lua so we can locate the exact
+-- extmark and update its highlight in-place (no position conflicts).
+local function recolor_obs_marks(buf, year, month)
+    local cal_ns = vim.api.nvim_get_namespaces()['calendar.nvim']
+    if not cal_ns then return end
+
+    local grid = require('calendar.model').build_month_grid(year, month)
+    local set  = load_holiday_set()
+    local icon = require('calendar.config').get().mark_icon
+
+    local is_cm = false
+    for row, week in ipairs(grid) do
+        for col, val in ipairs(week) do
+            local d = tonumber(val)
+            if is_cm and d == 1 then
+                is_cm = false
+            elseif not is_cm and d == 1 then
+                is_cm = true
+            end
+            if is_cm and d then
+                local key = string.format('%04d-%02d-%02d', year, month, d)
+                local h   = set[key]
+                if h and h.kind ~= 'public' then
+                    local line = (row - 1) * 2 + 4
+                    local cs   = d < 10
+                        and (col - 1) * 4 + 4
+                        or  (col - 1) * 4 + 3
+                    local new_base = h.kind == 'obs'
+                        and 'CalendarObs' or 'CalendarBoth'
+                    -- Find the mark extmark calendar.nvim placed at this cell.
+                    local ems = vim.api.nvim_buf_get_extmarks(
+                        buf, cal_ns, {line, cs}, {line, cs}, {details = true}
+                    )
+                    for _, em in ipairs(ems) do
+                        local id, opts = em[1], em[4]
+                        local vt = opts and opts.virt_text
+                        if vt and #vt > 0 and vt[1][1] == icon then
+                            -- Rebuild highlight list: replace base colour but
+                            -- preserve today/current highlights (indices 2+).
+                            local orig = vt[1][2]
+                            local hl
+                            if type(orig) == 'table' then
+                                hl = { new_base }
+                                for i = 2, #orig do
+                                    hl[#hl + 1] = orig[i]
+                                end
+                            else
+                                hl = new_base
+                            end
+                            vim.api.nvim_buf_set_extmark(
+                                buf, cal_ns, line, cs, {
+                                    id            = id,
+                                    virt_text     = {{ icon, hl }},
+                                    virt_text_pos = opts.virt_text_pos or 'overlay',
+                                }
+                            )
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
 -- ── Patch view ──────────────────────────────────────────────────────────────
 
 local _view = require('calendar.view')
@@ -514,16 +609,25 @@ if not _view._patched then
     local _orig_highlight = _view.highlight_day
     local _buf_patched    = false
 
-    -- Keep _cal.day in sync with every navigation move.
+    -- Keep _cal.day in sync; recolour obs/both marks after every set_mark call.
+    -- _cal.buf is -1 on the very first open (set below), so we skip silently
+    -- and let _view.open handle the initial recolour explicitly.
     _view.highlight_day = function(day)
         _cal.day = day
         _orig_highlight(day)
+        if _cal.buf ~= -1 and vim.api.nvim_buf_is_valid(_cal.buf) then
+            recolor_obs_marks(_cal.buf, _cal.year, _cal.month)
+        end
     end
 
     _view.open = function(y, m, d)
         _cal.year, _cal.month, _cal.day = y, m, d or _cal.day
         local b, w = _orig_open(y, m, d)
         _cal.win = w
+        _cal.buf = b
+        -- Explicit recolour for the initial open: _cal.buf was -1 when
+        -- highlight_day ran inside _orig_open, so marks are still red.
+        recolor_obs_marks(b, y, m)
 
         if not _buf_patched then
             _buf_patched = true
@@ -545,9 +649,16 @@ if not _view._patched then
             vim.api.nvim_buf_set_keymap(b, 'n', 'p', '', {
                 desc     = 'Preview holiday for selected day',
                 callback = function()
-                    local key     = string.format('%04d-%02d-%02d', _cal.year, _cal.month, _cal.day)
-                    local holiday = load_holiday_set()[key]
-                    local name    = holiday and holiday.name or '（无假期）'
+                    local key = string.format(
+                        '%04d-%02d-%02d', _cal.year, _cal.month, _cal.day
+                    )
+                    local h    = load_holiday_set()[key]
+                    local name = '（无假期）'
+                    if h then
+                        name = h.kind == 'both'
+                            and (h.name .. ' · ' .. h.obs_name)
+                            or  h.name
+                    end
                     show_holiday_popup(_cal.year, _cal.month, _cal.day, name)
                 end,
             })
@@ -563,14 +674,18 @@ if not _view._patched then
                     callback = function()
                         orig_mouse()
                         if vim.api.nvim_get_current_buf() ~= b then return end
-                        local day     = tonumber(vim.fn.expand('<cword>'))
+                        local day = tonumber(vim.fn.expand('<cword>'))
                         if not day then return end
-                        local key     = string.format('%04d-%02d-%02d', _cal.year, _cal.month, day)
-                        local holiday = load_holiday_set()[key]
-                        if holiday then
-                            show_holiday_popup(_cal.year, _cal.month, day, holiday.name)
+                        local key = string.format(
+                            '%04d-%02d-%02d', _cal.year, _cal.month, day
+                        )
+                        local h = load_holiday_set()[key]
+                        if h then
+                            local name = h.kind == 'both'
+                                and (h.name .. ' · ' .. h.obs_name)
+                                or  h.name
+                            show_holiday_popup(_cal.year, _cal.month, day, name)
                         end
-                        -- Mouse click on non-holiday: no popup (click is already visual feedback)
                     end,
                 })
             end
