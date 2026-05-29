@@ -68,6 +68,7 @@ local function async_fetch()
                     if ok and type(data) == 'table' and type(data.Years) == 'table' then
                         os.rename(tmp, cache_file)
                         _holiday_set = nil              -- force reload on next access
+                        _obs_set     = nil              -- invalidate observance cache too
                         local s = read_state()
                         s.failed = false; s.failed_date = nil; s.daily_attempts = 0
                         write_state(s)
