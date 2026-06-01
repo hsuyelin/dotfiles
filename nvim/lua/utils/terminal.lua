@@ -29,7 +29,16 @@ local function buf_setup(buf)
 	-- 	end,
 	-- })
 	vim.keymap.set("t", "jk", [[<C-\><C-n>]], { buffer = buf, silent = true })
-	vim.keymap.set("t", "<C-c>", [[<C-\><C-n><C-w>c]], { buffer = buf, silent = true })
+	-- Window navigation from terminal mode (smart-splits handles <C-\><C-n> internally).
+	local ss = require("smart-splits")
+	vim.keymap.set("t", "<C-h>", ss.move_cursor_left,  { buffer = buf, silent = true })
+	vim.keymap.set("t", "<C-j>", ss.move_cursor_down,  { buffer = buf, silent = true })
+	vim.keymap.set("t", "<C-k>", ss.move_cursor_up,    { buffer = buf, silent = true })
+	vim.keymap.set("t", "<C-l>", ss.move_cursor_right, { buffer = buf, silent = true })
+	-- Clear screen: <M-l> sends Ctrl-L to the shell, bypassing the navigation mapping.
+	vim.keymap.set("t", "<M-l>", function()
+		vim.fn.chansend(vim.bo.channel, "\12")
+	end, { buffer = buf, silent = true })
 	-- toggle (hide) the terminal from inside terminal mode
 	vim.keymap.set("t", "<leader>!", function()
 		local M = require("utils.terminal")
@@ -49,11 +58,16 @@ function M.new(cmd)
 	vim.api.nvim_buf_call(self.buf, function()
 		vim.fn.termopen(self.cmd, {
 			on_exit = function()
-				vim.api.nvim_buf_delete(self.buf, { force = true })
+				-- Remove from list first; if buf_delete throws, the list is
+				-- already clean and toggle() will never hit the stale entry.
 				for key, value in ipairs(terminals) do
 					if value.buf == self.buf then
 						table.remove(terminals, key)
+						break
 					end
+				end
+				if vim.api.nvim_buf_is_valid(self.buf) then
+					pcall(vim.api.nvim_buf_delete, self.buf, { force = true })
 				end
 			end,
 		})
@@ -114,6 +128,12 @@ end
 
 -- Toggle the first terminal: hide it if visible in the current tab, else show it.
 function M.toggle()
+	-- Prune entries whose buffers were deleted outside our on_exit.
+	for i = #terminals, 1, -1 do
+		if not vim.api.nvim_buf_is_valid(terminals[i].buf) then
+			table.remove(terminals, i)
+		end
+	end
 	local list = M.list()
 	if #list == 0 then
 		M.new()
@@ -150,12 +170,16 @@ function M.lazygit()
 
 	vim.fn.termopen("lazygit", {
 		on_exit = function()
-			if vim.api.nvim_win_is_valid(win) then
-				vim.api.nvim_win_close(win, true)
-			end
-			if vim.api.nvim_buf_is_valid(buf) then
-				vim.api.nvim_buf_delete(buf, { force = true })
-			end
+			-- Defer to next event-loop tick: Neovim finishes its own terminal
+			-- cleanup before we touch the window/buffer, avoiding TOCTOU crashes.
+			vim.schedule(function()
+				if vim.api.nvim_win_is_valid(win) then
+					pcall(vim.api.nvim_win_close, win, true)
+				end
+				if vim.api.nvim_buf_is_valid(buf) then
+					pcall(vim.api.nvim_buf_delete, buf, { force = true })
+				end
+			end)
 		end,
 	})
 	vim.cmd("startinsert")

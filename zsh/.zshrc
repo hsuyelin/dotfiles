@@ -76,6 +76,8 @@ zi light "zsh-users/zsh-autosuggestions"
 
 bindkey '^H' backward-delete-char
 bindkey '^?' backward-delete-char
+bindkey '^A' beginning-of-line
+bindkey '^E' end-of-line
 
 # Shift+Enter → insert literal newline without submitting (Kitty keyboard protocol,
 # requires tmux `extended-keys on` + `terminal-features extkeys`).
