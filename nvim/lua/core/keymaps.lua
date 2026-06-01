@@ -317,17 +317,19 @@ utils.map_on_filetype("dart", {
 })
 
 -- LSP keymaps registered globally; vim.lsp.buf.* silently no-ops when no LSP is attached.
-local lsp_opts = { noremap = true, silent = true }
-vim.keymap.set("n", "gd", vim.lsp.buf.definition, lsp_opts)
-vim.keymap.set("n", "gD", vim.lsp.buf.type_definition, lsp_opts)
-vim.keymap.set("n", "gr", "<cmd>Telescope lsp_references<cr>", lsp_opts)
-vim.keymap.set("n", "gi", vim.lsp.buf.implementation, lsp_opts)
-vim.keymap.set("n", "go", "<cmd>Telescope lsp_dynamic_workspace_symbols<cr>", lsp_opts)
-vim.keymap.set("n", "gl", "<cmd>Telescope aerial<cr>", lsp_opts)
-vim.keymap.set("n", "<leader>lo", "<cmd>AerialToggle<cr>", lsp_opts)
-vim.keymap.set("n", "ca", vim.lsp.buf.code_action, lsp_opts)
-vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, lsp_opts)
-vim.keymap.set("n", "<leader>lr", "<cmd>LspRestart<cr>", lsp_opts)
+local lsp_base = { noremap = true, silent = true }
+local function lsp_opt(desc) return vim.tbl_extend("force", lsp_base, { desc = desc }) end
+
+vim.keymap.set("n", "gd", vim.lsp.buf.definition,                          lsp_opt("跳转定义 (Go to Definition)"))
+vim.keymap.set("n", "gD", vim.lsp.buf.type_definition,                     lsp_opt("跳转类型定义 (Go to Type Definition)"))
+vim.keymap.set("n", "gr", "<cmd>Telescope lsp_references<cr>",             lsp_opt("查找引用 (References)"))
+vim.keymap.set("n", "gi", vim.lsp.buf.implementation,                      lsp_opt("跳转实现 (Implementation)"))
+vim.keymap.set("n", "go", "<cmd>Telescope lsp_dynamic_workspace_symbols<cr>", lsp_opt("工作区符号 (Workspace Symbols)"))
+vim.keymap.set("n", "gl", "<cmd>Telescope aerial<cr>",                     lsp_opt("文档符号 (Document Symbols)"))
+vim.keymap.set("n", "<leader>lo", "<cmd>AerialToggle<cr>",                 lsp_opt("大纲侧边栏 (Outline)"))
+vim.keymap.set("n", "ca", vim.lsp.buf.code_action,                         lsp_opt("代码操作 (Code Action)"))
+vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename,                      lsp_opt("重命名 (Rename)"))
+vim.keymap.set("n", "<leader>lr", "<cmd>LspRestart<cr>",                   lsp_opt("重启 LSP (Restart LSP)"))
 
 -- inlay hint and which-key registration still need the client; keep LspAttach for those.
 local augroup = vim.api.nvim_create_augroup("lsp_keymaps", { clear = true })

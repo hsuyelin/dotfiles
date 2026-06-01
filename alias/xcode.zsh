@@ -13,6 +13,18 @@ _xwarn() { printf '\033[1;33m%12s\033[0m  %s\n' "$1" "$2"; }
 _xerr()  { printf '\033[1;31m%12s\033[0m  %s\n' "error" "$1" >&2; }
 _xhint() { printf '\033[2m%14s  %s\033[0m\n' "" "$1" >&2; }
 
+# Return the most recent xcactivitylog that contains actual build (compile)
+# commands.  Skips empty files and clean-only logs (compressed size < 10 KB).
+_xbs_latest_build_log() {
+    local dir="$1"
+    local f sz
+    ls -t "$dir"/*.xcactivitylog 2>/dev/null | while IFS= read -r f; do
+        [[ -s "$f" ]] || continue
+        sz=$(stat -f '%z' "$f" 2>/dev/null || wc -c < "$f" 2>/dev/null || echo 0)
+        (( sz > 10000 )) && printf '%s\n' "$f" && return 0
+    done
+}
+
 # ---------------------------------------------------------------------------
 # Dependency check — call at the top of every public function.
 # Verifies xcodebuild (Xcode) and xcbeautify (brew) are available.
@@ -621,22 +633,25 @@ xindex() {
     _xlog "Generated" "buildServer.json"
 
     # ── Step 3: compile_commands.json from the just-produced build log ─────────
-    local ws_name dd_base log log_dir info
-    ws_name="$(basename "$ws_path" .xcworkspace)"
-    dd_base="$HOME/Library/Developer/Xcode/DerivedData"
-    log=""
-    for info in "$dd_base"/*/info.plist; do
-        [ -f "$info" ] || continue
-        grep -q "$ws_name" "$info" 2>/dev/null || continue
-        log_dir="$(dirname "$info")/Logs/Build"
-        [ -d "$log_dir" ] || continue
-        log="$(ls -t "$log_dir"/*.xcactivitylog 2>/dev/null | head -1)"
-        [ -n "$log" ] && break
-    done
+    # Read build_root from the buildServer.json that step 2 just generated —
+    # more reliable than searching DerivedData by workspace name.
+    local log_dir log
+    local _br
+    _br=$(python3 -c "
+import json, sys
+try: print(json.load(open('buildServer.json'))['build_root'])
+except: pass
+" 2>/dev/null)
 
-    if [ -z "$log" ]; then
-        _xwarn "Skipped" "build log not found in DerivedData"
-        _xhint "compile_commands.json was NOT generated"
+    log=""
+    if [[ -n "$_br" && -d "$_br/Logs/Build" ]]; then
+        log_dir="$_br/Logs/Build"
+        log=$(_xbs_latest_build_log "$log_dir")
+    fi
+
+    if [[ -z "$log" ]]; then
+        _xwarn "Skipped" "no valid build log found in DerivedData"
+        _xhint ".compile was NOT updated — build the project first, then re-run xindex --skip-build"
     else
         _xlog "Parsing" "$(basename "$log")"
         if xcode-build-server parse -a "$log"; then
@@ -705,10 +720,10 @@ xbs-parse() {
     fi
 
     local log
-    log=$(ls -t "$log_dir"/*.xcactivitylog 2>/dev/null | head -1)
+    log=$(_xbs_latest_build_log "$log_dir")
     if [[ -z "$log" ]]; then
-        _xerr "No .xcactivitylog found in $log_dir"
-        _xhint "Build the project in Xcode first"
+        _xerr "No valid build log found in $log_dir"
+        _xhint "Build the project first (Xcode ⌘B, or: xindex --workspace ... --scheme ...)"
         return 1
     fi
 
