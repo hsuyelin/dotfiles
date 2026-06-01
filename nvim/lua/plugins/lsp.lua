@@ -43,7 +43,11 @@ vim.api.nvim_create_user_command("LspRestart", function()
   for _, client in ipairs(clients) do
     vim.lsp.stop_client(client.id, true)
   end
-  vim.defer_fn(function() vim.cmd("edit") end, 500)
+  vim.defer_fn(function()
+    if vim.api.nvim_buf_get_name(0) ~= "" then
+      vim.cmd("edit")
+    end
+  end, 500)
 end, { desc = "Restart LSP clients for current buffer" })
 
 vim.keymap.set({ "n", "v" }, "<leader>lf", function()
