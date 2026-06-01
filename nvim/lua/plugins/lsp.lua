@@ -38,6 +38,14 @@ require("conform").setup({
   },
 })
 
+vim.api.nvim_create_user_command("LspRestart", function()
+  local clients = vim.lsp.get_clients({ bufnr = 0 })
+  for _, client in ipairs(clients) do
+    vim.lsp.stop_client(client.id, true)
+  end
+  vim.defer_fn(function() vim.cmd("edit") end, 500)
+end, { desc = "Restart LSP clients for current buffer" })
+
 vim.keymap.set({ "n", "v" }, "<leader>lf", function()
   require("conform").format({ async = false })
 end, { noremap = true, desc = "Format Code Block" })
