@@ -60,6 +60,7 @@ wk.add({
 	{ "<leader>at", "<cmd>TodoTelescope<cr>", desc = "待办列表 (Todo List)" },
 	{ "<leader>ae", "<cmd>Telescope emoji<cr>", desc = "表情符号 (Emoji)" },
 	{ "<leader>am", "<cmd>Telescope notify<cr>", desc = "消息通知 (Messages)" },
+	{ "<leader>ad", "<cmd>NoiceDismiss<cr>", desc = "关闭通知 (Dismiss Notifications)" },
 	-- Config
 	{ "<leader>C", group = "配置 (Config)" },
 	{ "<leader>Cc", utils.config_files, desc = "编辑配置 (Edit Config)" },
