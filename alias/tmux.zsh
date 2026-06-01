@@ -139,7 +139,14 @@ zle -N _tmux_session_picker_widget
 bindkey '\er' _tmux_session_picker_widget
 
 # trl: reload tmux config from the shell (works inside or outside tmux).
-alias trl='tmux source "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/tmux.conf" && echo "tmux config reloaded"'
+# Starts the server first if it isn't running, so new installs don't get
+# "error connecting to ... (No such file or directory)".
+unalias trl 2>/dev/null
+function trl {
+  tmux start-server 2>/dev/null
+  tmux source "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/tmux.conf" \
+    && echo "tmux config reloaded"
+}
 
 # tl: list sessions at a glance.
 alias tl='tmux list-sessions 2>/dev/null || echo "no tmux sessions."'

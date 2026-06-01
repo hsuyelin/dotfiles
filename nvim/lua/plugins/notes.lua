@@ -4,6 +4,11 @@ vim.pack.add({
     gh('epwalsh/obsidian.nvim'),
 })
 
+local notes_dir = vim.fn.expand("~/notes")
+if vim.fn.isdirectory(notes_dir) == 0 then
+    vim.fn.mkdir(notes_dir, "p")
+end
+
 require("obsidian").setup({
     workspaces = {
         { name = "personal", path = "~/notes" },

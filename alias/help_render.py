@@ -40,16 +40,23 @@ def pad(s: str, w: int) -> str:
     return s + ' ' * max(0, w - vw(s))
 
 
+sep_row  = '├' + '─' * (key_col + 2) + '┼' + '─' * (desc_col + 2) + '┤'
+sep_full = '├' + '─' * (key_col + desc_col + 5) + '┤'
+
+rendered = []
 for entry in json.load(sys.stdin):
     t = entry.get('type', '')
     if t == 'row':
         key  = trunc(entry.get('key', ''), key_col)
         desc = trunc(entry.get(lang, entry.get('en', '')), desc_col)
-        print(f'│ {C}{pad(key, key_col)}{R} │ {pad(desc, desc_col)} │')
+        rendered.append(('row', f'│ {C}{pad(key, key_col)}{R} │ {pad(desc, desc_col)} │'))
     elif t == 'note':
-        # Note spans both columns; inner text area = key_col + desc_col + 1
-        # Layout: │<sp>·<sp><note_padded><sp>│
-        #  2      + 2  + (key_col+desc_col+1) + 2 = key_col+desc_col+7 ✓
         note_w = key_col + desc_col + 1
         note   = trunc(entry.get(lang, entry.get('en', '')), note_w)
-        print(f'│ {D}· {pad(note, note_w)}{R} │')
+        rendered.append(('note', f'│ {D}· {pad(note, note_w)}{R} │'))
+
+for i, (typ, line) in enumerate(rendered):
+    print(line)
+    if i < len(rendered) - 1:
+        next_typ = rendered[i + 1][0]
+        print(sep_full if (typ == 'note' or next_typ == 'note') else sep_row)
