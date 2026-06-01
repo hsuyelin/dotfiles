@@ -2,6 +2,7 @@
 # ZI Initialization
 # ============================================================
 setopt AUTO_CD
+setopt NUMERIC_GLOB_SORT
 
 typeset -A ZI
 ZI[HOME_DIR]="${XDG_CONFIG_HOME}/zi"
