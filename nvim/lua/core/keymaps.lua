@@ -142,15 +142,7 @@ wk.add({
 		group = "Git",
 	},
 	{ "<leader>gg", require("neogit").open, desc = "打开 Neogit" },
-	{
-		"<leader>gG",
-		function()
-	        vim.cmd("tabnew")
-	        vim.fn.termopen("lazygit", { on_exit = function() vim.cmd("bdelete!") end })
-	        vim.cmd("startinsert")
-	    end,
-		desc = "打开 Lazygit"
-	},
+	{ "<leader>gG", utils.term.lazygit, desc = "打开 Lazygit (Lazygit)" },
 	{ "<leader>gs", "<cmd>Gitsigns stage_hunk<cr>", desc = "暂存当前块 (Stage Hunk)" },
 	{ "<leader>gS", "<cmd>Gitsigns stage_buffer<cr>", desc = "暂存整个文件 (Stage Buffer)" },
 	{ "<leader>gu", "<cmd>Gitsigns undo_stage_hunk<cr>", desc = "撤销暂存块 (Undo Stage Hunk)" },
