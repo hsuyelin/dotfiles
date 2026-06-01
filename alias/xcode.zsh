@@ -651,6 +651,99 @@ xindex() {
 }
 
 # ---------------------------------------------------------------------------
+# xbs-patch — Patch xcode-build-server to skip unsupported log formats.
+# Usage: xbs-patch [--dry-run] [--help]
+#
+# Xcode 26+ uses ogArchive log format; xcode-build-server ≤1.3.0 crashes on
+# it. This patch makes extract_compile_log skip unrecognised files gracefully.
+# Safe to run multiple times (idempotent). Re-run after `brew upgrade
+# xcode-build-server` if the error returns.
+# ---------------------------------------------------------------------------
+
+xbs-patch() {
+    local dry_run=0
+
+    for arg in "$@"; do
+        case "$arg" in
+            --help|-h)
+                printf 'Usage: xbs-patch [--dry-run]\n'
+                printf '\n'
+                printf '  Patches xcode-build-server xcactivitylog.py to skip Xcode 26+\n'
+                printf '  ogArchive log format instead of crashing with ValueError.\n'
+                printf '  Safe to run multiple times. Re-run after brew upgrade.\n'
+                return 0 ;;
+            --dry-run) dry_run=1 ;;
+        esac
+    done
+
+    local xbs_bin
+    xbs_bin=$(command -v xcode-build-server 2>/dev/null)
+    if [[ -z "$xbs_bin" ]]; then
+        _xerr "xcode-build-server not found"
+        _xhint "Install with: brew install xcode-build-server"
+        return 1
+    fi
+
+    local xbs_real
+    xbs_real=$(readlink -f "$xbs_bin" 2>/dev/null || realpath "$xbs_bin" 2>/dev/null || echo "$xbs_bin")
+
+    local target
+    target="$(dirname "$(dirname "$xbs_real")")/libexec/xcactivitylog.py"
+
+    if [[ ! -f "$target" ]]; then
+        _xerr "xcactivitylog.py not found at: $target"
+        return 1
+    fi
+
+    _xlog "Target" "$target"
+
+    if grep -q "ogArchive log format" "$target" 2>/dev/null; then
+        _xlog "Already" "patch already applied — nothing to do"
+        return 0
+    fi
+
+    if [[ $dry_run -eq 1 ]]; then
+        _xlog "DryRun" "would patch $target"
+        return 0
+    fi
+
+    python3 - "$target" <<'PYEOF'
+import sys
+
+path = sys.argv[1]
+with open(path, "r") as f:
+    content = f.read()
+
+OLD = "def extract_compile_log(path):\n    for type, value in tokenizer(path):"
+NEW = (
+    "def extract_compile_log(path):\n"
+    "    # Xcode 26+ uses ogArchive log format which is not SLF0-based; skip gracefully.\n"
+    "    try:\n"
+    "        tokens = list(tokenizer(path))\n"
+    "    except ValueError as e:\n"
+    "        import sys\n"
+    "        print(f\"warning: skipping unsupported log format at {path}: {e}\", file=sys.stderr)\n"
+    "        return\n"
+    "    for type, value in tokens:"
+)
+
+if OLD not in content:
+    print("error: patch target not found — already patched or upstream changed", file=sys.stderr)
+    sys.exit(2)
+
+with open(path, "w") as f:
+    f.write(content.replace(OLD, NEW, 1))
+PYEOF
+
+    local rc=$?
+    case $rc in
+        0) _xlog "Patched" "$target" ;;
+        2) _xwarn "Skipped" "patch target not found — may already be applied or upstream changed" ;;
+        *) _xerr "python3 patch script failed (exit $rc)"; return 1 ;;
+    esac
+}
+
+# ---------------------------------------------------------------------------
 # xhelp — Xcode helpers reference.
 # Usage: xhelp [list | show [--module <id>] [--lang zh]] [--help]
 # ---------------------------------------------------------------------------
