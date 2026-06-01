@@ -45,6 +45,15 @@
       ]
     },
     {
+      "id": "xbs-parse",
+      "title": { "en": "xbs-parse  — refresh .compile from latest build log", "zh": "xbs-parse — 从最新构建日志刷新 .compile" },
+      "entries": [
+        { "type": "note", "en": "Reads buildServer.json in $PWD to locate DerivedData, then parses the newest .xcactivitylog to populate .compile.", "zh": "读取当前目录的 buildServer.json 定位 DerivedData，解析最新 .xcactivitylog 并写入 .compile。" },
+        { "type": "note", "en": "Run after each Xcode build when source files change, then :LspRestart in Neovim.", "zh": "每次 Xcode build 后执行，再在 Neovim 中 :LspRestart 即可使 gd 生效。" },
+        { "type": "note", "en": "Lightweight alternative to xindex — no build step required.", "zh": "xindex 的轻量替代，无需重新构建。" }
+      ]
+    },
+    {
       "id": "xindex",
       "title": { "en": "xindex  — generate LSP index files", "zh": "xindex — 生成 LSP 索引文件" },
       "entries": [
