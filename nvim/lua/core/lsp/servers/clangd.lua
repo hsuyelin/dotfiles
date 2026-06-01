@@ -17,5 +17,8 @@ vim.api.nvim_create_autocmd("FileType", {
 return {
 	cmd = { "clangd" },
 	filetypes = { "c", "cpp", "objc", "objcpp" },
-	root_markers = core.configs.root_markers,
+	root_markers = vim.list_extend(
+		vim.deepcopy(core.configs.root_markers),
+		{ "compile_commands.json", "buildServer.json", "*.xcodeproj", "*.xcworkspace" }
+	),
 }

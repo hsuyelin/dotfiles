@@ -39,15 +39,24 @@ require("conform").setup({
 })
 
 vim.api.nvim_create_user_command("LspRestart", function()
-  local clients = vim.lsp.get_clients({ bufnr = 0 })
+  local bufnr = vim.api.nvim_get_current_buf()
+  local clients = vim.lsp.get_clients({ bufnr = bufnr })
   for _, client in ipairs(clients) do
-    vim.lsp.stop_client(client.id, true)
+    client:stop()
   end
-  vim.defer_fn(function()
-    if vim.api.nvim_buf_get_name(0) ~= "" then
-      vim.cmd("edit")
+  -- Poll until every client has actually stopped, then re-trigger attachment.
+  -- A fixed delay races against slow servers (e.g. sourcekit-lsp on SPM projects).
+  local timer = vim.uv.new_timer()
+  timer:start(200, 200, vim.schedule_wrap(function()
+    for _, client in ipairs(clients) do
+      if not client:is_stopped() then return end
     end
-  end, 500)
+    timer:stop()
+    timer:close()
+    if vim.api.nvim_buf_is_valid(bufnr) and vim.api.nvim_buf_get_name(bufnr) ~= "" then
+      vim.api.nvim_buf_call(bufnr, function() vim.cmd("edit") end)
+    end
+  end))
 end, { desc = "Restart LSP clients for current buffer" })
 
 vim.keymap.set({ "n", "v" }, "<leader>lf", function()

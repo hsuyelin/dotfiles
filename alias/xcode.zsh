@@ -639,15 +639,96 @@ xindex() {
         _xhint "compile_commands.json was NOT generated"
     else
         _xlog "Parsing" "$(basename "$log")"
-        if xcode-build-server parse -logArchive "$log" > compile_commands.json; then
-            _xlog "Generated" "compile_commands.json"
+        if xcode-build-server parse -a "$log"; then
+            local _sz
+            _sz=$(wc -c < "$PWD/.compile" 2>/dev/null | tr -d ' ')
+            _xlog "Updated" ".compile (${_sz} bytes)"
         else
             _xwarn "Failed" "xcode-build-server parse returned error"
-            _xhint "compile_commands.json may be incomplete"
+            _xhint ".compile may be incomplete"
         fi
     fi
 
     _xlog "Done" "run :LspRestart in Neovim"
+}
+
+# ---------------------------------------------------------------------------
+# xbs-parse — Refresh .compile from the latest Xcode build log.
+# Usage: xbs-parse [--help] [--dry-run]
+#
+# Reads buildServer.json in $PWD to locate DerivedData, finds the newest
+# .xcactivitylog, and runs `xcode-build-server parse -a <log>` to populate
+# .compile. Run this after each Xcode build when source files change.
+# ---------------------------------------------------------------------------
+
+xbs-parse() {
+    local dry_run=0
+
+    for arg in "$@"; do
+        case "$arg" in
+            --help|-h)
+                printf 'Usage: xbs-parse [--dry-run]\n'
+                printf '\n'
+                printf '  Refreshes .compile from the latest Xcode build log.\n'
+                printf '  Requires buildServer.json in the current directory.\n'
+                printf '  Run after each Xcode build when source files change.\n'
+                return 0 ;;
+            --dry-run) dry_run=1 ;;
+        esac
+    done
+
+    if ! command -v xcode-build-server >/dev/null 2>&1; then
+        _xerr "xcode-build-server not found"
+        _xhint "Install with: brew install xcode-build-server"
+        return 1
+    fi
+
+    local bsj="$PWD/buildServer.json"
+    if [[ ! -f "$bsj" ]]; then
+        _xerr "buildServer.json not found in $PWD"
+        _xhint "Run: xindex --workspace <name> --scheme <name>"
+        return 1
+    fi
+
+    local build_root
+    build_root=$(python3 -c "import json,sys; print(json.load(open(sys.argv[1]))['build_root'])" "$bsj" 2>/dev/null)
+    if [[ -z "$build_root" ]]; then
+        _xerr "Could not read build_root from buildServer.json"
+        return 1
+    fi
+
+    local log_dir="$build_root/Logs/Build"
+    if [[ ! -d "$log_dir" ]]; then
+        _xerr "Build log directory not found: $log_dir"
+        _xhint "Build the project in Xcode first"
+        return 1
+    fi
+
+    local log
+    log=$(ls -t "$log_dir"/*.xcactivitylog 2>/dev/null | head -1)
+    if [[ -z "$log" ]]; then
+        _xerr "No .xcactivitylog found in $log_dir"
+        _xhint "Build the project in Xcode first"
+        return 1
+    fi
+
+    _xlog "Parsing" "$(basename "$log")"
+
+    if (( dry_run )); then
+        _xlog "DryRun" "would run: xcode-build-server parse -a $log"
+        return 0
+    fi
+
+    xcode-build-server parse -a "$log"
+    local rc=$?
+    if (( rc != 0 )); then
+        _xerr "xcode-build-server parse failed (exit $rc)"
+        return 1
+    fi
+
+    local size
+    size=$(wc -c < "$PWD/.compile" 2>/dev/null | tr -d ' ')
+    _xlog "Updated" ".compile (${size} bytes) — run :LspRestart in Neovim"
 }
 
 # ---------------------------------------------------------------------------
