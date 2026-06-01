@@ -126,6 +126,8 @@
         { "type": "row", "key": "<space>gl",   "en": "git status in neo-tree sidebar",                  "zh": "neo-tree 侧边栏显示 git 状态" },
         { "type": "row", "key": "<space>gdd",  "en": "diff current file against HEAD",                  "zh": "当前文件与 HEAD 对比" },
         { "type": "row", "key": "<space>gdf",  "en": "file commit history (DiffviewFileHistory)",       "zh": "文件提交历史" },
+        { "type": "row", "key": "<space>gdl",  "en": "line commit history — commits that touched cursor line", "zh": "当前行提交历史 — 显示触碰光标行的所有提交" },
+        { "type": "row", "key": "<space>gdl",  "en": "[VISUAL] selection commit history — commits that touched selected range", "zh": "[可视] 选中区域提交历史 — 显示触碰选区的所有提交" },
         { "type": "row", "key": "<space>gdc",  "en": "close diffview",                                  "zh": "关闭 diffview" },
         { "type": "row", "key": "<space>gdt",  "en": "toggle diffview file list",                       "zh": "切换 diffview 文件列表" }
       ]

@@ -158,6 +158,20 @@ wk.add({
 	{ "<leader>gdd", "<cmd>Gitsigns diffthis<cr>", desc = "查看差异 (Diff This)" },
 	{ "<leader>gdc", "<cmd>DiffviewClose<cr>", desc = "关闭差异视图 (Close Diff)" },
 	{ "<leader>gdf", "<cmd>DiffviewFileHistory %<cr>", desc = "当前文件历史 (Current File History)" },
+	{
+		"<leader>gdl",
+		function()
+			local line = vim.fn.line(".")
+			vim.cmd("DiffviewFileHistory % -L" .. line .. "," .. line)
+		end,
+		desc = "当前行历史 (Line History)",
+	},
+	{
+		"<leader>gdl",
+		":'<,'>DiffviewFileHistory %<cr>",
+		mode = "v",
+		desc = "选中区域历史 (Selection History)",
+	},
 	{ "<leader>gdt", "<cmd>DiffviewToggleFiles<cr>", desc = "切换差异文件列表 (Toggle Files)" },
 	{ "<leader>gj", "<cmd>Gitsigns next_hunk<cr>", desc = "下一个块 (Next Hunk)" },
 	{ "<leader>gk", "<cmd>Gitsigns prev_hunk<cr>", desc = "上一个块 (Previous Hunk)" },
