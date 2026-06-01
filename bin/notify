@@ -119,6 +119,14 @@ main() {
     local payload="${title}"
     [[ -n "$body" ]] && payload+=$'\n'"${body}"
 
+    # nvim's terminal emulator does not support OSC 99; skip OSC and go straight
+    # to system notifications to avoid leaking the raw escape sequence as text.
+    if [[ -n "${NVIM:-}" ]]; then
+        send_system_notification "$title" "$body" &
+        disown
+        return
+    fi
+
     local tty
     tty="$(find_tty)"
 
