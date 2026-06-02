@@ -42,6 +42,33 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly SCRIPT_DIR
 readonly DOTFILES_DIR="${SCRIPT_DIR}"
 
+# ── Platform detection ────────────────────────────────────────────────────────
+_IS_MACOS=false
+[[ "$(uname -s)" == "Darwin" ]] && _IS_MACOS=true
+readonly _IS_MACOS
+
+# Detect Linux distro family from /etc/os-release.
+# Result: arch | debian | ubuntu | unknown  (empty on macOS).
+_LINUX_DISTRO="unknown"
+if [[ "${_IS_MACOS}" != "true" && -f /etc/os-release ]]; then
+    _ld_id="$(. /etc/os-release 2>/dev/null && printf '%s' "${ID:-}")"
+    _ld_like="$(. /etc/os-release 2>/dev/null && printf '%s' "${ID_LIKE:-}")"
+    case "${_ld_id}" in
+        arch)   _LINUX_DISTRO="arch" ;;
+        debian) _LINUX_DISTRO="debian" ;;
+        ubuntu) _LINUX_DISTRO="ubuntu" ;;
+        *)
+            case "${_ld_like}" in
+                *arch*)   _LINUX_DISTRO="arch" ;;
+                *ubuntu*) _LINUX_DISTRO="ubuntu" ;;
+                *debian*) _LINUX_DISTRO="debian" ;;
+            esac
+            ;;
+    esac
+    unset _ld_id _ld_like
+fi
+readonly _LINUX_DISTRO
+
 # ── Runtime constants ────────────────────────────────────────────────────────
 BACKUP_TIMESTAMP="$(date +%Y_%m_%d)"
 readonly BACKUP_TIMESTAMP
@@ -226,44 +253,132 @@ run() {
     fi
 }
 
+# ── Linux package management ──────────────────────────────────────────────────
+# Maps a Homebrew formula name to the distro-native package name.
+# Entry format: "brew_formula:arch_pkg:deb_pkg"
+# An empty deb_pkg field means the package is not in Debian/Ubuntu standard repos.
+# Returns empty string and exits 1 when no mapping exists for the formula.
+_linux_pkg_for() {
+    local formula="$1" distro="$2"
+    # brew_formula        : arch package   : debian/ubuntu package
+    local -a _map=(
+        "starship:starship:starship"
+        "fzf:fzf:fzf"
+        "eza:eza:eza"
+        "zoxide:zoxide:zoxide"
+        "tmux:tmux:tmux"
+        "neovim:neovim:neovim"
+        "node:nodejs:nodejs"
+        "go:go:golang"
+        "yazi:yazi:"                # not in Debian/Ubuntu standard repos
+        "bat:bat:bat"
+        "git:git:git"
+        "zsh:zsh:zsh"
+        "curl:curl:curl"
+        "jq:jq:jq"
+        "ripgrep:ripgrep:ripgrep"
+        "fd:fd:fd-find"             # Debian/Ubuntu ships as fd-find (binary: fdfind)
+        "btop:btop:btop"
+        "lazygit:lazygit:"          # not in Debian/Ubuntu standard repos
+        "git-delta:git-delta:"      # not in Debian/Ubuntu standard repos
+        "glow:glow:"                # not in standard repos
+        "luarocks:luarocks:luarocks"
+        "tree-sitter:tree-sitter:"  # not in standard repos
+    )
+    local entry bname rest arch_pkg deb_pkg
+    for entry in "${_map[@]}"; do
+        bname="${entry%%:*}"
+        rest="${entry#*:}"
+        arch_pkg="${rest%%:*}"
+        deb_pkg="${rest##*:}"
+        if [[ "${bname}" == "${formula}" ]]; then
+            case "${distro}" in
+                arch)          printf '%s' "${arch_pkg}" ;;
+                debian|ubuntu) printf '%s' "${deb_pkg}" ;;
+                *)             printf '' ;;
+            esac
+            return 0
+        fi
+    done
+    return 1
+}
+
+# Installs a single package via the distro's native package manager.
+# Respects DRY_RUN. Returns 0 on success, 1 on error or unsupported distro.
+# _APT_UPDATED is a session-scoped flag to avoid redundant `apt-get update` calls.
+_APT_UPDATED=false
+_linux_install_pkg() {
+    local pkg="$1"
+    [[ -z "${pkg}" ]] && return 1
+
+    case "${_LINUX_DISTRO}" in
+        arch)
+            if [[ "${DRY_RUN}" == "true" ]]; then
+                log_info "[dry-run] sudo pacman -S --noconfirm --needed ${pkg}"
+                return 0
+            fi
+            sudo pacman -S --noconfirm --needed "${pkg}"
+            ;;
+        debian|ubuntu)
+            if [[ "${_APT_UPDATED}" != "true" ]]; then
+                if [[ "${DRY_RUN}" == "true" ]]; then
+                    log_info "[dry-run] sudo apt-get update"
+                else
+                    sudo apt-get update -qq \
+                        || log_warn "apt-get update failed — package list may be stale"
+                fi
+                _APT_UPDATED=true
+            fi
+            if [[ "${DRY_RUN}" == "true" ]]; then
+                log_info "[dry-run] sudo apt-get install -y ${pkg}"
+                return 0
+            fi
+            sudo apt-get install -y --no-install-recommends "${pkg}"
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
 # ── Platform check ────────────────────────────────────────────────────
 check_platform() {
     log_step "Checking" "platform requirements"
 
-    if [[ "$(uname)" != "Darwin" ]]; then
-        die "This script targets macOS only (detected: $(uname))"
-    fi
-
     local arch
     arch="$(uname -m)"
 
-    if [[ "${arch}" != "arm64" ]]; then
-        printf '\n'
-        log_warn "Detected Intel architecture (${arch})."
-        log_warn "This installer was designed for Apple Silicon and has NOT been"
-        log_warn "tested on Intel Macs. Some steps may fail or produce an incomplete"
-        log_warn "setup (e.g. Homebrew on Intel uses /usr/local, not /opt/homebrew)."
-        printf '\n'
+    if [[ "${_IS_MACOS}" == "true" ]]; then
+        if [[ "${arch}" != "arm64" ]]; then
+            printf '\n'
+            log_warn "Detected Intel architecture (${arch})."
+            log_warn "This installer was designed for Apple Silicon and has NOT been"
+            log_warn "tested on Intel Macs. Some steps may fail or produce an incomplete"
+            log_warn "setup (e.g. Homebrew on Intel uses /usr/local, not /opt/homebrew)."
+            printf '\n'
 
-        if [[ ! -t 0 ]]; then
-            die "Non-interactive session on untested architecture (${arch}) — aborting."
+            if [[ ! -t 0 ]]; then
+                die "Non-interactive session on untested architecture (${arch}) — aborting."
+            fi
+
+            printf '    \033[0;33m%s\033[0m' "Intel arch is untested. Continue anyway? [y/N]: "
+            local answer=""
+            read -r answer
+            printf '\n'
+            case "${answer}" in
+                [Yy] | [Yy][Ee][Ss])
+                    log_warn "Proceeding on Intel — expect possible failures."
+                    ;;
+                *)
+                    die "Installation cancelled by user."
+                    ;;
+            esac
         fi
 
-        printf '    \033[0;33m%s\033[0m' "Intel arch is untested. Continue anyway? [y/N]: "
-        local answer=""
-        read -r answer
-        printf '\n'
-        case "${answer}" in
-            [Yy] | [Yy][Ee][Ss])
-                log_warn "Proceeding on Intel — expect possible failures."
-                ;;
-            *)
-                die "Installation cancelled by user."
-                ;;
-        esac
+        log_info "macOS $(sw_vers -productVersion) on ${arch}"
+    else
+        log_info "Linux ($(uname -s) ${arch}) — macOS-only steps will be skipped"
     fi
-
-    log_info "macOS $(sw_vers -productVersion) on ${arch}"
 }
 
 # ── Prerequisites ─────────────────────────────────────────────────────
@@ -272,9 +387,13 @@ check_prerequisites() {
 
     local missing_required=false
 
-    # System tools that cannot be installed via brew — fatal if absent.
+    # On macOS, brew is required alongside git/zsh/curl.
+    # On Linux, brew is optional — system package managers provide these tools.
     local req
-    for req in git zsh curl brew; do
+    local _required_tools=("git" "zsh" "curl")
+    [[ "${_IS_MACOS}" == "true" ]] && _required_tools+=("brew")
+
+    for req in "${_required_tools[@]}"; do
         if command -v "${req}" &>/dev/null; then
             log_info "${req} $("${req}" --version 2>&1 | head -1)"
         else
@@ -284,11 +403,37 @@ check_prerequisites() {
     done
 
     if [[ "${missing_required}" == "true" ]]; then
-        die "Missing system tools. Run bootstrap.sh first or: xcode-select --install"
+        if [[ "${_IS_MACOS}" == "true" ]]; then
+            die "Missing system tools. Run bootstrap.sh first or: xcode-select --install"
+        elif [[ "${_LINUX_DISTRO}" != "unknown" ]]; then
+            log_warn "Attempting to install missing required tools via ${_LINUX_DISTRO} package manager"
+            local req pkg
+            for req in git zsh curl; do
+                if ! command -v "${req}" &>/dev/null; then
+                    pkg="$(_linux_pkg_for "${req}" "${_LINUX_DISTRO}")"
+                    if [[ -n "${pkg}" ]]; then
+                        _linux_install_pkg "${pkg}" \
+                            || log_warn "Failed to install ${req} (${pkg}) — skipping"
+                    fi
+                fi
+            done
+            # Re-check after install attempts
+            missing_required=false
+            for req in git zsh curl; do
+                command -v "${req}" &>/dev/null \
+                    || { log_error "${req} still missing after install attempt"; missing_required=true; }
+            done
+            [[ "${missing_required}" == "true" ]] \
+                && die "Cannot install required tools. Install git/zsh/curl manually and re-run."
+        else
+            die "Missing system tools. Install git/zsh/curl via your system package manager."
+        fi
     fi
 
-    # Brew-installable tools — auto-install if missing, then re-verify.
-    # Format: "command:formula"  (formula differs from command for neovim/nvim)
+    # On macOS: auto-install missing tools via brew.
+    # On Linux (arch/debian/ubuntu): auto-install via native package manager; warn on failure.
+    # On unknown Linux: warn only.
+    # Format: "command:formula"  (formula differs from command, e.g. nvim:neovim)
     # node/go: required by mason to install pyright, bash-language-server, gopls.
     # yazi: required by the yy shell function.
     local entry cmd formula
@@ -299,7 +444,7 @@ check_prerequisites() {
         formula="${entry##*:}"
         if command -v "${cmd}" &>/dev/null; then
             log_info "${cmd} $("${cmd}" --version 2>&1 | head -1)"
-        else
+        elif [[ "${_IS_MACOS}" == "true" ]]; then
             log_warn "${cmd} not found — installing via brew"
             brew install "${formula}" \
                 || { log_error "brew install ${formula} failed"; missing_required=true; continue; }
@@ -309,11 +454,30 @@ check_prerequisites() {
                 log_error "${cmd} still not found after install"
                 missing_required=true
             fi
+        elif [[ "${_LINUX_DISTRO}" != "unknown" ]]; then
+            local linux_pkg
+            linux_pkg="$(_linux_pkg_for "${formula}" "${_LINUX_DISTRO}")"
+            if [[ -n "${linux_pkg}" ]]; then
+                log_warn "${cmd} not found — installing ${linux_pkg} via ${_LINUX_DISTRO}"
+                if _linux_install_pkg "${linux_pkg}"; then
+                    if command -v "${cmd}" &>/dev/null; then
+                        log_info "${cmd} installed: $("${cmd}" --version 2>&1 | head -1)"
+                    else
+                        log_warn "${cmd} not in PATH after installing ${linux_pkg} — skipping"
+                    fi
+                else
+                    log_warn "Failed to install ${linux_pkg} — skipping ${cmd}"
+                fi
+            else
+                log_warn "${cmd} not found — no package mapping for ${_LINUX_DISTRO}, skipping"
+            fi
+        else
+            log_warn "${cmd} not found — unknown Linux distro, install manually (brew formula: ${formula})"
         fi
     done
 
     if [[ "${missing_required}" == "true" ]]; then
-        die "Some required tools could not be installed. Check brew output above."
+        die "Some required tools could not be installed. Check output above."
     fi
 }
 
@@ -758,14 +922,16 @@ install_rtk() {
     fi
 
     # Symlink macOS app-support path → XDG config so config.toml is found.
-    local mac_support="${HOME}/Library/Application Support/rtk"
-    local xdg_rtk="${XDG_CONFIG_HOME:-${HOME}/.config}/rtk"
-    if [[ ! -e "${mac_support}" ]]; then
-        mkdir -p "$(dirname "${mac_support}")"
-        ln -sf "${xdg_rtk}" "${mac_support}"
-        log_step "Linked" "${HOME}/Library/Application Support/rtk → ${xdg_rtk}"
-    else
-        log_info "${HOME}/Library/Application Support/rtk already exists (skipped symlink)"
+    if [[ "${_IS_MACOS}" == "true" ]]; then
+        local mac_support="${HOME}/Library/Application Support/rtk"
+        local xdg_rtk="${XDG_CONFIG_HOME:-${HOME}/.config}/rtk"
+        if [[ ! -e "${mac_support}" ]]; then
+            mkdir -p "$(dirname "${mac_support}")"
+            ln -sf "${xdg_rtk}" "${mac_support}"
+            log_step "Linked" "${HOME}/Library/Application Support/rtk → ${xdg_rtk}"
+        else
+            log_info "${HOME}/Library/Application Support/rtk already exists (skipped symlink)"
+        fi
     fi
 
     # Patch Claude Code / Codex hook only when at least one is installed.
@@ -835,10 +1001,12 @@ uninstall_rtk() {
         rtk init -g --uninstall || true
     fi
 
-    local mac_support="${HOME}/Library/Application Support/rtk"
-    if [[ -L "${mac_support}" ]]; then
-        unlink "${mac_support}"
-        log_step "Removed" "symlink ~/Library/Application Support/rtk"
+    if [[ "${_IS_MACOS}" == "true" ]]; then
+        local mac_support="${HOME}/Library/Application Support/rtk"
+        if [[ -L "${mac_support}" ]]; then
+            unlink "${mac_support}"
+            log_step "Removed" "symlink ~/Library/Application Support/rtk"
+        fi
     fi
 
     if brew list rtk &>/dev/null 2>&1; then
@@ -855,6 +1023,8 @@ uninstall_rtk() {
 # which makes all .sh / .zsh files display the kitty icon in Finder even after
 # switching to Ghostty. Use duti to reassign the UTI to TextEdit.
 configure_file_associations() {
+    [[ "${_IS_MACOS}" != "true" ]] && return 0
+
     log_step "Checking" "file associations (duti)"
 
     if ! command -v duti &>/dev/null; then
@@ -989,9 +1159,11 @@ main() {
     create_placeholder_secrets
     configure_proxy
     init_tpm
-    select_terminal
-    install_terminal_app
-    clone_ghostty_shaders
+    if [[ "${_IS_MACOS}" == "true" ]]; then
+        select_terminal
+        install_terminal_app
+        clone_ghostty_shaders
+    fi
     set_permissions
     migrate_xdg_homes
     [[ "${INSTALL_RTK}" == "true" ]] && install_rtk

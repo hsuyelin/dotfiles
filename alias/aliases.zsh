@@ -38,10 +38,13 @@ if command -v bat >/dev/null 2>&1; then
 fi
 
 alias rvminstall='"$HOME/.rvm/.rvminstall.sh"'
-alias carthage_build='"${XDG_CONFIG_HOME}/bin/carthage_build.sh"'
-alias brew_export='"${XDG_CONFIG_HOME}/bin/brew_export.sh"'
-alias xcode='"${XDG_CONFIG_HOME}/bin/xcode.sh"'
 alias rubyfmt='rubocop -A'
+
+if [[ "$(uname -s)" == "Darwin" ]]; then
+  alias carthage_build='"${XDG_CONFIG_HOME}/bin/carthage_build.sh"'
+  alias brew_export='"${XDG_CONFIG_HOME}/bin/brew_export.sh"'
+  alias xcode='"${XDG_CONFIG_HOME}/bin/xcode.sh"'
+fi
 
 
 # -----------------------------
@@ -71,81 +74,85 @@ alias real-rm='\rm'
 # -----------------------------
 # System helpers
 # -----------------------------
-alias dns:flush='sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder'
+if [[ "$(uname -s)" == "Darwin" ]]; then
+  alias dns:flush='sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder'
 
-# pwtop: energy-sorted process monitor with Catppuccin Mocha styling.
-# See: $XDG_CONFIG_HOME/powermetrics/pwtop.sh
-alias pwtop='"${XDG_CONFIG_HOME}/powermetrics/pwtop.sh"'
+  # pwtop: energy-sorted process monitor with Catppuccin Mocha styling.
+  # See: $XDG_CONFIG_HOME/powermetrics/pwtop.sh
+  alias pwtop='"${XDG_CONFIG_HOME}/powermetrics/pwtop.sh"'
+fi
 
 
 # -----------------------------
-# Applications
+# Applications (macOS-only)
 # -----------------------------
-alias chrome="open -a \"Google Chrome\" --args --variations-override-country=us"
+if [[ "$(uname -s)" == "Darwin" ]]; then
+  alias chrome="open -a \"Google Chrome\" --args --variations-override-country=us"
 
-# sign_app: strip quarantine attributes and re-sign a macOS .app bundle.
-# Usage: sign_app <app>
-# <app> can be:
-#   - absolute path:  /Applications/Paste.app
-#   - name with ext:  Paste.app  (or paste.app)
-#   - name only:      paste
-sign_app() {
-  local input="$1"
+  # sign_app: strip quarantine attributes and re-sign a macOS .app bundle.
+  # Usage: sign_app <app>
+  # <app> can be:
+  #   - absolute path:  /Applications/Paste.app
+  #   - name with ext:  Paste.app  (or paste.app)
+  #   - name only:      paste
+  sign_app() {
+    local input="$1"
 
-  local _bold=$'\033[1m'
-  local _green=$'\033[0;32m'
-  local _yellow=$'\033[0;33m'
-  local _red=$'\033[0;31m'
-  local _cyan=$'\033[0;36m'
-  local _reset=$'\033[0m'
+    local _bold=$'\033[1m'
+    local _green=$'\033[0;32m'
+    local _yellow=$'\033[0;33m'
+    local _red=$'\033[0;31m'
+    local _cyan=$'\033[0;36m'
+    local _reset=$'\033[0m'
 
-  if [[ -z "$input" ]]; then
-    printf '%sUsage:%s sign_app <app-path|app-name>\n' "$_yellow" "$_reset"
-    return 1
-  fi
-
-  local app_path
-
-  if [[ "$input" == /* ]]; then
-    app_path="$input"
-  else
-    local name="${input%.[aA][pP][pP]}"
-    local found
-    found="$(find /Applications -maxdepth 1 -iname "${name}.app" -print -quit 2>/dev/null)"
-    if [[ -z "$found" ]]; then
-      printf '%serror:%s cannot find '"'"'%s%s.app%s'"'"' in /Applications\n' \
-          "$_red" "$_reset" "$_bold" "$name" "$_reset" >&2
+    if [[ -z "$input" ]]; then
+      printf '%sUsage:%s sign_app <app-path|app-name>\n' "$_yellow" "$_reset"
       return 1
     fi
-    app_path="$found"
-  fi
 
-  if [[ ! -d "$app_path" ]]; then
-    printf '%serror:%s '"'"'%s%s%s'"'"' does not exist or is not a directory\n' \
-        "$_red" "$_reset" "$_bold" "$app_path" "$_reset" >&2
-    return 1
-  fi
+    local app_path
 
-  printf '%s  Found%s %s%s%s\n' "$_cyan" "$_reset" "$_bold" "$app_path" "$_reset"
-  printf '%sProceed with signing?%s [y/N] ' "$_yellow" "$_reset"
-  local reply
-  read -r reply
-  if [[ "$reply" != [yY] ]]; then
-    printf '%sAborted.%s\n' "$_yellow" "$_reset"
-    return 0
-  fi
+    if [[ "$input" == /* ]]; then
+      app_path="$input"
+    else
+      local name="${input%.[aA][pP][pP]}"
+      local found
+      found="$(find /Applications -maxdepth 1 -iname "${name}.app" -print -quit 2>/dev/null)"
+      if [[ -z "$found" ]]; then
+        printf '%serror:%s cannot find '"'"'%s%s.app%s'"'"' in /Applications\n' \
+            "$_red" "$_reset" "$_bold" "$name" "$_reset" >&2
+        return 1
+      fi
+      app_path="$found"
+    fi
 
-  local _sudo=''
-  [[ "$EUID" -ne 0 ]] && _sudo='sudo'
+    if [[ ! -d "$app_path" ]]; then
+      printf '%serror:%s '"'"'%s%s%s'"'"' does not exist or is not a directory\n' \
+          "$_red" "$_reset" "$_bold" "$app_path" "$_reset" >&2
+      return 1
+    fi
 
-  printf '%sStripping%s quarantine attributes ...\n' "$_cyan" "$_reset"
-  $_sudo xattr -cr "$app_path" || { printf '%serror:%s xattr failed\n' "$_red" "$_reset" >&2; return 1; }
+    printf '%s  Found%s %s%s%s\n' "$_cyan" "$_reset" "$_bold" "$app_path" "$_reset"
+    printf '%sProceed with signing?%s [y/N] ' "$_yellow" "$_reset"
+    local reply
+    read -r reply
+    if [[ "$reply" != [yY] ]]; then
+      printf '%sAborted.%s\n' "$_yellow" "$_reset"
+      return 0
+    fi
 
-  printf '%s Signing%s %s%s%s ...\n' "$_cyan" "$_reset" "$_bold" "$app_path" "$_reset"
-  $_sudo codesign -fs - --deep "$app_path" || { printf '%serror:%s codesign failed\n' "$_red" "$_reset" >&2; return 1; }
+    local _sudo=''
+    [[ "$EUID" -ne 0 ]] && _sudo='sudo'
 
-  printf '%s   Done%s %s%s%s\n' "$_green" "$_reset" "$_bold" "$app_path" "$_reset"
-}
+    printf '%sStripping%s quarantine attributes ...\n' "$_cyan" "$_reset"
+    $_sudo xattr -cr "$app_path" || { printf '%serror:%s xattr failed\n' "$_red" "$_reset" >&2; return 1; }
+
+    printf '%s Signing%s %s%s%s ...\n' "$_cyan" "$_reset" "$_bold" "$app_path" "$_reset"
+    $_sudo codesign -fs - --deep "$app_path" || { printf '%serror:%s codesign failed\n' "$_red" "$_reset" >&2; return 1; }
+
+    printf '%s   Done%s %s%s%s\n' "$_green" "$_reset" "$_bold" "$app_path" "$_reset"
+  }
+fi
 
 
 # -----------------------------
@@ -190,18 +197,20 @@ rm() {
 
 
 # -----------------------------
-# fix: convert `cmd` => $(cmd) in clipboard content
+# fix: convert `cmd` => $(cmd) in clipboard content (macOS only)
 # -----------------------------
-fix() {
-  local clipboard_content fixed_content
+if [[ "$(uname -s)" == "Darwin" ]]; then
+  fix() {
+    local clipboard_content fixed_content
 
-  clipboard_content="$(pbpaste)"
-  # shellcheck disable=SC2016
-  fixed_content="$(echo "$clipboard_content" | sed -E 's/\`([^\`]+)\`/$(\1)/g')"
+    clipboard_content="$(pbpaste)"
+    # shellcheck disable=SC2016
+    fixed_content="$(echo "$clipboard_content" | sed -E 's/\`([^\`]+)\`/$(\1)/g')"
 
-  echo "$fixed_content" | pbcopy
-  echo -e "Fixed command copied to clipboard. Output:\n\n$fixed_content\n"
-}
+    echo "$fixed_content" | pbcopy
+    echo -e "Fixed command copied to clipboard. Output:\n\n$fixed_content\n"
+  }
+fi
 
 
 # -----------------------------
@@ -235,28 +244,30 @@ rd() {
 
 
 # -----------------------------
-# ipshow: show local / public ip
+# ipshow: show local / public ip (macOS only)
 # -----------------------------
-ipshow() {
-  local iface
-  iface="$(route get default 2>/dev/null | awk '/interface:/{print $2}')"
+if [[ "$(uname -s)" == "Darwin" ]]; then
+  ipshow() {
+    local iface
+    iface="$(route get default 2>/dev/null | awk '/interface:/{print $2}')"
 
-  case "$1" in
-    --local|-l)
-      echo "LAN: $(ipconfig getifaddr "$iface")"
-      ;;
-    --public|-p)
-      echo "WAN: $(curl -s ifconfig.me)"
-      ;;
-    "")
-      echo "LAN: $(ipconfig getifaddr "$iface")"
-      echo "WAN: $(curl -s ifconfig.me)"
-      ;;
-    *)
-      echo "Usage: ipshow [--local|-l | --public|-p]"
-      ;;
-  esac
-}
+    case "$1" in
+      --local|-l)
+        echo "LAN: $(ipconfig getifaddr "$iface")"
+        ;;
+      --public|-p)
+        echo "WAN: $(curl -s ifconfig.me)"
+        ;;
+      "")
+        echo "LAN: $(ipconfig getifaddr "$iface")"
+        echo "WAN: $(curl -s ifconfig.me)"
+        ;;
+      *)
+        echo "Usage: ipshow [--local|-l | --public|-p]"
+        ;;
+    esac
+  }
+fi
 
 # -----------------------------
 # git & fzf
@@ -273,7 +284,7 @@ alias gba='git branch -a | fzf --height=40% --border --preview "git log --onelin
 # -----------------------------
 yy() {
     if ! command -v yazi &>/dev/null; then
-        printf 'yy: yazi not installed. Run: brew install yazi\n' >&2
+        printf 'yy: yazi not installed. Install it via your system package manager.\n' >&2
         return 1
     fi
     local tmp cwd

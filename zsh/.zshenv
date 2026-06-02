@@ -15,8 +15,14 @@ export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-$HOME/.local/xdg-runtime}"
 # ============================================================
 # Homebrew
 # ============================================================
-
-export HOMEBREW_PREFIX="${HOMEBREW_PREFIX:-/opt/homebrew}"
+# Probe known locations; stays unset on systems without Homebrew.
+if   [[ -x /opt/homebrew/bin/brew ]]; then
+    export HOMEBREW_PREFIX="/opt/homebrew"
+elif [[ -x /usr/local/bin/brew ]]; then
+    export HOMEBREW_PREFIX="/usr/local"
+elif command -v brew &>/dev/null; then
+    export HOMEBREW_PREFIX="$(brew --prefix)"
+fi
 
 # ============================================================
 # Zsh
@@ -54,7 +60,7 @@ else
     export EDITOR='vi'
 fi
 export GIT_EDITOR='nvim'
-export TERMINAL='/Applications/Ghostty.app/Contents/MacOS/ghostty'
+[[ "$(uname -s)" == "Darwin" ]] && export TERMINAL='/Applications/Ghostty.app/Contents/MacOS/ghostty'
 
 # ============================================================
 # fpath
@@ -63,7 +69,7 @@ export TERMINAL='/Applications/Ghostty.app/Contents/MacOS/ghostty'
 # shellcheck disable=SC2206
 fpath=(
   "$DOTFILES/config/zsh/functions"
-  "$HOMEBREW_PREFIX/share/zsh/site-functions"
+  ${HOMEBREW_PREFIX:+"$HOMEBREW_PREFIX/share/zsh/site-functions"}
   $fpath
 )
 

@@ -79,7 +79,9 @@ send_osc() {
 }
 
 # macOS Notification Center — all attempts are silent on failure.
+# On non-macOS systems this is a no-op; OSC passthrough still works.
 send_system_notification() {
+    [[ "$(uname -s)" != "Darwin" ]] && return 0
     local title="$1" body="$2"
     local info bundle_id app_name
 

@@ -5,7 +5,7 @@
 <p align="center">
   <strong>Dotfiles</strong>
   <br />
-  Personal macOS configuration for Apple Silicon —<br/>
+  Personal configuration for Apple Silicon macOS — experimental Linux support (Arch / Debian / Ubuntu) —<br/>
   one-command bootstrap, XDG-compliant layout, unified <a href="https://github.com/catppuccin/catppuccin">Catppuccin Mocha</a> theme.
 </p>
 
@@ -21,11 +21,20 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue?style=flat-square" alt="License" /></a>
 </p>
 
+<p align="center">
+  <img src="https://img.shields.io/badge/macOS-primary-000000?style=flat-square&logo=apple" alt="macOS" />
+  <img src="https://img.shields.io/badge/Arch_Linux-experimental-1793D1?style=flat-square&logo=arch-linux&logoColor=white" alt="Arch Linux" />
+  <img src="https://img.shields.io/badge/Debian-experimental-A81D33?style=flat-square&logo=debian&logoColor=white" alt="Debian" />
+  <img src="https://img.shields.io/badge/Ubuntu-experimental-E95420?style=flat-square&logo=ubuntu&logoColor=white" alt="Ubuntu" />
+</p>
+
 ---
 
 ## Platform
 
-Developed and tested exclusively on:
+### Primary: macOS
+
+Developed and tested on:
 
 | | |
 |---|---|
@@ -34,6 +43,10 @@ Developed and tested exclusively on:
 | **Architecture** | ARM64 — any Apple Silicon Mac (M1 and later) should work |
 
 Intel Macs are **allowed but untested** — the installer prompts for confirmation before proceeding on x86_64.
+
+### Experimental: Linux
+
+Arch Linux, Debian, and Ubuntu are supported on a best-effort basis. macOS-only features (AeroSpace, JankyBorders, Ghostty shaders, `osascript` notifications, Xcode tooling) are automatically skipped. The package installer maps Homebrew formulae and casks to native equivalents where available; unrecognized packages are skipped with a warning.
 
 ### Tool Versions
 
@@ -85,7 +98,7 @@ Intel Macs are **allowed but untested** — the installer prompts for confirmati
         <video src="https://github.com/user-attachments/assets/2d5f83ed-4d26-426b-b02d-a6641253369a" controls width="100%"></video>
         <br/>
         <strong>Neovim — Editor</strong><br/>
-        <sub>Lazy.nvim · LSP · Treesitter</sub>
+        <sub>vim.pack · LSP · Treesitter</sub>
       </td>
     </tr>
     <tr>
@@ -130,7 +143,7 @@ Intel Macs are **allowed but untested** — the installer prompts for confirmati
 | Prompt | [Starship](https://starship.rs) | Catppuccin Mocha palette |
 | Terminal | [Ghostty](https://ghostty.org) *(default)* | Blur · CJK font map · cursor warp shader · quick terminal |
 | Terminal (alt) | [kitty](https://sw.kovidgoyal.net/kitty/) | Same theme + keybinds; no cursor shader or quick terminal |
-| Editor | [Neovim](https://neovim.io) | Lazy.nvim · LSP · Treesitter |
+| Editor | [Neovim](https://neovim.io) | vim.pack · LSP · Treesitter |
 | Window Manager | [AeroSpace](https://github.com/nikitabobko/AeroSpace) | Tiling · vim-style keybinds |
 | Window Borders | [JankyBorders](https://github.com/FelixKratz/JankyBorders) | Auto-launched by AeroSpace |
 | File manager | [Yazi](https://github.com/sxyazi/yazi) | `yy` alias · Catppuccin Mocha · image/video/PDF/archive preview |
@@ -173,6 +186,23 @@ bash ~/.config/install.sh
 ```
 
 Idempotent — safe to re-run on an existing machine. Also prompts for terminal selection if neither Ghostty nor kitty is installed.
+
+### Linux (experimental)
+
+`bootstrap.sh` is macOS-only. On Linux, clone and run the installer directly:
+
+```bash
+git clone https://github.com/hsuyelin/dotfiles ~/.config
+bash ~/.config/install.sh
+```
+
+Then install packages:
+
+```bash
+bash ~/.config/bin/brew_install.sh
+```
+
+`install.sh` detects Arch / Debian / Ubuntu automatically. macOS-only steps (Homebrew, AeroSpace, Ghostty shaders, Xcode) are skipped. `brew_install.sh` maps Homebrew formulae and casks to native package manager equivalents; packages with no Linux mapping are skipped with a warning.
 
 ### Terminal selection
 
@@ -230,7 +260,7 @@ Fill in the gitignored private files created as stubs by `install.sh`:
 Then:
 
 - Open **tmux** → `<prefix>+I` to install plugins via TPM
-- Open **Neovim** — Lazy.nvim installs plugins automatically on first launch
+- Open **Neovim** — vim.pack installs plugins automatically on first launch
 - Open **Ghostty** — cursor shader loads from `ghostty/shaders/`
 - Open **Yazi** — run `yy` to launch; exits back to the directory you navigated to
 - Install a Ruby version: `rvminstall 3.x.x`
@@ -261,7 +291,7 @@ Then:
 ├── kitty/           # kitty terminal config (alternative, mirrors Ghostty)
 ├── lazygit/         # lazygit TUI config
 ├── npm/             # npm XDG config
-├── nvim/            # Neovim — Lazy.nvim · LSP · Treesitter
+├── nvim/            # Neovim — vim.pack · LSP · Treesitter
 ├── yazi/            # Yazi file manager — Catppuccin Mocha · image/video/PDF/archive preview
 ├── rtk/             # RTK (Rust Token Killer) — Claude Code hook config
 ├── rvm/             # RVM install helper
