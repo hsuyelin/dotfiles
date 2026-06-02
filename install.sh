@@ -481,6 +481,71 @@ check_prerequisites() {
     fi
 }
 
+# ── Step: Ensure zsh is installed and set as default shell (Linux only) ────────
+# Installs zsh via the distro package manager if absent, registers it in
+# /etc/shells, and calls chsh to make it the login shell.
+# Sets _ZSH_SHELL_CHANGED=true when the default shell was actually switched so
+# that main() can exec zsh -l at the very end — giving the user a live zsh
+# session without opening a new terminal.
+_ZSH_SHELL_CHANGED=false
+ensure_zsh_default_shell() {
+    [[ "${_IS_MACOS}" == "true" ]] && return 0
+
+    log_step "Checking" "zsh default shell"
+
+    local zsh_path
+    zsh_path="$(command -v zsh 2>/dev/null || true)"
+
+    # Install zsh if it is not present at all.
+    if [[ -z "${zsh_path}" ]]; then
+        if [[ "${_LINUX_DISTRO}" != "unknown" ]]; then
+            log_step "Installing" "zsh via ${_LINUX_DISTRO} package manager"
+            if _linux_install_pkg "zsh"; then
+                zsh_path="$(command -v zsh 2>/dev/null || true)"
+            fi
+        fi
+        if [[ -z "${zsh_path}" ]]; then
+            log_warn "Could not install zsh — skipping default shell setup"
+            return 0
+        fi
+        log_info "zsh installed: ${zsh_path}"
+    else
+        log_info "zsh found: ${zsh_path}"
+    fi
+
+    # Check the current login shell from /etc/passwd (most reliable).
+    local current_shell
+    current_shell="$(getent passwd "$(id -un)" 2>/dev/null | cut -d: -f7 || true)"
+    [[ -z "${current_shell}" ]] && current_shell="${SHELL:-}"
+
+    if [[ "${current_shell}" == "${zsh_path}" ]]; then
+        log_info "zsh is already the default shell"
+        return 0
+    fi
+
+    # Register zsh in /etc/shells if missing (required by chsh).
+    if ! grep -qxF "${zsh_path}" /etc/shells 2>/dev/null; then
+        log_step "Registering" "${zsh_path} in /etc/shells"
+        if [[ "${DRY_RUN}" == "true" ]]; then
+            log_info "[dry-run] would append ${zsh_path} to /etc/shells"
+        else
+            printf '%s\n' "${zsh_path}" | sudo tee -a /etc/shells >/dev/null
+        fi
+    fi
+
+    log_step "Switching" "default shell: ${current_shell} → ${zsh_path}"
+    if [[ "${DRY_RUN}" == "true" ]]; then
+        log_info "[dry-run] chsh -s ${zsh_path}"
+    else
+        if chsh -s "${zsh_path}"; then
+            log_info "Default shell changed — will activate zsh at end of install"
+            _ZSH_SHELL_CHANGED=true
+        else
+            log_warn "chsh failed — run manually: chsh -s ${zsh_path}"
+        fi
+    fi
+}
+
 # ── Back up conflicting files ────────────────────────────────────────
 # ~/.zshenv is handled separately: we only back it up when it does NOT already
 # contain our XDG bootstrap (to avoid nuking a correctly configured machine).
@@ -1119,13 +1184,13 @@ print_checklist() {
     printf '%s\n' "    ${BACKUP_DIR}"
     printf '\n'
     printf '%s\n' "  ─────────────────────────────────────────────────────────"
-    printf '%s\n' "  Full environment (all Homebrew packages):"
+    printf '%s\n' "  Full environment (all packages):"
     printf '%s\n' "    This script installs only the minimum required tools."
     printf '%s\n' "    For the complete package set (LSP runtimes, CLI tools, etc.),"
-    printf '%s\n' "    run brew_install.sh — reads brew_formulae.txt + brew_casks.txt,"
+    printf '%s\n' "    run pkg_install.sh — reads brew_formulae.txt + brew_casks.txt,"
     printf '%s\n' "    skips already-installed packages, and continues past any errors:"
     printf '\n'
-    printf '%s\n' "      bash ${DOTFILES_DIR}/bin/brew_install.sh"
+    printf '%s\n' "      bash ${DOTFILES_DIR}/bin/pkg_install.sh"
     printf '\n'
 
     local terminal_display
@@ -1153,6 +1218,7 @@ main() {
 
     check_platform
     check_prerequisites
+    ensure_zsh_default_shell
     backup_conflicts
     create_xdg_dirs
     write_zshenv
@@ -1170,6 +1236,14 @@ main() {
     configure_file_associations
     install_claude_themes
     print_checklist
+
+    # On Linux, when the default shell was switched to zsh during this run,
+    # exec zsh -l to replace the current bash process so the user gets a live
+    # zsh session immediately — no terminal restart needed.
+    if [[ "${_ZSH_SHELL_CHANGED}" == "true" && -t 0 && -t 1 ]]; then
+        log_step "Activating" "zsh — no restart required"
+        exec zsh -l
+    fi
 }
 
 main "$@"

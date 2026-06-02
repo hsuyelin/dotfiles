@@ -199,10 +199,10 @@ bash ~/.config/install.sh
 Then install packages:
 
 ```bash
-bash ~/.config/bin/brew_install.sh
+bash ~/.config/bin/pkg_install.sh
 ```
 
-`install.sh` detects Arch / Debian / Ubuntu automatically. macOS-only steps (Homebrew, AeroSpace, Ghostty shaders, Xcode) are skipped. `brew_install.sh` maps Homebrew formulae and casks to native package manager equivalents; packages with no Linux mapping are skipped with a warning.
+`install.sh` detects Arch / Debian / Ubuntu automatically. macOS-only steps (Homebrew, AeroSpace, Ghostty shaders, Xcode) are skipped. `pkg_install.sh` maps Homebrew formulae and casks to native package manager equivalents; packages with no Linux mapping are skipped with a warning.
 
 ### Terminal selection
 

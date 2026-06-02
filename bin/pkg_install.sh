@@ -1,18 +1,21 @@
 #!/usr/bin/env bash
 
 # ============================================================
-# brew_install.sh — Standalone Homebrew package installer
+# pkg_install.sh — Cross-platform package installer
 # ============================================================
 # Usage:
-#   bash brew_install.sh [--dry-run] [--terminal=ghostty|kitty|iterm2]
+#   bash pkg_install.sh [--dry-run] [--terminal=ghostty|kitty|iterm2]
 #
-# Installs all formulae and casks declared in:
+# macOS  — installs via Homebrew from:
 #   ~/.config/brew/brew_formulae.txt
 #   ~/.config/brew/brew_casks.txt
 #
+# Linux  — maps formulae/casks to Arch (pacman) or Debian/Ubuntu (apt)
+#   equivalents and installs them; packages with no mapping are skipped.
+#
 # Safe to re-run: already-installed packages are skipped.
-# The AeroSpace tap (nikitabobko/tap) is added automatically.
-# Non-full ffmpeg / imagemagick are removed before install
+# The AeroSpace tap (nikitabobko/tap) is added automatically on macOS.
+# Non-full ffmpeg / imagemagick are removed before install on macOS
 # because Yazi requires the -full variants.
 
 set -euo pipefail
