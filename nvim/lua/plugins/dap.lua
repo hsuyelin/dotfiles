@@ -15,7 +15,10 @@ require("nvim-dap-virtual-text").setup({
 
 dapui.setup()
 
+local is_macos = vim.uv.os_uname().sysname == "Darwin"
+
 local function xcrun_find(tool)
+  if not is_macos then return nil end
   local path = vim.fn.system({ "xcrun", "--find", tool })
   if vim.v.shell_error ~= 0 then
     return nil
