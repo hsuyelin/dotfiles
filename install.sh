@@ -628,6 +628,9 @@ create_xdg_dirs() {
 # ── Write ~/.zshenv ───────────────────────────────────────────────────
 # This file is not inside the dotfiles repo — it lives at $HOME and is the
 # single entry point that sets ZDOTDIR before zsh loads anything else.
+# _ZSHENV_WRITTEN is set to true when the file is freshly written so that
+# main() knows to exec zsh -l even when the default shell was already zsh.
+_ZSHENV_WRITTEN=false
 write_zshenv() {
     log_step "Checking" "${HOME}/.zshenv"
 
@@ -656,6 +659,7 @@ export ZDOTDIR="${ZDOTDIR:-$XDG_CONFIG_HOME/zsh}"
 [[ -f "$ZDOTDIR/.zshenv" ]] && source "$ZDOTDIR/.zshenv"
 ZSHENV
 
+    _ZSHENV_WRITTEN=true
     log_info "Wrote ${ZSHENV_HOME}"
 }
 
@@ -1237,10 +1241,13 @@ main() {
     install_claude_themes
     print_checklist
 
-    # On Linux, when the default shell was switched to zsh during this run,
-    # exec zsh -l to replace the current bash process so the user gets a live
-    # zsh session immediately — no terminal restart needed.
-    if [[ "${_ZSH_SHELL_CHANGED}" == "true" && -t 0 && -t 1 ]]; then
+    # exec zsh -l when either:
+    #   1. the default shell was switched to zsh during this run, OR
+    #   2. ~/.zshenv was freshly written (XDG/ZDOTDIR not yet active in the
+    #      current session — without exec the user must open a new terminal)
+    # Only fires in an interactive TTY session.
+    if [[ ( "${_ZSH_SHELL_CHANGED}" == "true" || "${_ZSHENV_WRITTEN}" == "true" ) \
+          && -t 0 && -t 1 ]]; then
         log_step "Activating" "zsh — no restart required"
         exec zsh -l
     fi
