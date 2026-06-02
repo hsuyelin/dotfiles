@@ -3,6 +3,26 @@
 -- Must be required before any vim.pack.add() call so the wrapper intercepts
 -- every registration and builds the registry used by PackClean / PackUpdate.
 
+-- vim.pack requires Neovim >= 0.11. On older versions stub it out so that
+-- plugin files calling vim.pack.add() do not crash — plugins simply won't load.
+if not vim.pack then
+    vim.notify(
+        "pack_manager: vim.pack not found — Neovim ≥ 0.11 required, plugins disabled",
+        vim.log.levels.WARN
+    )
+    vim.pack = { add = function() end, del = function() end }
+    local noop = function()
+        vim.notify("Requires Neovim ≥ 0.11", vim.log.levels.WARN)
+    end
+    return {
+        _registry    = {},
+        update       = noop,
+        clean        = noop,
+        check_update = noop,
+        check_health = noop,
+    }
+end
+
 local M = {}
 
 M._registry = {} -- name → { src, dir, version? }
