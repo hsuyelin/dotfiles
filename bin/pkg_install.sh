@@ -265,6 +265,33 @@ _linux_install_formulae() {
     local _installed=0 _nomap=0 _failed=0
     while IFS= read -r formula; do
         [[ -z "${formula}" || "${formula}" == \#* ]] && continue
+
+        # Formulae not in standard repos but installable via npm.
+        case "${formula}" in
+            tree-sitter-cli)
+                if command -v npm &>/dev/null; then
+                    if command -v tree-sitter &>/dev/null; then
+                        log_info "tree-sitter already installed (skipped)"
+                    elif [[ "${DRY_RUN}" == "true" ]]; then
+                        log_info "[dry-run] npm install -g tree-sitter-cli"
+                        (( _installed++ )) || true
+                    else
+                        log_step "npm" "install -g tree-sitter-cli"
+                        if npm install -g tree-sitter-cli; then
+                            (( _installed++ )) || true
+                        else
+                            log_warn "Failed to install tree-sitter-cli via npm"
+                            (( _failed++ )) || true
+                        fi
+                    fi
+                else
+                    log_warn "npm not found — skipping tree-sitter-cli (install nodejs first)"
+                    (( _nomap++ )) || true
+                fi
+                continue
+                ;;
+        esac
+
         # Use || true to prevent set -e from aborting when the formula has no mapping.
         pkg="$(_linux_pkg_for_formula "${formula}" "${_LINUX_DISTRO}")" || true
         if [[ -z "${pkg}" ]]; then
