@@ -83,11 +83,15 @@ local options = {
 	laststatus = 3,
 	title = true,
 	titlestring = "%{expand('%:p') != '' ? expand('%:p') : getcwd()}",
-	winborder = "bold",
 }
 
 for k, v in pairs(options) do
 	vim.opt[k] = v
+end
+
+-- winborder: global border style for floating windows, added in Neovim 0.11
+if vim.fn.has("nvim-0.11") == 1 then
+	vim.opt.winborder = "bold"
 end
 
 -- filetypes
