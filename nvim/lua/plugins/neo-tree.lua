@@ -88,6 +88,7 @@ require("neo-tree").setup({
       ["<tab>"] = "open",
       ["O"] = "expand_all_nodes",
       ["C"] = "close_all_subnodes",
+      ["<C-f>"] = function() vim.cmd("Telescope find_files") end,
       [">"] = function()
         vim.api.nvim_win_set_width(0, vim.api.nvim_win_get_width(0) + 5)
       end,

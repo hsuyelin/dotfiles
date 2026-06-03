@@ -78,6 +78,7 @@ vim.schedule(function()
 
   local neoscroll = require("neoscroll")
   neoscroll.setup({
+    mappings = {},
     easing = "sine",
     duration_multiplier = 0.4,
   })
