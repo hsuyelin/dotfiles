@@ -659,6 +659,49 @@ except Exception:
     clang = 'clang'
 
 db, seen = [], set()
+# Xcode-specific flags clangd cannot handle.
+# _SKIP_EXACT:  standalone flags to remove (no argument).
+# _SKIP_NEXT:   flags whose following argument must also be removed.
+# _SKIP_PREFIX: flags with value embedded via '=' to remove.
+_SKIP_EXACT = {'-gmodules'}
+_SKIP_NEXT = {'-ivfsoverlay', '-working-directory'}
+_SKIP_PREFIX = (
+    '-fmodules-cache-path=',
+    '-fmodule-name=',
+    '-fprebuilt-module-path=',
+    '-ivfsoverlay=',
+)
+
+def _filter(raw):
+    result, i = [], 0
+    while i < len(raw):
+        f = raw[i]
+        if f in _SKIP_EXACT:
+            i += 1
+            continue
+        if f in _SKIP_NEXT:
+            i += 2  # skip flag + its argument
+            continue
+        if any(f.startswith(p) for p in _SKIP_PREFIX):
+            i += 1
+            continue
+        # Strip .hmap paths — clangd cannot read Xcode's binary header maps.
+        # Form 1: '-iquote /path/to/file.hmap'  (two tokens)
+        if f == '-iquote' and i + 1 < len(raw) and raw[i + 1].endswith('.hmap'):
+            i += 2
+            continue
+        # Form 2: '-I /path/to/file.hmap'  (two tokens, rare)
+        if f == '-I' and i + 1 < len(raw) and raw[i + 1].endswith('.hmap'):
+            i += 2
+            continue
+        # Form 3: '-I/path/to/file.hmap'  (single token)
+        if f.startswith('-I') and f.endswith('.hmap'):
+            i += 1
+            continue
+        result.append(f)
+        i += 1
+    return result
+
 for cmd in manifest.get('commands', {}).values():
     if cmd.get('tool') != 'ccompile':
         continue
@@ -679,7 +722,18 @@ for cmd in manifest.get('commands', {}).values():
                 flags.extend(shlex.split(open(inp).read()))
             except Exception:
                 pass
-    args = [clang] + flags + ['-c', source, '-o', output_obj]
+    flags = _filter(flags)
+    # Prepend CocoaPods real header directories so clangd can resolve
+    # imports that were previously routed through unreadable .hmap files.
+    pods_inc = []
+    for sub in ('Public', 'Private'):
+        p = os.path.join(project_root, 'Pods', 'Headers', sub)
+        if os.path.isdir(p):
+            pods_inc.append(f'-I{p}')
+            for pod in os.scandir(p):
+                if pod.is_dir():
+                    pods_inc.append(f'-I{pod.path}')
+    args = [clang] + pods_inc + flags + ['-c', source, '-o', output_obj]
     db.append({
         'directory': project_root,
         'file': source,
