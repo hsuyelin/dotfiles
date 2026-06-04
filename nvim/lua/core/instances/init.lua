@@ -7,3 +7,8 @@ end
 if vim.env.GHOSTTY_RESOURCES_DIR then
 	require("core.instances.ghostty")
 end
+
+-- Linux: clipboard provider detection and OSC52 fallback
+if vim.uv.os_uname().sysname == "Linux" then
+	require("core.instances.linux")
+end

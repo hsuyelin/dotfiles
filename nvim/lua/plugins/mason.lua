@@ -33,6 +33,18 @@ for _, server in ipairs(lsp_servers) do
     table.insert(ensure_installed, server[1])
   end
 end
--- Fixed: setup calls moved outside the loop
+
+-- formatters managed by Mason (cross-platform)
+local mason_formatters = {
+  "stylua",
+  "prettier",
+  "yapf",
+  "clang-format",
+  "goimports",
+  "shfmt",
+  "taplo",
+}
+vim.list_extend(ensure_installed, mason_formatters)
+
 require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 -- mason-nvim-dap.setup() is called in plugins/dap.lua after nvim-dap is loaded

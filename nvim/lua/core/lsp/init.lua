@@ -15,6 +15,7 @@ for _, server in ipairs(enabled_servers) do
 			end
 		end,
 		root_markers = core.configs.root_markers,
+		capabilities = require("blink.cmp").get_lsp_capabilities(),
 	}
 
 	local ok, custom_settings = pcall(require, "core.lsp.servers." .. server)

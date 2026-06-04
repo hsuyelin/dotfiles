@@ -14,28 +14,132 @@ vim.api.nvim_create_autocmd("InsertEnter", {
   end,
 })
 
-require("conform").setup({
-  formatters_by_ft = {
-    lua = { "stylua" },
-    python = { "yapf" },
-    swift = { "swiftformat_custom" },
-  },
-  format_on_save = {
-    lsp_fallback = true,
-    timeout_ms = 500,
-  },
-  formatters = {
-    swiftformat_custom = {
-      command = "swiftformat",
-      args = {
-        "--config",
-        (os.getenv("XDG_CONFIG_HOME") or os.getenv("HOME") .. "/.config") .. "/swiftformat/.swiftformat",
-        "--stdinpath",
-        "$FILENAME",
-      },
-      stdin = true,
+local is_mac   = vim.uv.os_uname().sysname == "Darwin"
+local is_linux = vim.uv.os_uname().sysname == "Linux"
+
+local AUTO_FORMAT_FT = {
+  go = true, rust = true, python = true,
+}
+if is_mac then
+  AUTO_FORMAT_FT.swift = true
+  AUTO_FORMAT_FT.objc  = true
+end
+
+local formatters_by_ft = {
+  -- auto-format on save
+  go         = { "goimports" },
+  rust       = { "rustfmt" },
+  python     = { "yapf" },
+
+  -- manual only
+  lua        = { "stylua" },
+  typescript = { "prettier" },
+  javascript = { "prettier" },
+  typescriptreact = { "prettier" },
+  javascriptreact = { "prettier" },
+  json       = { "prettier" },
+  jsonc      = { "prettier" },
+  yaml       = { "prettier" },
+  html       = { "prettier" },
+  css        = { "prettier" },
+  scss       = { "prettier" },
+  markdown   = { "prettier" },
+  sh         = { "shfmt" },
+  bash       = { "shfmt" },
+  toml       = { "taplo" },
+  xml        = { "xmllint" },
+}
+if is_mac then
+  formatters_by_ft.swift = { "swiftformat_custom" }
+  formatters_by_ft.objc  = { "clang_format" }
+end
+
+local custom_formatters = {}
+if is_mac then
+  custom_formatters.swiftformat_custom = {
+    command = "swiftformat",
+    args = {
+      "--config",
+      (os.getenv("XDG_CONFIG_HOME") or os.getenv("HOME") .. "/.config") .. "/swiftformat/.swiftformat",
+      "--stdinpath",
+      "$FILENAME",
     },
-  },
+    stdin = true,
+  }
+end
+
+require("conform").setup({
+  formatters_by_ft = formatters_by_ft,
+
+  format_on_save = function(bufnr)
+    if AUTO_FORMAT_FT[vim.bo[bufnr].filetype] then
+      return { lsp_fallback = true, timeout_ms = 500 }
+    end
+  end,
+
+  formatters = custom_formatters,
+})
+
+-- install system-level formatters not managed by Mason
+vim.api.nvim_create_autocmd("VimEnter", {
+  once = true,
+  callback = function()
+    -- rustfmt: ships with rustup, not available in Mason
+    if vim.fn.exepath("rustup") ~= "" and vim.fn.exepath("rustfmt") == "" then
+      vim.notify("[formatter] installing rustfmt via rustup...", vim.log.levels.INFO)
+      vim.fn.jobstart("rustup component add rustfmt", {
+        on_exit = function(_, code)
+          local msg = code == 0
+            and "[formatter] rustfmt installed"
+            or "[formatter] rustfmt install failed (exit " .. code .. ")"
+          local level = code == 0 and vim.log.levels.INFO or vim.log.levels.WARN
+          vim.schedule(function() vim.notify(msg, level) end)
+        end,
+      })
+    end
+
+    if is_mac then
+      local brew = vim.fn.exepath("brew")
+      if brew == "" then return end
+
+      -- swiftformat
+      if vim.fn.exepath("swiftformat") == "" then
+        vim.notify("[formatter] installing swiftformat via brew...", vim.log.levels.INFO)
+        vim.fn.jobstart(brew .. " install swiftformat", {
+          on_exit = function(_, code)
+            local msg = code == 0
+              and "[formatter] swiftformat installed"
+              or "[formatter] swiftformat install failed (exit " .. code .. ")"
+            local level = code == 0 and vim.log.levels.INFO or vim.log.levels.WARN
+            vim.schedule(function() vim.notify(msg, level) end)
+          end,
+        })
+      end
+
+      -- xmllint (part of libxml2)
+      if vim.fn.exepath("xmllint") == "" then
+        vim.notify("[formatter] installing libxml2 (xmllint) via brew...", vim.log.levels.INFO)
+        vim.fn.jobstart(brew .. " install libxml2", {
+          on_exit = function(_, code)
+            local msg = code == 0
+              and "[formatter] xmllint installed"
+              or "[formatter] xmllint install failed (exit " .. code .. ")"
+            local level = code == 0 and vim.log.levels.INFO or vim.log.levels.WARN
+            vim.schedule(function() vim.notify(msg, level) end)
+          end,
+        })
+      end
+
+    elseif is_linux then
+      -- xmllint needs system package manager (requires sudo, notify only)
+      if vim.fn.exepath("xmllint") == "" then
+        vim.notify(
+          "[formatter] xmllint not found. Install with: sudo apt install libxml2-utils  (or: sudo dnf install libxml2)",
+          vim.log.levels.WARN
+        )
+      end
+    end
+  end,
 })
 
 vim.api.nvim_create_user_command("LspRestart", function()
