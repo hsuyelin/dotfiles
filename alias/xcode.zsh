@@ -13,17 +13,6 @@ _xwarn() { printf '\033[1;33m%12s\033[0m  %s\n' "$1" "$2"; }
 _xerr()  { printf '\033[1;31m%12s\033[0m  %s\n' "error" "$1" >&2; }
 _xhint() { printf '\033[2m%14s  %s\033[0m\n' "" "$1" >&2; }
 
-# Return the most recent xcactivitylog that contains actual build (compile)
-# commands.  Skips empty files and clean-only logs (compressed size < 10 KB).
-_xbs_latest_build_log() {
-    local dir="$1"
-    local f sz
-    ls -t "$dir"/*.xcactivitylog 2>/dev/null | while IFS= read -r f; do
-        [[ -s "$f" ]] || continue
-        sz=$(stat -f '%z' "$f" 2>/dev/null || wc -c < "$f" 2>/dev/null || echo 0)
-        (( sz > 10000 )) && printf '%s\n' "$f" && return 0
-    done
-}
 
 # ---------------------------------------------------------------------------
 # Dependency check — call at the top of every public function.
@@ -640,24 +629,7 @@ try: print(json.load(open('buildServer.json'))['build_root'])
 except: pass
 " 2>/dev/null)
 
-    # ── Step 3a: .compile via xcactivitylog (works on Xcode < 26) ────────────────
-    local log=""
-    if [[ -n "$_br" && -d "$_br/Logs/Build" ]]; then
-        log=$(_xbs_latest_build_log "$_br/Logs/Build")
-    fi
-
-    if [[ -n "$log" ]]; then
-        _xlog "Parsing" "$(basename "$log")"
-        if xcode-build-server parse -a "$log"; then
-            local _sz
-            _sz=$(wc -c < "$PWD/.compile" 2>/dev/null | tr -d ' ')
-            _xlog "Updated" ".compile (${_sz} bytes)"
-        else
-            _xwarn "Failed" "xcode-build-server parse returned error"
-        fi
-    fi
-
-    # ── Step 3b: compile_commands.json via xcbuilddata (Xcode 26+) ───────────────
+    # ── Step 3: compile_commands.json via xcbuilddata ─────────────────────────────
     # Xcode 26 no longer writes usable xcactivitylog; read the build manifest
     # from XCBuildData instead and reconstruct clang invocations directly.
     if [[ -n "$_br" ]]; then
@@ -732,84 +704,6 @@ PYEOF
     _xlog "Done" "run :LspRestart in Neovim"
 }
 
-# ---------------------------------------------------------------------------
-# xbs-parse — Refresh .compile from the latest Xcode build log.
-# Usage: xbs-parse [--help] [--dry-run]
-#
-# Reads buildServer.json in $PWD to locate DerivedData, finds the newest
-# .xcactivitylog, and runs `xcode-build-server parse -a <log>` to populate
-# .compile. Run this after each Xcode build when source files change.
-# ---------------------------------------------------------------------------
-
-xbs-parse() {
-    local dry_run=0
-
-    for arg in "$@"; do
-        case "$arg" in
-            --help|-h)
-                printf 'Usage: xbs-parse [--dry-run]\n'
-                printf '\n'
-                printf '  Refreshes .compile from the latest Xcode build log.\n'
-                printf '  Requires buildServer.json in the current directory.\n'
-                printf '  Run after each Xcode build when source files change.\n'
-                return 0 ;;
-            --dry-run) dry_run=1 ;;
-        esac
-    done
-
-    if ! command -v xcode-build-server >/dev/null 2>&1; then
-        _xerr "xcode-build-server not found"
-        _xhint "Install with: brew install xcode-build-server"
-        return 1
-    fi
-
-    local bsj="$PWD/buildServer.json"
-    if [[ ! -f "$bsj" ]]; then
-        _xerr "buildServer.json not found in $PWD"
-        _xhint "Run: xindex --workspace <name> --scheme <name>"
-        return 1
-    fi
-
-    local build_root
-    build_root=$(python3 -c "import json,sys; print(json.load(open(sys.argv[1]))['build_root'])" "$bsj" 2>/dev/null)
-    if [[ -z "$build_root" ]]; then
-        _xerr "Could not read build_root from buildServer.json"
-        return 1
-    fi
-
-    local log_dir="$build_root/Logs/Build"
-    if [[ ! -d "$log_dir" ]]; then
-        _xerr "Build log directory not found: $log_dir"
-        _xhint "Build the project in Xcode first"
-        return 1
-    fi
-
-    local log
-    log=$(_xbs_latest_build_log "$log_dir")
-    if [[ -z "$log" ]]; then
-        _xerr "No valid build log found in $log_dir"
-        _xhint "Build the project first (Xcode ⌘B, or: xindex --workspace ... --scheme ...)"
-        return 1
-    fi
-
-    _xlog "Parsing" "$(basename "$log")"
-
-    if (( dry_run )); then
-        _xlog "DryRun" "would run: xcode-build-server parse -a $log"
-        return 0
-    fi
-
-    xcode-build-server parse -a "$log"
-    local rc=$?
-    if (( rc != 0 )); then
-        _xerr "xcode-build-server parse failed (exit $rc)"
-        return 1
-    fi
-
-    local size
-    size=$(wc -c < "$PWD/.compile" 2>/dev/null | tr -d ' ')
-    _xlog "Updated" ".compile (${size} bytes) — run :LspRestart in Neovim"
-}
 
 # ---------------------------------------------------------------------------
 # xbs-patch — Patch xcode-build-server to skip unsupported log formats.
