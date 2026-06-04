@@ -632,10 +632,7 @@ xindex() {
     fi
     _xlog "Generated" "buildServer.json"
 
-    # ── Step 3: compile_commands.json from the just-produced build log ─────────
-    # Read build_root from the buildServer.json that step 2 just generated —
-    # more reliable than searching DerivedData by workspace name.
-    local log_dir log
+    # ── Step 3: read build_root from freshly generated buildServer.json ──────────
     local _br
     _br=$(python3 -c "
 import json, sys
@@ -643,16 +640,13 @@ try: print(json.load(open('buildServer.json'))['build_root'])
 except: pass
 " 2>/dev/null)
 
-    log=""
+    # ── Step 3a: .compile via xcactivitylog (works on Xcode < 26) ────────────────
+    local log=""
     if [[ -n "$_br" && -d "$_br/Logs/Build" ]]; then
-        log_dir="$_br/Logs/Build"
-        log=$(_xbs_latest_build_log "$log_dir")
+        log=$(_xbs_latest_build_log "$_br/Logs/Build")
     fi
 
-    if [[ -z "$log" ]]; then
-        _xwarn "Skipped" "no valid build log found in DerivedData"
-        _xhint ".compile was NOT updated — build the project first, then re-run xindex --skip-build"
-    else
+    if [[ -n "$log" ]]; then
         _xlog "Parsing" "$(basename "$log")"
         if xcode-build-server parse -a "$log"; then
             local _sz
@@ -660,7 +654,78 @@ except: pass
             _xlog "Updated" ".compile (${_sz} bytes)"
         else
             _xwarn "Failed" "xcode-build-server parse returned error"
-            _xhint ".compile may be incomplete"
+        fi
+    fi
+
+    # ── Step 3b: compile_commands.json via xcbuilddata (Xcode 26+) ───────────────
+    # Xcode 26 no longer writes usable xcactivitylog; read the build manifest
+    # from XCBuildData instead and reconstruct clang invocations directly.
+    if [[ -n "$_br" ]]; then
+        _xlog "Generating" "compile_commands.json (xcbuilddata)"
+        local _cc_count
+        _cc_count=$(python3 - "$_br" "$PWD" "$PWD/compile_commands.json" <<'PYEOF'
+import json, os, sys, glob, shlex, subprocess
+
+build_root, project_root, output = sys.argv[1], sys.argv[2], sys.argv[3]
+
+xcbd_dir = os.path.join(build_root, 'Build', 'Intermediates.noindex', 'XCBuildData')
+xcbd_dirs = glob.glob(os.path.join(xcbd_dir, '*.xcbuilddata'))
+if not xcbd_dirs:
+    print("no xcbuilddata", file=sys.stderr); sys.exit(1)
+
+latest = max(xcbd_dirs, key=os.path.getmtime)
+manifest_path = os.path.join(latest, 'manifest.json')
+if not os.path.exists(manifest_path):
+    print("manifest.json not found", file=sys.stderr); sys.exit(1)
+
+manifest = json.load(open(manifest_path))
+try:
+    clang = subprocess.run(
+        ['xcrun', '--find', 'clang'], capture_output=True, text=True
+    ).stdout.strip() or 'clang'
+except Exception:
+    clang = 'clang'
+
+db, seen = [], set()
+for cmd in manifest.get('commands', {}).values():
+    if cmd.get('tool') != 'ccompile':
+        continue
+    desc = cmd.get('description', '')
+    if not desc.startswith('CompileC '):
+        continue
+    parts = desc.split()
+    if len(parts) < 3:
+        continue
+    output_obj, source = parts[1], parts[2]
+    if not os.path.isabs(source) or not os.path.exists(source) or source in seen:
+        continue
+    seen.add(source)
+    flags = []
+    for inp in cmd.get('inputs', []):
+        if inp.endswith('.resp') and os.path.exists(inp):
+            try:
+                flags.extend(shlex.split(open(inp).read()))
+            except Exception:
+                pass
+    args = [clang] + flags + ['-c', source, '-o', output_obj]
+    db.append({
+        'directory': project_root,
+        'file': source,
+        'command': ' '.join(shlex.quote(a) for a in args),
+    })
+
+if not db:
+    print("no compile entries found", file=sys.stderr); sys.exit(1)
+json.dump(db, open(output, 'w'), indent=2)
+print(len(db))
+PYEOF
+        )
+        local _py_rc=$?
+        if (( _py_rc == 0 )) && [[ -n "$_cc_count" ]]; then
+            _xlog "Generated" "compile_commands.json (${_cc_count} entries)"
+        else
+            _xwarn "Skipped" "compile_commands.json — xcbuilddata parse failed"
+            _xhint "ObjC/C clangd gd may not work; try a full rebuild with xindex"
         fi
     fi
 
