@@ -666,7 +666,6 @@ db, seen = [], set()
 _SKIP_EXACT = {'-gmodules'}
 _SKIP_NEXT = {'-ivfsoverlay', '-working-directory'}
 _SKIP_PREFIX = (
-    '-fmodules-cache-path=',
     '-fmodule-name=',
     '-fprebuilt-module-path=',
     '-ivfsoverlay=',
