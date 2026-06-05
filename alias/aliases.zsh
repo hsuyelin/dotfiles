@@ -52,14 +52,14 @@ fi
 # - If eza exists, use it. Otherwise fall back to system ls.
 # -----------------------------
 if command -v eza >/dev/null 2>&1; then
-  alias ls='eza --icons --group-directories-first'
-  alias l='eza -l --icons --git --header --group-directories-first --color-scale'
-  alias ll='eza -la --icons --git --header --group-directories-first --color-scale'
-  alias la='eza -a --icons --group-directories-first'
-  alias lr='eza -l --sort=modified --icons --git --header --group-directories-first --color-scale'
-  alias lb='eza -l --sort=size --icons --git --header --group-directories-first --color-scale'
-  alias lt='eza --tree --level=2 --icons --group-directories-first'
-  alias lta='eza --tree -a --level=2 --icons --group-directories-first'
+  alias ls='eza --icons --group-directories-first --hyperlink'
+  alias l='eza -l --icons --git --header --group-directories-first --color-scale --hyperlink'
+  alias ll='eza -la --icons --git --header --group-directories-first --color-scale --hyperlink'
+  alias la='eza -a --icons --group-directories-first --hyperlink'
+  alias lr='eza -l --sort=modified --icons --git --header --group-directories-first --color-scale --hyperlink'
+  alias lb='eza -l --sort=size --icons --git --header --group-directories-first --color-scale --hyperlink'
+  alias lt='eza --tree --level=2 --icons --group-directories-first --hyperlink'
+  alias lta='eza --tree -a --level=2 --icons --group-directories-first --hyperlink'
 else
   alias l='ls -lh'
   alias ll='ls -lah'
