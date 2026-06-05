@@ -12,7 +12,7 @@ end
 
 return {
 	cmd = sourcekit_cmd(),
-	filetypes = { "swift", "objc", "objcpp" },
+	filetypes = { "swift" },
 	root_markers = vim.list_extend(
 		vim.deepcopy(core.configs.root_markers),
 		{ "buildServer.json", "Package.swift" }
