@@ -615,7 +615,7 @@ xindex() {
 
     # ── Step 2: buildServer.json (sourcekit-lsp — Swift / ObjC gd/gr) ─────────
     _xlog "Generating" "buildServer.json"
-    if ! xcode-build-server config -workspace "$ws_path" -scheme "$scheme" 2>/dev/null; then
+    if ! xcode-build-server config -workspace "$ws_path" -scheme "$scheme" &>/dev/null; then
         if [ -f "buildServer.json" ]; then
             _xwarn "Warning" "xcode-build-server config failed — reusing existing buildServer.json"
         else
