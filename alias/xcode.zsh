@@ -616,10 +616,15 @@ xindex() {
     # ── Step 2: buildServer.json (sourcekit-lsp — Swift / ObjC gd/gr) ─────────
     _xlog "Generating" "buildServer.json"
     if ! xcode-build-server config -workspace "$ws_path" -scheme "$scheme"; then
-        _xerr "xcode-build-server config failed"
-        return 1
+        if [ -f "buildServer.json" ]; then
+            _xwarn "Warning" "xcode-build-server config failed — reusing existing buildServer.json"
+        else
+            _xerr "xcode-build-server config failed and no existing buildServer.json found"
+            return 1
+        fi
+    else
+        _xlog "Generated" "buildServer.json"
     fi
-    _xlog "Generated" "buildServer.json"
 
     # ── Step 3: read build_root from freshly generated buildServer.json ──────────
     local _br
