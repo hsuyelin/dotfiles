@@ -7,24 +7,29 @@ vim.pack.add({
   gh('j-hui/fidget.nvim'),
 })
 
-require("fidget").setup({
-  progress = {
-    poll_rate = 0,
-    suppress_on_insert = true,
-    ignore_done_already = false,
-    display = {
-      render_limit = 4,
-      done_ttl = 2,
-      progress_icon = { pattern = "dots" },
-    },
-  },
-  notification = {
-    window = {
-      winblend = 0,
-      border = "none",
-      align = "bottom",
-    },
-  },
+vim.api.nvim_create_autocmd("VimEnter", {
+  once = true,
+  callback = function()
+    require("fidget").setup({
+      progress = {
+        poll_rate = 0,
+        suppress_on_insert = true,
+        ignore_done_already = false,
+        display = {
+          render_limit = 4,
+          done_ttl = 2,
+          progress_icon = { pattern = "dots" },
+        },
+      },
+      notification = {
+        window = {
+          winblend = 0,
+          border = "none",
+          align = "bottom",
+        },
+      },
+    })
+  end,
 })
 
 -- lsp_signature: defer to first InsertEnter to avoid slowing startup

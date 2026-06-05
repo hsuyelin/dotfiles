@@ -1,0 +1,11 @@
+{
+  "trustedformulae": [
+    "felixkratz/formulae/borders",
+    "oven-sh/bun/bun",
+    "xcodesorg/made/xcodes"
+  ],
+  "trustedcasks": [
+    "farion1231/ccswitch/cc-switch",
+    "nikitabobko/tap/aerospace"
+  ]
+}
