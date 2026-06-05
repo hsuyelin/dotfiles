@@ -214,6 +214,29 @@ M.update = function()
         return
     end
 
+    -- fidget progress handle — shows real-time progress in the corner,
+    -- especially useful once the float is dismissed to background mode.
+    local fh = nil
+    local ok, fmod = pcall(require, "fidget.progress.handle")
+    if ok then
+        fh = fmod.create({
+            title       = "PackUpdate",
+            lsp_client  = { name = "pack" },
+            cancellable = false,
+            percentage  = 0,
+            message     = string.format("0 / %d", #items),
+        })
+    end
+
+    local function fidget_report(n_done)
+        if fh then
+            fh:report({
+                percentage = math.floor(n_done / #items * 100),
+                message    = string.format("%d / %d", n_done, #items),
+            })
+        end
+    end
+
     local init = { string.format("  Updating %d plugin(s) …", #items), "" }
     for _, item in ipairs(items) do
         local tag = item.version and " [pinned]" or ""
@@ -244,6 +267,7 @@ M.update = function()
             spinner_timer:stop()
             spinner_timer:close()
         end
+        if fh then fh:finish() end
         if not bg_mode and vim.api.nvim_buf_is_valid(buf) then
             local last = vim.api.nvim_buf_line_count(buf) - 1
             set_line(buf, last, string.format(
@@ -286,6 +310,7 @@ M.update = function()
                 if icon == "✓" then n_ok   = n_ok   + 1
                 elseif icon == "↩" then n_skip = n_skip + 1
                 else n_fail = n_fail + 1 end
+                fidget_report(done)
                 if not bg_mode and vim.api.nvim_buf_is_valid(buf) then
                     local suffix = detail and ("  " .. detail) or ""
                     set_line(buf, HEADER + i - 1, string.format(

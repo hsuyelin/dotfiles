@@ -4,6 +4,27 @@ vim.pack.add({
   gh('onsails/lspkind.nvim'),
   gh('ray-x/lsp_signature.nvim'),
   gh('stevearc/conform.nvim'),
+  gh('j-hui/fidget.nvim'),
+})
+
+require("fidget").setup({
+  progress = {
+    poll_rate = 0,
+    suppress_on_insert = true,
+    ignore_done_already = false,
+    display = {
+      render_limit = 4,
+      done_ttl = 2,
+      progress_icon = { pattern = "dots" },
+    },
+  },
+  notification = {
+    window = {
+      winblend = 0,
+      border = "none",
+      align = "bottom",
+    },
+  },
 })
 
 -- lsp_signature: defer to first InsertEnter to avoid slowing startup
