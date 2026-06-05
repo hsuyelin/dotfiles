@@ -663,7 +663,7 @@ db, seen = [], set()
 # _SKIP_EXACT:  standalone flags to remove (no argument).
 # _SKIP_NEXT:   flags whose following argument must also be removed.
 # _SKIP_PREFIX: flags with value embedded via '=' to remove.
-_SKIP_EXACT = {'-gmodules', '-fmodules'}
+_SKIP_EXACT = {'-gmodules'}
 _SKIP_NEXT = {'-ivfsoverlay', '-working-directory'}
 _SKIP_PREFIX = (
     '-fmodules-cache-path=',
