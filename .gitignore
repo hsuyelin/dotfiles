@@ -55,3 +55,9 @@ cups/
 
 # Swift Package Manager — machine-specific package trust fingerprints and cache
 swiftpm/
+
+# Rclone — contains remote credentials and mount configs
+rclone/
+
+# Go workspace cache and module data
+go/

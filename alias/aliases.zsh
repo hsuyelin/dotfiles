@@ -30,6 +30,10 @@ alias bash-edit='subl "${XDG_CONFIG_HOME}/bash/.bash_profile"'
 # -----------------------------
 # Tool shortcuts
 # -----------------------------
+if command -v batcat >/dev/null 2>&1 && ! command -v bat >/dev/null 2>&1; then
+  alias bat='batcat'
+fi
+
 if command -v bat >/dev/null 2>&1; then
   alias batp='bat -p'       # plain style (no decorations)
   alias batP='bat -P'       # no paging
@@ -301,6 +305,7 @@ yy() {
 # SSH
 # -----------------------------
 alias ssh='TERM=xterm-256color ssh'
+alias ssh-reset='ssh-keygen -R'
 
 # -----------------------------
 # shelp: shell tools & zsh line-editing reference.

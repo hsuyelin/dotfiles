@@ -43,7 +43,9 @@ require("plugins.ai")
 require("plugins.go")
 require("plugins.flutter")
 require("plugins.markdown")
-require("plugins.swift")
+if vim.uv.os_uname().sysname == "Darwin" then
+  require("plugins.swift")
+end
 require("plugins.lua")
 
 -- Notes

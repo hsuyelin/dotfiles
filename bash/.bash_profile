@@ -1,19 +1,3 @@
-# PATH environment
-export PATH="$PATH:\
-${XDG_CONFIG_HOME:-$HOME/.config}/bin:\
-/opt/homebrew/bin:\
-/usr/local/sbin:/usr/local/bin:\
-/sbin:/bin:/usr/sbin:/usr/bin:\
-/root/bin:\
-$HOME/.local/bin:\
-$HOME/.rvm/bin:\
-/Applications/Xcode.app/Contents/SharedFrameworks/DVTFoundation.framework/Versions/A/Resources"
-
-# Android SDK — only add to PATH if ANDROID_SDK is actually defined
-if [[ -n "${ANDROID_SDK:-}" ]]; then
-  export PATH="$PATH:$ANDROID_SDK/platform-tools:$ANDROID_SDK/tools"
-fi
-
 # UTF-8 Local
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8

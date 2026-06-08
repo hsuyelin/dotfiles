@@ -6,11 +6,16 @@ vim.pack.add({
   { src = gh('nvim-treesitter/nvim-treesitter-textobjects'), version = 'master' },
 })
 
+local is_mac = vim.uv.os_uname().sysname == "Darwin"
+
 local ENSURE_INSTALLED = {
   "bash", "c", "cpp", "diff", "go", "gomod", "gosum", "gowork",
   "html", "javascript", "json", "lua", "markdown", "markdown_inline",
-  "python", "query", "regex", "swift", "vim", "vimdoc", "yaml",
+  "python", "query", "regex", "vim", "vimdoc", "yaml",
 }
+if is_mac then
+  table.insert(ENSURE_INSTALLED, "swift")
+end
 
 local legacy_ok, legacy_configs = pcall(require, "nvim-treesitter.configs")
 if legacy_ok then
@@ -91,11 +96,61 @@ local ts_repeat = require("nvim-treesitter-textobjects.repeatable_move")
 vim.keymap.set({ "n", "x", "o" }, ";", ts_repeat.repeat_last_move_next)
 vim.keymap.set({ "n", "x", "o" }, ",", ts_repeat.repeat_last_move_previous)
 
+-- Ensure tree-sitter-cli is available (required to compile parsers from source).
+--   macOS : brew install tree-sitter-cli
+--   Linux : npm install -g tree-sitter-cli  (only when npm is present)
+local function ensure_tree_sitter_cli()
+  if vim.fn.exepath("tree-sitter") ~= "" then return end
+
+  if is_mac then
+    local brew = vim.fn.exepath("brew")
+    if brew == "" then
+      vim.notify("[treesitter] tree-sitter-cli not found. Install: brew install tree-sitter-cli", vim.log.levels.WARN)
+      return
+    end
+    vim.notify("[treesitter] installing tree-sitter-cli via brew...", vim.log.levels.INFO)
+    vim.fn.jobstart({ brew, "install", "tree-sitter-cli" }, {
+      on_exit = function(_, code)
+        vim.schedule(function()
+          if code == 0 then
+            vim.notify("[treesitter] tree-sitter-cli installed", vim.log.levels.INFO)
+          else
+            vim.notify("[treesitter] tree-sitter-cli install failed (exit " .. code .. ")", vim.log.levels.WARN)
+          end
+        end)
+      end,
+    })
+  else
+    local npm = vim.fn.exepath("npm")
+    if npm == "" then
+      vim.notify(
+        "[treesitter] tree-sitter-cli not found. Install npm first, then: npm install -g tree-sitter-cli",
+        vim.log.levels.WARN
+      )
+      return
+    end
+    vim.notify("[treesitter] installing tree-sitter-cli via npm...", vim.log.levels.INFO)
+    vim.fn.jobstart({ npm, "install", "-g", "tree-sitter-cli" }, {
+      on_exit = function(_, code)
+        vim.schedule(function()
+          if code == 0 then
+            vim.notify("[treesitter] tree-sitter-cli installed", vim.log.levels.INFO)
+          else
+            vim.notify("[treesitter] tree-sitter-cli install failed (exit " .. code .. ")", vim.log.levels.WARN)
+          end
+        end)
+      end,
+    })
+  end
+end
+
 -- Auto-install any missing parsers from ENSURE_INSTALLED on first launch.
 -- vim.pack.add() has no build hook, so ensure_installed alone is not reliable.
 vim.api.nvim_create_autocmd("VimEnter", {
   once = true,
   callback = function()
+    ensure_tree_sitter_cli()
+
     local install_ok, install = pcall(require, "nvim-treesitter.install")
     if not install_ok then return end
     local parsers_ok, parsers = pcall(require, "nvim-treesitter.parsers")

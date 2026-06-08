@@ -10,10 +10,11 @@ core.configs = {
 			-- Shell (bash-language-server, uses shellcheck internally)
 			"bashls",
 
-			-- Swift / Objective-C (Xcode toolchain)
+			-- Swift / Objective-C (Xcode toolchain, macOS only)
 			{
 				"sourcekit-lsp",
-				mason = false,
+				mason   = false,
+				enabled = vim.uv.os_uname().sysname == "Darwin",
 			},
 
 			-- C / C++ / Objective-C
