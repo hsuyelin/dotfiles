@@ -178,6 +178,18 @@ wk.add({
 	{ "<leader>gts", "<cmd>Gitsigns toggle_signs<cr>", desc = "符号显示 (Signs)" },
 	{ "<leader>gb", "<cmd>Gitsigns blame<cr>", desc = "行级追溯 (Blame)" },
 	{ "<leader>gB", "<cmd>Gitsigns blame_line<cr>", desc = "行级追溯弹窗 (Blame Line)" },
+	-- Replace
+	{ "<leader>r",  group = "替换 (Replace)" },
+	{
+		"<leader>rs",
+		function() utils.replace({ regex = false }) end,
+		desc = "字面替换 (Literal Replace)",
+	},
+	{
+		"<leader>rr",
+		function() utils.replace({ regex = true }) end,
+		desc = "正则替换 (Regex Replace)",
+	},
 	-- Project
 	{ "<leader>p", group = "项目 (Project)" },
 	{

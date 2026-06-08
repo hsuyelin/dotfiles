@@ -65,6 +65,42 @@ function M.grep_lines_to_tab()
     vim.bo[buf].filetype  = filetype
 end
 
+-- Batch replace across the current buffer (normal mode) or visual selection.
+-- opts.regex = true  → pattern is a Vim regex
+-- opts.regex = false → pattern is treated as a literal string (\V very-nomagic)
+function M.replace(opts)
+    opts = opts or {}
+    local use_regex = opts.regex == true
+
+    -- Capture visual range BEFORE calling input(), which would exit visual mode.
+    local range = "%"
+    local mode = vim.fn.mode()
+    if mode == "v" or mode == "V" or mode == "\22" then
+        local from = math.min(vim.fn.line("v"), vim.fn.line("."))
+        local to   = math.max(vim.fn.line("v"), vim.fn.line("."))
+        range = from .. "," .. to
+        local esc = vim.api.nvim_replace_termcodes("<Esc>", true, false, true)
+        vim.api.nvim_feedkeys(esc, "nx", false)
+    end
+
+    local label = use_regex and "[regex]" or "[literal]"
+    local search = vim.fn.input(label .. " Search: ")
+    if search == "" then return end
+    local replacement = vim.fn.input(label .. " Replace: ")
+
+    local pattern = use_regex and search
+        or ("\\V" .. vim.fn.escape(search, "\\/"))
+    -- In literal mode also escape special replacement atoms (&, ~).
+    local rep = use_regex
+        and vim.fn.escape(replacement, "/\\")
+        or  vim.fn.escape(replacement, "/\\&~")
+
+    local ok, err = pcall(vim.cmd, range .. "s/" .. pattern .. "/" .. rep .. "/g")
+    if not ok then
+        vim.notify("Replace failed: " .. tostring(err), vim.log.levels.ERROR)
+    end
+end
+
 function M.config_files()
 	local ok, telescope = pcall(require, "telescope.builtin")
 	if not ok then
