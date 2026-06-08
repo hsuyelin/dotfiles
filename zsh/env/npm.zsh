@@ -19,6 +19,9 @@ export PATH
 # Set NVM_DIR before sourcing so the official install script respects it.
 if [[ "$(uname -s)" == "Linux" ]]; then
     export NVM_DIR="${XDG_DATA_HOME}/nvm"
+    # nvm is incompatible with NPM_CONFIG_PREFIX; the prefix is already
+    # declared in npmrc so unsetting the env var here is safe.
+    unset NPM_CONFIG_PREFIX
     # shellcheck disable=SC1090,SC1091
     [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
     # shellcheck disable=SC1090,SC1091
