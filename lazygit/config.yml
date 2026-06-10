@@ -258,7 +258,8 @@ os:
   openDirInEditor: ""
   # A built-in preset that sets all of the above settings. Supported presets
   # are defined in the getPreset function in editor_presets.go.
-  editPreset: ""
+  # Use Neovim for all in-app editing (reword, edit file, open dir, etc.).
+  editPreset: nvim
   # Command for opening a file, as if the file is double-clicked. Should
   # contain "{{filename}}", but doesn't support "{{line}}".
   open: ""
@@ -457,3 +458,19 @@ keybinding:
     bulkMenu: b
   commitMessage:
     commitMenu: <c-o>
+# Custom commands for copying info from any historical commit.
+# Native `y` (copyCommitAttributeToClipboard) already opens a menu to copy
+# hash / URL / diff / message / author — these add single-key shortcuts that
+# skip the menu. Clipboard command auto-detects pbcopy (macOS), wl-copy
+# (Wayland) or xclip (X11) so it works on macOS and Linux alike.
+customCommands:
+  - key: <c-y>
+    context: commits
+    description: Copy commit hash to clipboard
+    command: printf '%s' '{{.SelectedLocalCommit.Hash}}' | sh -c 'if command -v pbcopy >/dev/null 2>&1; then pbcopy; elif command -v wl-copy >/dev/null 2>&1; then wl-copy; else xclip -selection clipboard; fi'
+    output: none
+  - key: Y
+    context: commits
+    description: Copy full commit message to clipboard
+    command: git log -1 --format=%B {{.SelectedLocalCommit.Hash}} | sh -c 'if command -v pbcopy >/dev/null 2>&1; then pbcopy; elif command -v wl-copy >/dev/null 2>&1; then wl-copy; else xclip -selection clipboard; fi'
+    output: none
