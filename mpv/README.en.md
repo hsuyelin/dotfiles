@@ -14,7 +14,7 @@
 | **HW decode** | `hwdec=auto-safe` — VideoToolbox on macOS, VAAPI/NVDEC on Linux |
 | **Fonts** | Subtitles / danmaku / stats use **LXGW WenKai Mono Medium**; UI & menus use **Source Han Sans SC Medium** (uosc reads `osd-font`) |
 | **Subtitles** | Warm white `#FFF1E6` text + moderate dark outline, readability first |
-| **OSC** | [uosc](https://github.com/tomasklaen/uosc) modern control bar + context menu, Simplified Chinese UI, orange theme |
+| **OSC** | [uosc](https://github.com/tomasklaen/uosc) modern control bar + context menu, Simplified Chinese UI |
 | **Danmaku** | [uosc_danmaku](https://github.com/Tony15246/uosc_danmaku), DanDanPlay source |
 | **Online subs** | [sub-assrt](https://github.com/Sorrow446/mpv-sub-assrt) subtitle search |
 | **Upscaling** | [Anime4K](https://github.com/bloc97/Anime4K) GLSL shaders, HQ and fast tiers |
