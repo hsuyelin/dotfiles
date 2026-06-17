@@ -13,8 +13,8 @@
 | **Renderer** | `gpu-next` (libplacebo) + `high-quality` scalers, `deband` for banding, tuned for 4K panels |
 | **HW decode** | `hwdec=auto-safe` — VideoToolbox on macOS, VAAPI/NVDEC on Linux |
 | **Fonts** | Subtitles / danmaku / stats use **LXGW WenKai Mono Medium**; UI & menus use **Source Han Sans SC Medium** (uosc reads `osd-font`) |
-| **Subtitles** | Neutral cool-white `#F2F4F8` text + moderate dark outline, readability first |
-| **OSC** | [uosc](https://github.com/tomasklaen/uosc) modern control bar + context menu, Simplified Chinese UI, blue theme (macOS system blue) |
+| **Subtitles** | Warm white `#FFF1E6` text + moderate dark outline, readability first |
+| **OSC** | [uosc](https://github.com/tomasklaen/uosc) modern control bar + context menu, Simplified Chinese UI, orange theme |
 | **Danmaku** | [uosc_danmaku](https://github.com/Tony15246/uosc_danmaku), DanDanPlay source |
 | **Online subs** | [sub-assrt](https://github.com/Sorrow446/mpv-sub-assrt) subtitle search |
 | **Upscaling** | [Anime4K](https://github.com/bloc97/Anime4K) GLSL shaders, HQ and fast tiers |
@@ -31,7 +31,7 @@ mpv/
 ├── mpv.conf                 # main config (render/window/fonts/subs/OSD/log, incl. [linux] profile)
 ├── input.conf              # key & mouse bindings
 ├── script-opts/            # per-script options
-│   ├── uosc.conf            # OSC / UI (orange theme, danmaku buttons)
+│   ├── uosc.conf            # OSC / UI (danmaku buttons)
 │   ├── console.conf         # command console font (Source Han Sans SC Medium)
 │   ├── stats.conf           # stats overlay font (LXGW Medium)
 │   ├── uosc_danmaku.conf    # danmaku

@@ -13,8 +13,8 @@
 | **渲染** | `gpu-next`（libplacebo）+ `high-quality` 高质量缩放，`deband` 抑制色带，专为 4K 面板调优 |
 | **硬解** | `hwdec=auto-safe`，macOS 走 VideoToolbox，Linux 自动选 VAAPI/NVDEC |
 | **字体** | 字幕/弹幕用**霞鹜文楷等宽 Medium**，统计信息也用 LXGW；界面/菜单用**思源黑体 SC Medium**（uosc 走 `osd-font`） |
-| **字幕** | 中性冷白 `#F2F4F8` + 适度深色描边，可读性优先 |
-| **OSC** | [uosc](https://github.com/tomasklaen/uosc) 现代化控制栏 + 上下文菜单，简体中文界面，蓝色主题（macOS 系统蓝） |
+| **字幕** | 暖白 `#FFF1E6` + 适度深色描边，可读性优先 |
+| **OSC** | [uosc](https://github.com/tomasklaen/uosc) 现代化控制栏 + 上下文菜单，简体中文界面，橙色主题 |
 | **弹幕** | [uosc_danmaku](https://github.com/Tony15246/uosc_danmaku)，弹弹play 弹幕源 |
 | **在线字幕** | [sub-assrt](https://github.com/Sorrow446/mpv-sub-assrt) 伪射手字幕搜索 |
 | **超分** | [Anime4K](https://github.com/bloc97/Anime4K) GLSL 着色器，高画质/低开销两档 |
@@ -31,7 +31,7 @@ mpv/
 ├── mpv.conf                 # 主配置（渲染/窗口/字体/字幕/OSD/日志，含 [linux] profile）
 ├── input.conf              # 键鼠绑定
 ├── script-opts/            # 各脚本配置
-│   ├── uosc.conf            # OSC / 界面（橙色主题，含弹幕按钮）
+│   ├── uosc.conf            # OSC / 界面（含弹幕按钮）
 │   ├── console.conf         # 命令控制台字体（思源黑体 SC Medium）
 │   ├── stats.conf           # 统计信息字体（LXGW Medium）
 │   ├── uosc_danmaku.conf    # 弹幕
