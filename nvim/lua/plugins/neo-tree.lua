@@ -85,6 +85,9 @@ require("neo-tree").setup({
   window = {
     width = 30,
     mappings = {
+      -- Release <space> so it falls through to the global leader key inside
+      -- the tree. Expand/collapse is still available via l / h / <tab> / <cr>.
+      ["<space>"] = "none",
       ["<tab>"] = "open",
       ["O"] = "expand_all_nodes",
       ["C"] = "close_all_subnodes",
@@ -132,7 +135,9 @@ require("neo-tree").setup({
         ["H"] = "navigate_up",
         ["l"] = "open",
         ["h"] = "close_node",
-        ["<space>"] = "toggle_node",
+        -- Overrides the filesystem-source default (toggle_node) so <space>
+        -- stays the leader key here too.
+        ["<space>"] = "none",
         ["."] = "toggle_hidden",
       },
     },
