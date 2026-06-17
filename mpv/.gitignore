@@ -1,0 +1,14 @@
+# macOS
+.DS_Store
+
+# Runtime logs (keep the folder, ignore its contents)
+log/*
+!log/.gitkeep
+
+# mpv runtime state
+watch_later/
+cache/
+*.log
+
+# Generated danmaku/thumbnail caches
+scripts/uosc_danmaku/danmaku/
