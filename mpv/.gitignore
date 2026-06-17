@@ -12,3 +12,4 @@ cache/
 
 # Generated danmaku/thumbnail caches
 scripts/uosc_danmaku/danmaku/
+danmaku-history.json
