@@ -6,7 +6,7 @@ vim.pack.add({
   { src = gh('nvim-treesitter/nvim-treesitter-textobjects'), version = 'master' },
 })
 
-local is_mac = vim.uv.os_uname().sysname == "Darwin"
+local is_mac = (vim.uv or vim.loop).os_uname().sysname == "Darwin"
 
 local ENSURE_INSTALLED = {
   "bash", "c", "cpp", "diff", "go", "gomod", "gosum", "gowork",
@@ -121,10 +121,37 @@ local function ensure_tree_sitter_cli()
       end,
     })
   else
+    -- npm's tree-sitter-cli only ships x86_64 prebuilds; on ARM it leaves no
+    -- executable behind.  Prefer cargo (compiles from source, any arch).
+    local cargo = vim.fn.exepath("cargo")
+    if cargo ~= "" then
+      vim.notify("[treesitter] installing tree-sitter-cli via cargo...", vim.log.levels.INFO)
+      vim.fn.jobstart({ cargo, "install", "tree-sitter-cli" }, {
+        on_exit = function(_, code)
+          vim.schedule(function()
+            if code == 0 then
+              vim.notify("[treesitter] tree-sitter-cli installed", vim.log.levels.INFO)
+            else
+              vim.notify("[treesitter] tree-sitter-cli install failed (exit " .. code .. ")", vim.log.levels.WARN)
+            end
+          end)
+        end,
+      })
+      return
+    end
+
     local npm = vim.fn.exepath("npm")
     if npm == "" then
       vim.notify(
-        "[treesitter] tree-sitter-cli not found. Install npm first, then: npm install -g tree-sitter-cli",
+        "[treesitter] tree-sitter-cli not found. On ARM: cargo install tree-sitter-cli",
+        vim.log.levels.WARN
+      )
+      return
+    end
+    local arch = (vim.uv or vim.loop).os_uname().machine
+    if arch:find("arm") or arch:find("aarch") then
+      vim.notify(
+        "[treesitter] ARM detected: npm tree-sitter-cli has no prebuilt binary. Run: cargo install tree-sitter-cli",
         vim.log.levels.WARN
       )
       return
