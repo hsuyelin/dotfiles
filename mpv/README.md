@@ -1,4 +1,4 @@
-# mpv 配置
+# ∂mpv 配置
 
 > 面向 **macOS（Apple Silicon / arm64）** 调优的 mpv 播放器配置，兼顾 4K 显示器与动漫/影视观看体验；附带在线字幕、弹幕、Anime4K 超分与插帧切换等增强。
 >
@@ -12,9 +12,9 @@
 |---|---|
 | **渲染** | `gpu-next`（libplacebo）+ `high-quality` 高质量缩放，`deband` 抑制色带，专为 4K 面板调优 |
 | **硬解** | `hwdec=auto-safe`，macOS 走 VideoToolbox，Linux 自动选 VAAPI/NVDEC |
-| **字体** | 媒体信息/字幕/弹幕用**霞鹜文楷等宽 Medium**；界面菜单用**思源黑体 SC Medium**（全中文覆盖） |
+| **字体** | 字幕/弹幕用**霞鹜文楷等宽 Medium**，统计信息也用 LXGW；界面/菜单用**思源黑体 SC Medium**（uosc 走 `osd-font`） |
 | **字幕** | 暖白字体 `#FFF1E6` + 适度深色描边，呼应橙色主题，可读性优先 |
-| **OSC** | [ModernZ](https://github.com/Samillion/ModernZ) 现代化控制栏，简体中文界面 |
+| **OSC** | [uosc](https://github.com/tomasklaen/uosc) 现代化控制栏 + 上下文菜单，简体中文界面，橙色主题 |
 | **弹幕** | [uosc_danmaku](https://github.com/Tony15246/uosc_danmaku)，弹弹play 弹幕源 |
 | **在线字幕** | [sub-assrt](https://github.com/Sorrow446/mpv-sub-assrt) 伪射手字幕搜索 |
 | **超分** | [Anime4K](https://github.com/bloc97/Anime4K) GLSL 着色器，高画质/低开销两档 |
@@ -31,22 +31,22 @@ mpv/
 ├── mpv.conf                 # 主配置（渲染/窗口/字体/字幕/OSD/日志，含 [linux] profile）
 ├── input.conf              # 键鼠绑定
 ├── script-opts/            # 各脚本配置
-│   ├── console.conf         # 菜单字体（思源黑体 SC Medium）
+│   ├── uosc.conf            # OSC / 界面（橙色主题，含弹幕按钮）
+│   ├── console.conf         # 命令控制台字体（思源黑体 SC Medium）
 │   ├── stats.conf           # 统计信息字体（LXGW Medium）
-│   ├── modernz.conf         # OSC 控制栏
-│   ├── modernz-locale.json  # OSC 多语言（已补全简中翻译）
 │   ├── uosc_danmaku.conf    # 弹幕
 │   └── thumbfast.conf       # 缩略图
 ├── scripts/                # Lua 脚本
 │   ├── interp_switch.lua    # 插帧切换（自定义）
-│   ├── modernz.lua / sub-assrt.lua / thumbfast.lua
-│   └── uosc_danmaku/        # 弹幕脚本（上游，请勿手改）
+│   ├── uosc/                # OSC 控制栏（上游，请勿手改）
+│   ├── uosc_danmaku/        # 弹幕脚本（上游，请勿手改）
+│   └── sub-assrt.lua / thumbfast.lua
 ├── shaders/                # Anime4K GLSL 着色器
-├── fonts/                  # OSC 图标字体
+├── fonts/                  # uosc 图标 / 纹理字体
 └── log/                    # 运行日志（git 忽略）
 ```
 
-> 第三方脚本（`modernz.lua`、`thumbfast.lua`、`sub-assrt.lua`、`uosc_danmaku/`）保持上游原样，方便后续升级。
+> 第三方脚本（`uosc/`、`thumbfast.lua`、`sub-assrt.lua`、`uosc_danmaku/`）保持上游原样，方便后续升级。
 
 ---
 
@@ -122,7 +122,7 @@ mpv/
 | 字体 | 用途 | 安装 |
 |---|---|---|
 | 霞鹜文楷等宽 (LXGW WenKai Mono) | 字幕 / OSD / 弹幕 / 统计信息 | [LXGW/LxgwWenKai](https://github.com/lxgw/LxgwWenKai) |
-| 思源黑体 SC Medium (Source Han Sans SC) | 界面菜单 | `brew install --cask font-source-han-sans-vf`（再实例化出 Medium，见下） |
+| 思源黑体 SC Medium (Source Han Sans SC) | uosc 界面 / 菜单（`osd-font`） | `brew install --cask font-source-han-sans-vf`（再实例化出 Medium，见下） |
 
 > 思源黑体官方仅提供可变字体（VF），libass 无法直接选中 Medium 字重，因此从 VF 实例化出静态 `Source Han Sans SC Medium` 安装到 `~/Library/Fonts`。若需重建：
 > ```bash
@@ -146,4 +146,4 @@ mpv --profile=linux <file>
 
 ## 🙏 致谢
 
-[mpv](https://mpv.io) · [ModernZ](https://github.com/Samillion/ModernZ) · [uosc_danmaku](https://github.com/Tony15246/uosc_danmaku) · [thumbfast](https://github.com/po5/thumbfast) · [Anime4K](https://github.com/bloc97/Anime4K) · [mpv-sub-assrt](https://github.com/Sorrow446/mpv-sub-assrt)
+[mpv](https://mpv.io) · [uosc](https://github.com/tomasklaen/uosc) · [uosc_danmaku](https://github.com/Tony15246/uosc_danmaku) · [thumbfast](https://github.com/po5/thumbfast) · [Anime4K](https://github.com/bloc97/Anime4K) · [mpv-sub-assrt](https://github.com/Sorrow446/mpv-sub-assrt)

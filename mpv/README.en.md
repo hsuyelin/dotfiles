@@ -12,9 +12,9 @@
 |---|---|
 | **Renderer** | `gpu-next` (libplacebo) + `high-quality` scalers, `deband` for banding, tuned for 4K panels |
 | **HW decode** | `hwdec=auto-safe` — VideoToolbox on macOS, VAAPI/NVDEC on Linux |
-| **Fonts** | Media info / subtitles / danmaku use **LXGW WenKai Mono Medium**; menus use **Source Han Sans SC Medium** (full CJK) |
+| **Fonts** | Subtitles / danmaku / stats use **LXGW WenKai Mono Medium**; UI & menus use **Source Han Sans SC Medium** (uosc reads `osd-font`) |
 | **Subtitles** | Warm-white `#FFF1E6` text + moderate dark outline, matching the orange theme, readability first |
-| **OSC** | [ModernZ](https://github.com/Samillion/ModernZ) modern control bar, Simplified Chinese UI |
+| **OSC** | [uosc](https://github.com/tomasklaen/uosc) modern control bar + context menu, Simplified Chinese UI, orange theme |
 | **Danmaku** | [uosc_danmaku](https://github.com/Tony15246/uosc_danmaku), DanDanPlay source |
 | **Online subs** | [sub-assrt](https://github.com/Sorrow446/mpv-sub-assrt) subtitle search |
 | **Upscaling** | [Anime4K](https://github.com/bloc97/Anime4K) GLSL shaders, HQ and fast tiers |
@@ -31,22 +31,22 @@ mpv/
 ├── mpv.conf                 # main config (render/window/fonts/subs/OSD/log, incl. [linux] profile)
 ├── input.conf              # key & mouse bindings
 ├── script-opts/            # per-script options
-│   ├── console.conf         # menu font (Source Han Sans SC Medium)
+│   ├── uosc.conf            # OSC / UI (orange theme, danmaku buttons)
+│   ├── console.conf         # command console font (Source Han Sans SC Medium)
 │   ├── stats.conf           # stats overlay font (LXGW Medium)
-│   ├── modernz.conf         # OSC control bar
-│   ├── modernz-locale.json  # OSC localization (zh strings completed)
 │   ├── uosc_danmaku.conf    # danmaku
 │   └── thumbfast.conf       # thumbnails
 ├── scripts/                # Lua scripts
 │   ├── interp_switch.lua    # interpolation toggle (custom)
-│   ├── modernz.lua / sub-assrt.lua / thumbfast.lua
-│   └── uosc_danmaku/        # danmaku script (upstream, don't hand-edit)
+│   ├── uosc/                # OSC control bar (upstream, don't hand-edit)
+│   ├── uosc_danmaku/        # danmaku script (upstream, don't hand-edit)
+│   └── sub-assrt.lua / thumbfast.lua
 ├── shaders/                # Anime4K GLSL shaders
-├── fonts/                  # OSC icon font
+├── fonts/                  # uosc icon / texture fonts
 └── log/                    # runtime logs (git-ignored)
 ```
 
-> Third-party scripts (`modernz.lua`, `thumbfast.lua`, `sub-assrt.lua`, `uosc_danmaku/`) are kept verbatim from upstream for easy updates.
+> Third-party scripts (`uosc/`, `thumbfast.lua`, `sub-assrt.lua`, `uosc_danmaku/`) are kept verbatim from upstream for easy updates.
 
 ---
 
@@ -122,7 +122,7 @@ mpv/
 | Font | Used for | Install |
 |---|---|---|
 | LXGW WenKai Mono | Subtitles / OSD / danmaku / stats | [LXGW/LxgwWenKai](https://github.com/lxgw/LxgwWenKai) |
-| Source Han Sans SC Medium | Menus | `brew install --cask font-source-han-sans-vf` (then instance Medium, see below) |
+| Source Han Sans SC Medium | uosc UI / menus (`osd-font`) | `brew install --cask font-source-han-sans-vf` (then instance Medium, see below) |
 
 > Source Han Sans ships only as a variable font (VF); libass cannot select the Medium weight directly, so a static `Source Han Sans SC Medium` is instanced from the VF into `~/Library/Fonts`. To rebuild:
 > ```bash
@@ -146,4 +146,4 @@ For explicit HW decode: NVIDIA → `hwdec=nvdec-copy`, Intel/AMD → `hwdec=vaap
 
 ## 🙏 Credits
 
-[mpv](https://mpv.io) · [ModernZ](https://github.com/Samillion/ModernZ) · [uosc_danmaku](https://github.com/Tony15246/uosc_danmaku) · [thumbfast](https://github.com/po5/thumbfast) · [Anime4K](https://github.com/bloc97/Anime4K) · [mpv-sub-assrt](https://github.com/Sorrow446/mpv-sub-assrt)
+[mpv](https://mpv.io) · [uosc](https://github.com/tomasklaen/uosc) · [uosc_danmaku](https://github.com/Tony15246/uosc_danmaku) · [thumbfast](https://github.com/po5/thumbfast) · [Anime4K](https://github.com/bloc97/Anime4K) · [mpv-sub-assrt](https://github.com/Sorrow446/mpv-sub-assrt)
