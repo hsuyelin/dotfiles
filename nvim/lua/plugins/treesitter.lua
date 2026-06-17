@@ -10,12 +10,19 @@ local is_mac = (vim.uv or vim.loop).os_uname().sysname == "Darwin"
 
 local ENSURE_INSTALLED = {
   "bash", "c", "cpp", "diff", "go", "gomod", "gosum", "gowork",
-  "html", "javascript", "json", "lua", "markdown", "markdown_inline",
+  "html", "ini", "javascript", "json", "lua", "markdown", "markdown_inline",
   "python", "query", "regex", "vim", "vimdoc", "yaml",
 }
 if is_mac then
   table.insert(ENSURE_INSTALLED, "swift")
 end
+
+-- There is no dedicated tree-sitter "conf" parser. The vast majority of *.conf
+-- files use the standard `key = value` / `[section]` / `# comment` syntax, which
+-- the `ini` parser handles well. Map conf -> ini so the FileType autocmd in
+-- core/options.lua attaches the ini parser and gives rich highlighting (the
+-- weak built-in conf.vim syntax only colors comments).
+vim.treesitter.language.register("ini", { "conf" })
 
 local legacy_ok, legacy_configs = pcall(require, "nvim-treesitter.configs")
 if legacy_ok then
