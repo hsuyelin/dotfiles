@@ -273,6 +273,10 @@ if.app-id = 'com.nssurge.surge-mac' # Surge.app
 run = ['layout floating']
 
 [[on-window-detected]]
+if.app-id = 'com.pilipili.etlp' # Genshin
+run = ['layout floating']
+
+[[on-window-detected]]
 if.app-id = 'com.zzd.Xnip'
 run = ['layout floating']
 

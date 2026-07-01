@@ -155,13 +155,13 @@ wk.add({
 		"<leader>gdl",
 		function()
 			local line = vim.fn.line(".")
-			vim.cmd("DiffviewFileHistory % -L" .. line .. "," .. line)
+			vim.cmd(("%d,%dDiffviewFileHistory"):format(line, line))
 		end,
 		desc = "当前行历史 (Line History)",
 	},
 	{
 		"<leader>gdl",
-		":'<,'>DiffviewFileHistory %<cr>",
+		":'<,'>DiffviewFileHistory<cr>",
 		mode = "v",
 		desc = "选中区域历史 (Selection History)",
 	},
@@ -376,4 +376,3 @@ utils.map_on_filetype("lua", {
 	["s"] = { "<cmd>source %<cr>", "重新加载 (Source)" },
 	r = { "<cmd>LuaRun<cr>", "运行当前文件 (Run Current Buffer)" },
 })
-

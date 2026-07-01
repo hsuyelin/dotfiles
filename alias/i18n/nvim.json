@@ -750,6 +750,12 @@
         },
         {
           "type": "row",
+          "key": "<space>bB",
+          "en": "tab-local buffer picker (Telescope)",
+          "zh": "当前标签页 buffer 选择器（Telescope）"
+        },
+        {
+          "type": "row",
           "key": "<space>bh / bl",
           "en": "previous / next buffer",
           "zh": "上 / 下一个 buffer"
