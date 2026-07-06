@@ -16,6 +16,12 @@
 # ─────────────────────────────────────────────────────────────────────────────
 
 # --- Core Configuration ---
+# Use AeroSpace config v2 semantics.
+config-version = 2
+
+# v1 inferred these workspaces from key bindings. v2 requires explicit entries.
+persistent-workspaces = ['D', 'T', 'W', 'C', 'O', 'F', 'L', '8', '9']
+
 # Start AeroSpace at login
 start-at-login = true
 
@@ -114,7 +120,7 @@ alt-tab = 'workspace-back-and-forth'
 alt-shift-tab = 'move-workspace-to-monitor --wrap-around next'
 
 # Enter Service Mode (for advanced actions)
-alt-semicolon = 'mode service' 
+alt-semicolon = 'mode service'
 
 # # Close the focused window
 alt-q = '''exec-and-forget osascript -e '
@@ -274,6 +280,10 @@ run = ['layout floating']
 
 [[on-window-detected]]
 if.app-id = 'com.pilipili.etlp' # Genshin
+run = ['layout floating']
+
+[[on-window-detected]]
+if.app-id = 'moe.tsuna.tsukimi' # Tsukimi
 run = ['layout floating']
 
 [[on-window-detected]]
