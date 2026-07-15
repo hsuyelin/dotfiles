@@ -386,15 +386,15 @@
         },
         {
           "type": "row",
-          "key": "Plugin: lazygit split",
-          "en": "toggle lazygit in a split pane: herdr plugin action invoke herdr-lazygit.open-lazygit",
-          "zh": "在分割面板中切换 lazygit：herdr plugin action invoke herdr-lazygit.open-lazygit"
+          "key": "prefix + Alt + g",
+          "en": "toggle lazygit in a split pane: herdr plugin action invoke open-lazygit --plugin herdr-lazygit",
+          "zh": "在分割面板中切换 lazygit：herdr plugin action invoke open-lazygit --plugin herdr-lazygit"
         },
         {
           "type": "row",
-          "key": "Plugin: lazygit tab",
-          "en": "toggle lazygit in its own tab: herdr plugin action invoke herdr-lazygit.open-lazygit-tab",
-          "zh": "在独立标签中切换 lazygit：herdr plugin action invoke herdr-lazygit.open-lazygit-tab"
+          "key": "prefix + Alt + Shift + g",
+          "en": "toggle lazygit in its own tab: herdr plugin action invoke open-lazygit-tab --plugin herdr-lazygit",
+          "zh": "在独立标签中切换 lazygit：herdr plugin action invoke open-lazygit-tab --plugin herdr-lazygit"
         },
         {
           "type": "row",

@@ -91,7 +91,7 @@ alt-shift-equal = 'resize smart +100'
 # Keep plain Alt+Enter free so terminal TUIs can receive Option+Enter.
 alt-shift-enter = 'exec-and-forget open -a Ghostty'
 # alt-shift-enter = 'exec-and-forget open -a kitty'
-alt-g = 'exec-and-forget open -a "Google Chrome"' # Launch Web Browser
+alt-b = 'exec-and-forget open -a "Google Chrome"' # Launch Web Browser
 
 # Workspace switching (based on suggested categories)
 alt-1 = 'workspace D' # Dev
@@ -137,10 +137,10 @@ ctrl-alt-t = [
     'exec-and-forget open -a Typora'
 ]
 
-# Focus on Telegram (App name: Telegram)
-ctrl-alt-g = [
-    'workspace 9',
-    'exec-and-forget open -a Telegram'
+# Focus on Safari window if it exists on workspace 3.
+ctrl-alt-s = [
+    'workspace W',
+    'exec-and-forget open -a Safari'
 ]
 
 # Focus on WeChat (App name: WeChat)

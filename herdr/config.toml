@@ -98,6 +98,16 @@ key = "prefix+ctrl+l"
 type = "shell"
 command = "pane_id=$(herdr pane current | jq -r '.result.pane.pane_id') && herdr pane send-keys \"$pane_id\" ctrl+l"
 
+[[keys.command]]
+key = "prefix+alt+g"
+type = "shell"
+command = "herdr plugin action invoke open-lazygit --plugin herdr-lazygit"
+
+[[keys.command]]
+key = "prefix+alt+shift+g"
+type = "shell"
+command = "herdr plugin action invoke open-lazygit-tab --plugin herdr-lazygit"
+
 [ui]
 accent = "#fab387"
 mouse_capture = true
