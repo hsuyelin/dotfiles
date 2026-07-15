@@ -34,4 +34,5 @@ core.configs = {
 }
 
 require("core.options")
+require("core.filetypes")
 require("core.instances")
