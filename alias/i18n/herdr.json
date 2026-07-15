@@ -1,0 +1,519 @@
+{
+  "title": {
+    "en": "Herdr Cheatsheet",
+    "zh": "Herdr 快捷键"
+  },
+  "subtitle": {
+    "en": "prefix = Ctrl+a  |  theme = Catppuccin Mocha",
+    "zh": "prefix = Ctrl+a  |  theme = Catppuccin Mocha"
+  },
+  "modules": [
+    {
+      "id": "panes",
+      "title": {
+        "en": "Panes",
+        "zh": "面板"
+      },
+      "entries": [
+        {
+          "type": "row",
+          "key": "prefix + |",
+          "en": "split right",
+          "zh": "向右分割面板"
+        },
+        {
+          "type": "row",
+          "key": "prefix + -",
+          "en": "split down",
+          "zh": "向下分割面板"
+        },
+        {
+          "type": "row",
+          "key": "prefix + q",
+          "en": "close current pane",
+          "zh": "关闭当前面板"
+        },
+        {
+          "type": "row",
+          "key": "Ctrl + h/j/k/l",
+          "en": "focus pane left/down/up/right",
+          "zh": "在面板间向左/下/上/右导航"
+        },
+        {
+          "type": "row",
+          "key": "prefix + Shift + h/j/k/l",
+          "en": "enter resize workflow",
+          "zh": "进入调整面板大小流程"
+        },
+        {
+          "type": "row",
+          "key": "prefix + z",
+          "en": "zoom current pane",
+          "zh": "放大/还原当前面板"
+        },
+        {
+          "type": "row",
+          "key": "prefix + Shift + ,",
+          "en": "rename current pane",
+          "zh": "重命名当前面板"
+        },
+        {
+          "type": "row",
+          "key": "prefix + e",
+          "en": "edit scrollback",
+          "zh": "编辑滚动历史"
+        },
+        {
+          "type": "row",
+          "key": "prefix + Ctrl + l",
+          "en": "send Ctrl+l to clear the focused pane",
+          "zh": "向当前面板发送 Ctrl+l 清屏"
+        }
+      ]
+    },
+    {
+      "id": "tabs",
+      "title": {
+        "en": "Tabs",
+        "zh": "标签"
+      },
+      "entries": [
+        {
+          "type": "row",
+          "key": "prefix + c",
+          "en": "new tab",
+          "zh": "新建标签"
+        },
+        {
+          "type": "row",
+          "key": "prefix + Shift + q",
+          "en": "close tab",
+          "zh": "关闭标签"
+        },
+        {
+          "type": "row",
+          "key": "prefix + 1-9",
+          "en": "jump to tab by number",
+          "zh": "按数字跳转到标签"
+        },
+        {
+          "type": "row",
+          "key": "prefix + n",
+          "en": "next tab",
+          "zh": "下一个标签"
+        },
+        {
+          "type": "row",
+          "key": "prefix + p",
+          "en": "previous tab",
+          "zh": "上一个标签"
+        },
+        {
+          "type": "row",
+          "key": "prefix + Shift + t",
+          "en": "rename tab",
+          "zh": "重命名标签"
+        }
+      ]
+    },
+    {
+      "id": "workspaces",
+      "title": {
+        "en": "Workspaces / Worktrees",
+        "zh": "工作区 / Worktree"
+      },
+      "entries": [
+        {
+          "type": "row",
+          "key": "prefix + s",
+          "en": "workspace picker",
+          "zh": "工作区选择器"
+        },
+        {
+          "type": "row",
+          "key": "prefix + g",
+          "en": "goto palette",
+          "zh": "跳转面板"
+        },
+        {
+          "type": "row",
+          "key": "prefix + Shift + n",
+          "en": "new workspace",
+          "zh": "新建工作区"
+        },
+        {
+          "type": "row",
+          "key": "CLI: create named",
+          "en": "create and name a workspace: herdr workspace create --label <name>",
+          "zh": "创建 workspace 时直接命名：herdr workspace create --label <name>"
+        },
+        {
+          "type": "row",
+          "key": "CLI: create + cwd",
+          "en": "create, name, set cwd, and focus: herdr workspace create --label <name> --cwd <path> --focus",
+          "zh": "创建、命名、指定目录并聚焦：herdr workspace create --label <name> --cwd <path> --focus"
+        },
+        {
+          "type": "row",
+          "key": "prefix + h/l",
+          "en": "previous / next workspace",
+          "zh": "上一个 / 下一个工作区"
+        },
+        {
+          "type": "row",
+          "key": "prefix + Shift + g",
+          "en": "new worktree",
+          "zh": "新建 worktree"
+        },
+        {
+          "type": "row",
+          "key": "prefix + Shift + w",
+          "en": "rename workspace",
+          "zh": "重命名工作区"
+        },
+        {
+          "type": "row",
+          "key": "CLI: rename",
+          "en": "rename a workspace from shell: herdr workspace rename <id> <name>",
+          "zh": "从 shell 重命名 workspace：herdr workspace rename <id> <name>"
+        },
+        {
+          "type": "row",
+          "key": "prefix + Shift + d",
+          "en": "close workspace",
+          "zh": "关闭工作区"
+        },
+        {
+          "type": "row",
+          "key": "CLI: list",
+          "en": "list workspace ids: herdr workspace list",
+          "zh": "列出工作区 ID：herdr workspace list"
+        },
+        {
+          "type": "row",
+          "key": "CLI: close one",
+          "en": "remove a specific workspace: herdr workspace close <id>",
+          "zh": "移除指定工作区：herdr workspace close <id>"
+        },
+        {
+          "type": "row",
+          "key": "CLI: close all",
+          "en": "remove all workspaces: herdr workspace list | jq -r '.result.workspaces[].workspace_id' | xargs -n1 herdr workspace close",
+          "zh": "移除所有工作区：herdr workspace list | jq -r '.result.workspaces[].workspace_id' | xargs -n1 herdr workspace close"
+        },
+        {
+          "type": "row",
+          "key": "prefix + Shift + 1-9",
+          "en": "jump to workspace by number",
+          "zh": "按数字跳转到工作区"
+        }
+      ]
+    },
+    {
+      "id": "agents",
+      "title": {
+        "en": "Agents",
+        "zh": "智能体"
+      },
+      "entries": [
+        {
+          "type": "row",
+          "key": "prefix + Alt + 1-9",
+          "en": "focus agent row by number",
+          "zh": "按数字聚焦智能体"
+        },
+        {
+          "type": "row",
+          "key": "prefix + j",
+          "en": "next agent",
+          "zh": "下一个智能体"
+        },
+        {
+          "type": "row",
+          "key": "prefix + k",
+          "en": "previous agent",
+          "zh": "上一个智能体"
+        },
+        {
+          "type": "row",
+          "key": "CLI: agents",
+          "en": "list agents: herdr agent list",
+          "zh": "列出智能体：herdr agent list"
+        },
+        {
+          "type": "row",
+          "key": "CLI: agent read",
+          "en": "read visible agent output: herdr agent read <target>",
+          "zh": "读取智能体可见输出：herdr agent read <target>"
+        },
+        {
+          "type": "row",
+          "key": "CLI: agent send",
+          "en": "send text to an agent: herdr agent send <target> <text>",
+          "zh": "向智能体发送文本：herdr agent send <target> <text>"
+        },
+        {
+          "type": "row",
+          "key": "CLI: agent wait",
+          "en": "wait for an agent status: herdr agent wait <target>",
+          "zh": "等待智能体状态变化：herdr agent wait <target>"
+        }
+      ]
+    },
+    {
+      "id": "config",
+      "title": {
+        "en": "Config / Session",
+        "zh": "配置 / 会话"
+      },
+      "entries": [
+        {
+          "type": "row",
+          "key": "prefix + ?",
+          "en": "open Herdr help",
+          "zh": "打开 Herdr 内置帮助"
+        },
+        {
+          "type": "row",
+          "key": "prefix + ,",
+          "en": "open settings",
+          "zh": "打开设置"
+        },
+        {
+          "type": "row",
+          "key": "prefix + r",
+          "en": "reload Herdr config",
+          "zh": "重载 Herdr 配置"
+        },
+        {
+          "type": "row",
+          "key": "prefix + d",
+          "en": "detach client",
+          "zh": "断开客户端并保留会话"
+        },
+        {
+          "type": "row",
+          "key": "prefix + b",
+          "en": "toggle sidebar",
+          "zh": "隐藏/显示左侧 sidebar"
+        },
+        {
+          "type": "row",
+          "key": "UI: sidebar width",
+          "en": "configure the left workspace sidebar width: sidebar_width / sidebar_min_width / sidebar_max_width",
+          "zh": "配置左侧 workspace 区域宽度：sidebar_width / sidebar_min_width / sidebar_max_width"
+        },
+        {
+          "type": "row",
+          "key": "UI: hide sidebar",
+          "en": "make sidebar toggle fully hidden: sidebar_collapsed_mode = \"hidden\"",
+          "zh": "让 sidebar 收起时完全隐藏：sidebar_collapsed_mode = \"hidden\""
+        },
+        {
+          "type": "row",
+          "key": "CLI: reload",
+          "en": "reload config from shell: herdr server reload-config",
+          "zh": "从 shell 重载配置：herdr server reload-config"
+        },
+        {
+          "type": "row",
+          "key": "CLI: sessions",
+          "en": "list sessions: herdr session list",
+          "zh": "列出会话：herdr session list"
+        },
+        {
+          "type": "row",
+          "key": "CLI: stop default",
+          "en": "stop the default session: herdr session stop default",
+          "zh": "停止默认会话：herdr session stop default"
+        },
+        {
+          "type": "row",
+          "key": "CLI: stop session",
+          "en": "stop a named session: herdr session stop <name>",
+          "zh": "停止指定会话：herdr session stop <name>"
+        },
+        {
+          "type": "row",
+          "key": "CLI: server stop",
+          "en": "fully stop Herdr so it no longer runs in the background: herdr server stop",
+          "zh": "完全退出 Herdr，不让后台服务继续运行：herdr server stop"
+        },
+        {
+          "type": "row",
+          "key": "~/.config/herdr/config.toml",
+          "en": "main config file",
+          "zh": "主配置文件"
+        }
+      ]
+    },
+    {
+      "id": "plugins",
+      "title": {
+        "en": "Installed Plugin Actions",
+        "zh": "已安装插件动作"
+      },
+      "entries": [
+        {
+          "type": "row",
+          "key": "CLI: plugin actions",
+          "en": "list actions exposed by one plugin: herdr plugin action list --plugin <id>",
+          "zh": "列出某个插件提供的动作：herdr plugin action list --plugin <id>"
+        },
+        {
+          "type": "row",
+          "key": "Plugin: palette",
+          "en": "open all plugin actions from a palette: herdr plugin action invoke jt.command-palette.open",
+          "zh": "打开插件动作命令面板：herdr plugin action invoke jt.command-palette.open"
+        },
+        {
+          "type": "row",
+          "key": "Plugin: key overlay",
+          "en": "show a visual keybinding overlay: herdr plugin action invoke ramarivera.pretty-which.open",
+          "zh": "显示可视化快捷键提示：herdr plugin action invoke ramarivera.pretty-which.open"
+        },
+        {
+          "type": "row",
+          "key": "Plugin: floax",
+          "en": "toggle a floating scratch pane: herdr plugin action invoke herdr-floax.toggle",
+          "zh": "切换浮动临时面板：herdr plugin action invoke herdr-floax.toggle"
+        },
+        {
+          "type": "row",
+          "key": "Plugin: lazygit split",
+          "en": "toggle lazygit in a split pane: herdr plugin action invoke herdr-lazygit.open-lazygit",
+          "zh": "在分割面板中切换 lazygit：herdr plugin action invoke herdr-lazygit.open-lazygit"
+        },
+        {
+          "type": "row",
+          "key": "Plugin: lazygit tab",
+          "en": "toggle lazygit in its own tab: herdr plugin action invoke herdr-lazygit.open-lazygit-tab",
+          "zh": "在独立标签中切换 lazygit：herdr plugin action invoke herdr-lazygit.open-lazygit-tab"
+        },
+        {
+          "type": "row",
+          "key": "Plugin: Jira split",
+          "en": "open Jira in a split pane: herdr plugin action invoke herdr-jira.open-jira",
+          "zh": "在分割面板中打开 Jira：herdr plugin action invoke herdr-jira.open-jira"
+        },
+        {
+          "type": "row",
+          "key": "Plugin: Jira tab",
+          "en": "open Jira in its own tab: herdr plugin action invoke herdr-jira.open-jira-tab",
+          "zh": "在独立标签中打开 Jira：herdr plugin action invoke herdr-jira.open-jira-tab"
+        },
+        {
+          "type": "row",
+          "key": "Plugin: reviewr toggle",
+          "en": "toggle the reviewr sidebar: herdr plugin action invoke persiyanov.reviewr.toggle",
+          "zh": "切换 reviewr 代码审查侧边栏：herdr plugin action invoke persiyanov.reviewr.toggle"
+        },
+        {
+          "type": "row",
+          "key": "Plugin: reviewr open",
+          "en": "open the reviewr sidebar: herdr plugin action invoke persiyanov.reviewr.open",
+          "zh": "打开 reviewr 代码审查侧边栏：herdr plugin action invoke persiyanov.reviewr.open"
+        },
+        {
+          "type": "row",
+          "key": "Plugin: reviewr close",
+          "en": "close the reviewr sidebar: herdr plugin action invoke persiyanov.reviewr.close",
+          "zh": "关闭 reviewr 代码审查侧边栏：herdr plugin action invoke persiyanov.reviewr.close"
+        },
+        {
+          "type": "row",
+          "key": "Plugin: PR worktree",
+          "en": "create a worktree from a GitHub PR: herdr plugin action invoke tdi.worktree-from-pr.pick",
+          "zh": "从 GitHub PR 创建 worktree：herdr plugin action invoke tdi.worktree-from-pr.pick"
+        },
+        {
+          "type": "row",
+          "key": "Plugin: copy mode",
+          "en": "open scrollback copy mode: herdr plugin action invoke copy-search.copy",
+          "zh": "打开滚动历史复制模式：herdr plugin action invoke copy-search.copy"
+        },
+        {
+          "type": "row",
+          "key": "Plugin: search scrollback",
+          "en": "search pane scrollback: herdr plugin action invoke copy-search.search",
+          "zh": "搜索面板滚动历史：herdr plugin action invoke copy-search.search"
+        },
+        {
+          "type": "row",
+          "key": "Plugin: extract tokens",
+          "en": "extract tokens from scrollback: herdr plugin action invoke copy-search.extract",
+          "zh": "从滚动历史中提取 token：herdr plugin action invoke copy-search.extract"
+        },
+        {
+          "type": "row",
+          "key": "Plugin: layout equalize",
+          "en": "equalize split ratios: herdr plugin action invoke edi.layout-tools.equalize",
+          "zh": "均分面板分割比例：herdr plugin action invoke edi.layout-tools.equalize"
+        },
+        {
+          "type": "row",
+          "key": "Plugin: layout main-left",
+          "en": "reshape panes to main-left layout: herdr plugin action invoke edi.layout-tools.reshape-main-left",
+          "zh": "调整为左主面板布局：herdr plugin action invoke edi.layout-tools.reshape-main-left"
+        },
+        {
+          "type": "row",
+          "key": "Plugin: layout grid",
+          "en": "reshape panes to main-left grid: herdr plugin action invoke edi.layout-tools.reshape-main-grid",
+          "zh": "调整为左主面板加网格布局：herdr plugin action invoke edi.layout-tools.reshape-main-grid"
+        },
+        {
+          "type": "row",
+          "key": "Plugin: focus agent",
+          "en": "focus the next agent pane needing attention: herdr plugin action invoke trapple.herdr-focus.focus",
+          "zh": "聚焦下一个需要关注的智能体面板：herdr plugin action invoke trapple.herdr-focus.focus"
+        },
+        {
+          "type": "row",
+          "key": "Plugin: notify test",
+          "en": "send a test focus notification: herdr plugin action invoke herdr-focus-notify.test",
+          "zh": "发送测试关注通知：herdr plugin action invoke herdr-focus-notify.test"
+        },
+        {
+          "type": "row",
+          "key": "Plugin: vim nav",
+          "en": "navigate with Vim-style Herdr movement: herdr plugin action invoke vim-herdr-navigation.left/down/up/right",
+          "zh": "使用 Vim 风格在 Herdr 中导航：herdr plugin action invoke vim-herdr-navigation.left/down/up/right"
+        }
+      ]
+    },
+    {
+      "id": "skills",
+      "title": {
+        "en": "Skills / Plugin Safety",
+        "zh": "技能 / 插件安全"
+      },
+      "entries": [
+        {
+          "type": "row",
+          "key": "SKILL.md",
+          "en": "install Herdr agent skill manually when needed",
+          "zh": "需要时手动安装 Herdr 智能体技能文件"
+        },
+        {
+          "type": "row",
+          "key": "no npx",
+          "en": "do not use npx skills add for this dotfile",
+          "zh": "本 dotfile 不使用 npx skills add"
+        },
+        {
+          "type": "row",
+          "key": "CLI: plugin link",
+          "en": "prefer local plugin linking after source review: herdr plugin link <path>",
+          "zh": "审查源码后优先链接本地插件：herdr plugin link <path>"
+        },
+        {
+          "type": "row",
+          "key": "CLI: plugin install",
+          "en": "avoid unknown GitHub plugins that may run build steps: herdr plugin install",
+          "zh": "避免安装可能执行构建步骤的未知 GitHub 插件：herdr plugin install"
+        }
+      ]
+    }
+  ]
+}

@@ -67,3 +67,12 @@ configstore/
 
 # etlp — runtime data
 etlp/
+
+# OpenSpec local configuration
+openspec/
+
+# Herdr runtime state and logs
+herdr/session.json
+herdr/session-history.json
+herdr/herdr-client.log
+herdr/herdr-server.log

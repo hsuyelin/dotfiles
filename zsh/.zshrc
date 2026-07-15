@@ -161,6 +161,8 @@ unset _km
 # shellcheck disable=SC1091
 [[ -f "${XDG_CONFIG_HOME}/alias/ai.zsh" ]] && source "${XDG_CONFIG_HOME}/alias/ai.zsh"
 # shellcheck disable=SC1091
+[[ -f "${XDG_CONFIG_HOME}/alias/herdr.zsh" ]] && source "${XDG_CONFIG_HOME}/alias/herdr.zsh"
+# shellcheck disable=SC1091
 [[ -f "${XDG_CONFIG_HOME}/alias/tmux.zsh" ]] && source "${XDG_CONFIG_HOME}/alias/tmux.zsh"
 # shellcheck disable=SC1091
 [[ "$(uname -s)" == "Darwin" && -f "${XDG_CONFIG_HOME}/alias/xcode.zsh" ]] && source "${XDG_CONFIG_HOME}/alias/xcode.zsh"

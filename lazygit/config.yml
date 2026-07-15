@@ -337,6 +337,7 @@ keybinding:
     goInto: <enter>
     confirm: <enter>
     confirmInEditor: <a-enter>
+    confirmInEditor-alt: <c-s>
     remove: d
     new: "n"
     edit: e
@@ -374,6 +375,7 @@ keybinding:
     increaseRenameSimilarityThreshold: )
     decreaseRenameSimilarityThreshold: (
     openDiffTool: <c-t>
+    newWorktree: w
   status:
     checkForUpdate: u
     recentRepos: <enter>
@@ -412,8 +414,6 @@ keybinding:
     setUpstream: u
     fetchRemote: f
     sortOrder: s
-  worktrees:
-    viewWorktreeOptions: w
   commits:
     squashDown: s
     renameCommit: r

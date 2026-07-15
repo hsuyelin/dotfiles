@@ -1,9 +1,17 @@
 # -----------------------------
 # AI
 # -----------------------------
-alias cc='claude'
-alias cc-agents='claude agents'
-alias cx='codex'
+function cc() {
+  claude --dangerously-skip-permissions "$@"
+}
+
+function cc-agents() {
+  claude agents --dangerously-skip-permissions "$@"
+}
+
+function cx() {
+  codex "$@"
+}
 
 # cc-bg: launch a Claude session in the background.
 # Flags:

@@ -5,8 +5,8 @@
 # Default terminal is Ghostty. To switch to kitty:
 #
 #   Step 1 — Change the launch keybind (search "Launch Terminal" below):
-#     Comment out:   alt-enter = 'exec-and-forget open -a Ghostty'
-#     Uncomment:     # alt-enter = 'exec-and-forget open -a kitty'
+#     Comment out:   alt-shift-enter = 'exec-and-forget open -a Ghostty'
+#     Uncomment:     # alt-shift-enter = 'exec-and-forget open -a kitty'
 #
 #   Step 2 — Change the on-window-detected rule (search "## 2. Terminal" below):
 #     Comment out the Ghostty rule (app-id = 'com.mitchellh.ghostty')
@@ -88,8 +88,9 @@ alt-shift-equal = 'resize smart +100'
 
 # Quick application launch examples
 # Launch Terminal — default: Ghostty. To use kitty instead, swap the two lines.
-alt-enter = 'exec-and-forget open -a Ghostty'
-# alt-enter = 'exec-and-forget open -a kitty'
+# Keep plain Alt+Enter free so terminal TUIs can receive Option+Enter.
+alt-shift-enter = 'exec-and-forget open -a Ghostty'
+# alt-shift-enter = 'exec-and-forget open -a kitty'
 alt-g = 'exec-and-forget open -a "Google Chrome"' # Launch Web Browser
 
 # Workspace switching (based on suggested categories)
