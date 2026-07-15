@@ -356,6 +356,12 @@
       "entries": [
         {
           "type": "row",
+          "key": "CLI: bootstrap",
+          "en": "preview approved plugin installs: herdr/bootstrap-plugins.zsh --dry-run",
+          "zh": "手动安装缺失的已批准插件：~/.config/herdr/bootstrap-plugins.zsh --dry-run"
+        },
+        {
+          "type": "row",
           "key": "CLI: plugin actions",
           "en": "list actions exposed by one plugin: herdr plugin action list --plugin <id>",
           "zh": "列出某个插件提供的动作：herdr plugin action list --plugin <id>"
@@ -500,6 +506,18 @@
           "key": "no npx",
           "en": "do not use npx skills add for this dotfile",
           "zh": "本 dotfile 不使用 npx skills add"
+        },
+        {
+          "type": "row",
+          "key": "CLI: bootstrap dry-run",
+          "en": "preview approved plugin installs: herdr/bootstrap-plugins.zsh --dry-run",
+          "zh": "预览已批准插件安装计划：~/.config/herdr/bootstrap-plugins.zsh --dry-run"
+        },
+        {
+          "type": "row",
+          "key": "CLI: bootstrap install",
+          "en": "install missing approved plugins: herdr/bootstrap-plugins.zsh",
+          "zh": "确认后安装缺失的已批准插件：~/.config/herdr/bootstrap-plugins.zsh"
         },
         {
           "type": "row",
