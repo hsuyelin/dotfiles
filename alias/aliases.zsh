@@ -81,6 +81,10 @@ alias real-rm='\rm'
 if [[ "$(uname -s)" == "Darwin" ]]; then
   alias dns:flush='sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder'
 
+  # disk: fast disk usage report powered by dust.
+  # See: $XDG_CONFIG_HOME/bin/disktop.sh
+  alias disk='"${XDG_CONFIG_HOME}/bin/disktop.sh"'
+
   # pwtop: energy-sorted process monitor with Catppuccin Mocha styling.
   # See: $XDG_CONFIG_HOME/powermetrics/pwtop.sh
   alias pwtop='"${XDG_CONFIG_HOME}/powermetrics/pwtop.sh"'
