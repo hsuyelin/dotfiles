@@ -70,10 +70,10 @@ close_tab = "prefix+shift+q"
 # Pane bindings mirror tmux panes.
 rename_pane = "prefix+shift+comma"
 edit_scrollback = "prefix+e"
-focus_pane_left = "ctrl+h"
-focus_pane_down = "ctrl+j"
-focus_pane_up = "ctrl+k"
-focus_pane_right = "ctrl+l"
+focus_pane_left = "prefix+left"
+focus_pane_down = "prefix+down"
+focus_pane_up = "prefix+up"
+focus_pane_right = "prefix+right"
 cycle_pane_next = "prefix+tab"
 cycle_pane_previous = "prefix+shift+tab"
 last_pane = "prefix+backslash"
@@ -92,6 +92,30 @@ navigate_pane_down = "down"
 navigate_pane_up = "up"
 navigate_pane_right = "l"
 remote_image_paste = "ctrl+v"
+
+[[keys.command]]
+key = "ctrl+h"
+type = "plugin_action"
+command = "vim-herdr-navigation.left"
+description = "navigate left (vim/herdr)"
+
+[[keys.command]]
+key = "ctrl+j"
+type = "plugin_action"
+command = "vim-herdr-navigation.down"
+description = "navigate down (vim/herdr)"
+
+[[keys.command]]
+key = "ctrl+k"
+type = "plugin_action"
+command = "vim-herdr-navigation.up"
+description = "navigate up (vim/herdr)"
+
+[[keys.command]]
+key = "ctrl+l"
+type = "plugin_action"
+command = "vim-herdr-navigation.right"
+description = "navigate right (vim/herdr)"
 
 [[keys.command]]
 key = "prefix+ctrl+l"

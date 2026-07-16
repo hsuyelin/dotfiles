@@ -30,10 +30,31 @@ vim.keymap.set("n", "<C-f>", "<cmd>Telescope find_files<cr>")
 vim.keymap.set("i", "<C-e>", "<cmd>Telescope emoji<cr>")
 
 -- moving between splits
-vim.keymap.set("n", "<C-h>", require("smart-splits").move_cursor_left)
-vim.keymap.set("n", "<C-j>", require("smart-splits").move_cursor_down)
-vim.keymap.set("n", "<C-k>", require("smart-splits").move_cursor_up)
-vim.keymap.set("n", "<C-l>", require("smart-splits").move_cursor_right)
+local window_navigation = require("core.window_navigation")
+vim.keymap.set(
+    "n",
+    "<C-h>",
+    window_navigation.left,
+    { desc = "Navigate left (nvim/herdr/tmux)" }
+)
+vim.keymap.set(
+    "n",
+    "<C-j>",
+    window_navigation.down,
+    { desc = "Navigate down (nvim/herdr/tmux)" }
+)
+vim.keymap.set(
+    "n",
+    "<C-k>",
+    window_navigation.up,
+    { desc = "Navigate up (nvim/herdr/tmux)" }
+)
+vim.keymap.set(
+    "n",
+    "<C-l>",
+    window_navigation.right,
+    { desc = "Navigate right (nvim/herdr/tmux)" }
+)
 
 local wk = require("which-key")
 
