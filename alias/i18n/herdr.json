@@ -434,9 +434,9 @@
         },
         {
           "type": "row",
-          "key": "Plugin: copy mode",
-          "en": "open scrollback copy mode: herdr plugin action invoke copy-search.copy",
-          "zh": "打开滚动历史复制模式：herdr plugin action invoke copy-search.copy"
+          "key": "prefix + Shift + v",
+          "en": "open scrollback copy mode",
+          "zh": "打开滚动历史复制模式"
         },
         {
           "type": "row",

@@ -118,6 +118,12 @@ command = "vim-herdr-navigation.right"
 description = "navigate right (vim/herdr)"
 
 [[keys.command]]
+key = "prefix+shift+v"
+type = "plugin_action"
+command = "copy-search.copy"
+description = "open scrollback copy mode"
+
+[[keys.command]]
 key = "prefix+ctrl+l"
 type = "shell"
 command = "pane_id=$(herdr pane current | jq -r '.result.pane.pane_id') && herdr pane send-keys \"$pane_id\" ctrl+l"
