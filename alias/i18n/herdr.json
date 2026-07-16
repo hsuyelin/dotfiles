@@ -357,8 +357,8 @@
         {
           "type": "row",
           "key": "CLI: bootstrap",
-          "en": "preview approved plugin installs: herdr/bootstrap-plugins.zsh --dry-run",
-          "zh": "手动安装缺失的已批准插件：~/.config/herdr/bootstrap-plugins.zsh --dry-run"
+          "en": "preview approved plugin installs: herdr/bootstrap-plugins.sh --dry-run",
+          "zh": "手动安装缺失的已批准插件：~/.config/herdr/bootstrap-plugins.sh --dry-run"
         },
         {
           "type": "row",
@@ -510,14 +510,14 @@
         {
           "type": "row",
           "key": "CLI: bootstrap dry-run",
-          "en": "preview approved plugin installs: herdr/bootstrap-plugins.zsh --dry-run",
-          "zh": "预览已批准插件安装计划：~/.config/herdr/bootstrap-plugins.zsh --dry-run"
+          "en": "preview approved plugin installs: herdr/bootstrap-plugins.sh --dry-run",
+          "zh": "预览已批准插件安装计划：~/.config/herdr/bootstrap-plugins.sh --dry-run"
         },
         {
           "type": "row",
           "key": "CLI: bootstrap install",
-          "en": "install missing approved plugins: herdr/bootstrap-plugins.zsh",
-          "zh": "确认后安装缺失的已批准插件：~/.config/herdr/bootstrap-plugins.zsh"
+          "en": "install missing approved plugins: herdr/bootstrap-plugins.sh",
+          "zh": "确认后安装缺失的已批准插件：~/.config/herdr/bootstrap-plugins.sh"
         },
         {
           "type": "row",
