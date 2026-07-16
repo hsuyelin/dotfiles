@@ -74,5 +74,12 @@ openspec/
 # Herdr runtime state and logs
 herdr/session.json
 herdr/session-history.json
+herdr/release-notes.json
 herdr/herdr-client.log
 herdr/herdr-server.log
+
+# Herdr plugins are installed by herdr/bootstrap-plugins.sh.
+herdr/plugins/github/*
+
+# Homebrew runtime locks
+homebrew/*.lock
