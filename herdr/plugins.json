@@ -1,12 +1,12 @@
 [
   {
-    "plugin_id": "herdr-lazygit",
-    "name": "herdr-lazygit",
-    "version": "0.1.0",
+    "plugin_id": "tdi.worktree-from-pr",
+    "name": "Worktree from PR",
+    "version": "0.2.0",
     "min_herdr_version": "0.7.0",
-    "description": "Open lazygit in a herdr split pane or tab, with smart toggle.",
-    "manifest_path": "/Users/hsuyelin/.config/herdr/plugins/github/herdr-lazygit-b11d62e75f78/herdr-plugin.toml",
-    "plugin_root": "/Users/hsuyelin/.config/herdr/plugins/github/herdr-lazygit-b11d62e75f78",
+    "description": "Create a git worktree from a GitHub PR and open it as a workspace",
+    "manifest_path": "/Users/hsuyelin/.config/herdr/plugins/github/tdi.worktree-from-pr-10c57ec5f2ca/herdr-plugin.toml",
+    "plugin_root": "/Users/hsuyelin/.config/herdr/plugins/github/tdi.worktree-from-pr-10c57ec5f2ca",
     "enabled": true,
     "platforms": [
       "linux",
@@ -14,51 +14,47 @@
     ],
     "actions": [
       {
-        "id": "open-lazygit",
-        "title": "Open lazygit",
-        "description": "Toggle lazygit in a split pane (open / focus / close).",
+        "id": "pick",
+        "title": "Worktree from GitHub PR",
+        "contexts": [
+          "workspace",
+          "tab",
+          "pane"
+        ],
         "command": [
-          "bash",
-          "scripts/open-lazygit.sh"
-        ]
-      },
-      {
-        "id": "open-lazygit-tab",
-        "title": "Open lazygit (tab)",
-        "description": "Toggle lazygit in its own tab (open / switch / close).",
-        "command": [
-          "bash",
-          "scripts/open-lazygit-tab.sh"
+          "node",
+          "bin/open.js"
         ]
       }
     ],
     "panes": [
       {
-        "id": "lazygit",
-        "title": "lazygit",
-        "placement": "split",
+        "id": "picker",
+        "title": "Pick a PR",
+        "placement": "overlay",
         "command": [
-          "lazygit"
+          "node",
+          "bin/picker.js"
         ]
       }
     ],
     "source": {
       "kind": "github",
-      "owner": "JacquesvanWyk",
-      "repo": "herdr-lazygit",
-      "resolved_commit": "557125c4e74148530799640cc4973c8acafe0bf7",
-      "managed_path": "/Users/hsuyelin/.config/herdr/plugins/github/herdr-lazygit-b11d62e75f78",
-      "installed_unix_ms": 1784082037570
+      "owner": "tdi",
+      "repo": "herdr-worktree-from-pr",
+      "resolved_commit": "da51dd83f738568b347988a95ec43f93cb43b92a",
+      "managed_path": "/Users/hsuyelin/.config/herdr/plugins/github/tdi.worktree-from-pr-10c57ec5f2ca",
+      "installed_unix_ms": 1784082058079
     }
   },
   {
-    "plugin_id": "copy-search",
-    "name": "Copy Search",
-    "version": "0.1.4",
+    "plugin_id": "ramarivera.pretty-which",
+    "name": "Pretty Which",
+    "version": "0.1.5",
     "min_herdr_version": "0.7.0",
-    "description": "tmux-style copy mode, copycat pattern search, and extrakto token extraction for pane scrollback, copying via OSC 52",
-    "manifest_path": "/Users/hsuyelin/.config/herdr/plugins/github/copy-search-c76f1e25de11/herdr-plugin.toml",
-    "plugin_root": "/Users/hsuyelin/.config/herdr/plugins/github/copy-search-c76f1e25de11",
+    "description": "A tasteful which-key style training overlay for Herdr keybindings.",
+    "manifest_path": "/Users/hsuyelin/.config/herdr/plugins/github/ramarivera.pretty-which-9cf671d5751a/herdr-plugin.toml",
+    "plugin_root": "/Users/hsuyelin/.config/herdr/plugins/github/ramarivera.pretty-which-9cf671d5751a",
     "enabled": true,
     "platforms": [
       "linux",
@@ -66,101 +62,127 @@
     ],
     "build": [
       {
+        "platforms": [
+          "linux",
+          "macos"
+        ],
         "command": [
           "cargo",
           "build",
-          "--release",
-          "--locked"
+          "--release"
         ]
       }
     ],
     "actions": [
       {
-        "id": "copy",
-        "title": "Open copy mode",
+        "id": "open",
+        "title": "Open pretty which",
         "contexts": [
-          "pane"
+          "workspace",
+          "tab",
+          "pane",
+          "global"
         ],
         "command": [
-          "sh",
-          "-c",
-          "exec \"$HERDR_BIN_PATH\" plugin pane open --plugin copy-search --entrypoint copy"
-        ]
-      },
-      {
-        "id": "extract",
-        "title": "Extract tokens",
-        "contexts": [
-          "pane"
-        ],
-        "command": [
-          "sh",
-          "-c",
-          "exec \"$HERDR_BIN_PATH\" plugin pane open --plugin copy-search --entrypoint extract"
-        ]
-      },
-      {
-        "id": "search",
-        "title": "Search scrollback",
-        "contexts": [
-          "pane"
-        ],
-        "command": [
-          "sh",
-          "-c",
-          "exec \"$HERDR_BIN_PATH\" plugin pane open --plugin copy-search --entrypoint search"
+          "herdr",
+          "plugin",
+          "pane",
+          "open",
+          "--plugin",
+          "ramarivera.pretty-which",
+          "--entrypoint",
+          "overlay",
+          "--placement",
+          "overlay",
+          "--focus"
         ]
       }
     ],
     "panes": [
       {
-        "id": "copy",
-        "title": "copy mode",
+        "id": "overlay",
+        "title": "Pretty Which",
         "placement": "overlay",
         "command": [
-          "sh",
-          "-c",
-          "exec \"$HERDR_PLUGIN_ROOT/target/release/herdr-copy-search\" --mode copy"
-        ]
-      },
-      {
-        "id": "extract",
-        "title": "extract",
-        "placement": "overlay",
-        "command": [
-          "sh",
-          "-c",
-          "exec \"$HERDR_PLUGIN_ROOT/target/release/herdr-copy-search\" --mode extract"
-        ]
-      },
-      {
-        "id": "search",
-        "title": "scrollback search",
-        "placement": "overlay",
-        "command": [
-          "sh",
-          "-c",
-          "exec \"$HERDR_PLUGIN_ROOT/target/release/herdr-copy-search\" --mode search"
+          "target/release/herdr-pretty-which"
         ]
       }
     ],
     "source": {
       "kind": "github",
-      "owner": "qq88976321",
-      "repo": "herdr-copy-search",
-      "resolved_commit": "4059440b5f43c1a74269108acfafbe4c5dc7f474",
-      "managed_path": "/Users/hsuyelin/.config/herdr/plugins/github/copy-search-c76f1e25de11",
-      "installed_unix_ms": 1784082039789
+      "owner": "ramarivera",
+      "repo": "herdr-pretty-which",
+      "resolved_commit": "c11c6e5af6f866b70f837bdd89157ba7441dc543",
+      "managed_path": "/Users/hsuyelin/.config/herdr/plugins/github/ramarivera.pretty-which-9cf671d5751a",
+      "installed_unix_ms": 1784082090500
     }
   },
   {
-    "plugin_id": "jt.command-palette",
-    "name": "Command Palette (fzf)",
+    "plugin_id": "trapple.herdr-focus",
+    "name": "Herdr Focus",
+    "version": "1.1.0",
+    "min_herdr_version": "0.7.0",
+    "description": "Focus the next blocked/done agent pane and bring the terminal app to front. Global hotkey included.",
+    "manifest_path": "/Users/hsuyelin/.config/herdr/plugins/github/trapple.herdr-focus-8458823f751c/herdr-plugin.toml",
+    "plugin_root": "/Users/hsuyelin/.config/herdr/plugins/github/trapple.herdr-focus-8458823f751c",
+    "enabled": true,
+    "platforms": [
+      "macos"
+    ],
+    "actions": [
+      {
+        "id": "focus",
+        "title": "Focus next agent pane needing attention",
+        "contexts": [
+          "workspace"
+        ],
+        "command": [
+          "bin/focus"
+        ]
+      },
+      {
+        "id": "hotkey-install",
+        "title": "Install global hotkey daemon (optional)",
+        "command": [
+          "bin/hotkey-install"
+        ]
+      },
+      {
+        "id": "hotkey-uninstall",
+        "title": "Uninstall global hotkey daemon",
+        "command": [
+          "bin/hotkey-uninstall"
+        ]
+      }
+    ],
+    "panes": [
+      {
+        "id": "hotkey-install",
+        "title": "Install hotkey daemon",
+        "placement": "overlay",
+        "command": [
+          "bash",
+          "bin/hotkey-install"
+        ]
+      }
+    ],
+    "source": {
+      "kind": "github",
+      "owner": "trapple",
+      "repo": "herdr-focus",
+      "resolved_commit": "a65cd8b82831841915b2a2e4614eb01dbfc487de",
+      "managed_path": "/Users/hsuyelin/.config/herdr/plugins/github/trapple.herdr-focus-8458823f751c",
+      "installed_unix_ms": 1784082021012
+    }
+  },
+  {
+    "plugin_id": "vim-herdr-navigation",
+    "name": "Vim Herdr Navigation",
     "version": "0.1.0",
     "min_herdr_version": "0.7.0",
-    "description": "An fzf command palette for herdr: pops up a fuzzy-searchable list of every action exposed by every installed plugin (via `herdr plugin action list`) and invokes the one you pick. The picker runs in an overlay pane so fzf gets a real TTY; the origin workspace's cwd is forwarded so context-aware actions resolve the right repo.",
-    "manifest_path": "/Users/hsuyelin/.config/herdr/plugins/github/jt.command-palette-24905dca5f16/herdr-plugin.toml",
-    "plugin_root": "/Users/hsuyelin/.config/herdr/plugins/github/jt.command-palette-24905dca5f16",
+    "description": "Seamless Ctrl+h/j/k/l navigation across herdr panes and Vim/Neovim splits",
+    "manifest_path": "/Users/hsuyelin/.config/herdr/plugins/github/vim-herdr-navigation-a8bf42123d81/herdr-plugin.toml",
+    "plugin_root": "/Users/hsuyelin/.config/herdr/plugins/github/vim-herdr-navigation-a8bf42123d81",
     "enabled": true,
     "platforms": [
       "linux",
@@ -168,36 +190,61 @@
     ],
     "actions": [
       {
-        "id": "open",
-        "title": "Command palette (all plugin actions)",
+        "id": "down",
+        "title": "Navigate down (Vim/herdr)",
         "contexts": [
-          "workspace"
+          "global"
         ],
         "command": [
           "bash",
-          "open.sh"
+          "navigate.sh",
+          "down"
         ]
-      }
-    ],
-    "panes": [
+      },
       {
-        "id": "palette",
-        "title": "Command palette",
-        "placement": "overlay",
+        "id": "left",
+        "title": "Navigate left (Vim/herdr)",
+        "contexts": [
+          "global"
+        ],
         "command": [
           "bash",
-          "-c",
-          "exec \"$HERDR_PLUGIN_ROOT/palette.sh\""
+          "navigate.sh",
+          "left"
+        ]
+      },
+      {
+        "id": "right",
+        "title": "Navigate right (Vim/herdr)",
+        "contexts": [
+          "global"
+        ],
+        "command": [
+          "bash",
+          "navigate.sh",
+          "right"
+        ]
+      },
+      {
+        "id": "up",
+        "title": "Navigate up (Vim/herdr)",
+        "contexts": [
+          "global"
+        ],
+        "command": [
+          "bash",
+          "navigate.sh",
+          "up"
         ]
       }
     ],
     "source": {
       "kind": "github",
-      "owner": "JanTvrdik",
-      "repo": "herdr-command-palette",
-      "resolved_commit": "eab940018c2135ac23718efa11e23e9dddcd2a75",
-      "managed_path": "/Users/hsuyelin/.config/herdr/plugins/github/jt.command-palette-24905dca5f16",
-      "installed_unix_ms": 1784082010115
+      "owner": "paulbkim-dev",
+      "repo": "vim-herdr-navigation",
+      "resolved_commit": "53e318c772c4d3b7fbd904ac43bcf3e5b5d8b244",
+      "managed_path": "/Users/hsuyelin/.config/herdr/plugins/github/vim-herdr-navigation-a8bf42123d81",
+      "installed_unix_ms": 1784082008618
     }
   },
   {
@@ -348,13 +395,13 @@
     }
   },
   {
-    "plugin_id": "tdi.worktree-from-pr",
-    "name": "Worktree from PR",
-    "version": "0.2.0",
+    "plugin_id": "herdr-lazygit",
+    "name": "herdr-lazygit",
+    "version": "0.1.0",
     "min_herdr_version": "0.7.0",
-    "description": "Create a git worktree from a GitHub PR and open it as a workspace",
-    "manifest_path": "/Users/hsuyelin/.config/herdr/plugins/github/tdi.worktree-from-pr-10c57ec5f2ca/herdr-plugin.toml",
-    "plugin_root": "/Users/hsuyelin/.config/herdr/plugins/github/tdi.worktree-from-pr-10c57ec5f2ca",
+    "description": "Open lazygit in a herdr split pane or tab, with smart toggle.",
+    "manifest_path": "/Users/hsuyelin/.config/herdr/plugins/github/herdr-lazygit-b11d62e75f78/herdr-plugin.toml",
+    "plugin_root": "/Users/hsuyelin/.config/herdr/plugins/github/herdr-lazygit-b11d62e75f78",
     "enabled": true,
     "platforms": [
       "linux",
@@ -362,37 +409,88 @@
     ],
     "actions": [
       {
-        "id": "pick",
-        "title": "Worktree from GitHub PR",
-        "contexts": [
-          "workspace",
-          "tab",
-          "pane"
-        ],
+        "id": "open-lazygit",
+        "title": "Open lazygit",
+        "description": "Toggle lazygit in a split pane (open / focus / close).",
         "command": [
-          "node",
-          "bin/open.js"
+          "bash",
+          "scripts/open-lazygit.sh"
+        ]
+      },
+      {
+        "id": "open-lazygit-tab",
+        "title": "Open lazygit (tab)",
+        "description": "Toggle lazygit in its own tab (open / switch / close).",
+        "command": [
+          "bash",
+          "scripts/open-lazygit-tab.sh"
         ]
       }
     ],
     "panes": [
       {
-        "id": "picker",
-        "title": "Pick a PR",
-        "placement": "overlay",
+        "id": "lazygit",
+        "title": "lazygit",
+        "placement": "split",
         "command": [
-          "node",
-          "bin/picker.js"
+          "lazygit"
         ]
       }
     ],
     "source": {
       "kind": "github",
-      "owner": "tdi",
-      "repo": "herdr-worktree-from-pr",
-      "resolved_commit": "da51dd83f738568b347988a95ec43f93cb43b92a",
-      "managed_path": "/Users/hsuyelin/.config/herdr/plugins/github/tdi.worktree-from-pr-10c57ec5f2ca",
-      "installed_unix_ms": 1784082058079
+      "owner": "JacquesvanWyk",
+      "repo": "herdr-lazygit",
+      "resolved_commit": "557125c4e74148530799640cc4973c8acafe0bf7",
+      "managed_path": "/Users/hsuyelin/.config/herdr/plugins/github/herdr-lazygit-b11d62e75f78",
+      "installed_unix_ms": 1784082037570
+    }
+  },
+  {
+    "plugin_id": "jt.command-palette",
+    "name": "Command Palette (fzf)",
+    "version": "0.1.0",
+    "min_herdr_version": "0.7.0",
+    "description": "An fzf command palette for herdr: pops up a fuzzy-searchable list of every action exposed by every installed plugin (via `herdr plugin action list`) and invokes the one you pick. The picker runs in an overlay pane so fzf gets a real TTY; the origin workspace's cwd is forwarded so context-aware actions resolve the right repo.",
+    "manifest_path": "/Users/hsuyelin/.config/herdr/plugins/github/jt.command-palette-24905dca5f16/herdr-plugin.toml",
+    "plugin_root": "/Users/hsuyelin/.config/herdr/plugins/github/jt.command-palette-24905dca5f16",
+    "enabled": true,
+    "platforms": [
+      "linux",
+      "macos"
+    ],
+    "actions": [
+      {
+        "id": "open",
+        "title": "Command palette (all plugin actions)",
+        "contexts": [
+          "workspace"
+        ],
+        "command": [
+          "bash",
+          "open.sh"
+        ]
+      }
+    ],
+    "panes": [
+      {
+        "id": "palette",
+        "title": "Command palette",
+        "placement": "overlay",
+        "command": [
+          "bash",
+          "-c",
+          "exec \"$HERDR_PLUGIN_ROOT/palette.sh\""
+        ]
+      }
+    ],
+    "source": {
+      "kind": "github",
+      "owner": "JanTvrdik",
+      "repo": "herdr-command-palette",
+      "resolved_commit": "eab940018c2135ac23718efa11e23e9dddcd2a75",
+      "managed_path": "/Users/hsuyelin/.config/herdr/plugins/github/jt.command-palette-24905dca5f16",
+      "installed_unix_ms": 1784082010115
     }
   },
   {
@@ -456,76 +554,6 @@
     }
   },
   {
-    "plugin_id": "ramarivera.pretty-which",
-    "name": "Pretty Which",
-    "version": "0.1.5",
-    "min_herdr_version": "0.7.0",
-    "description": "A tasteful which-key style training overlay for Herdr keybindings.",
-    "manifest_path": "/Users/hsuyelin/.config/herdr/plugins/github/ramarivera.pretty-which-9cf671d5751a/herdr-plugin.toml",
-    "plugin_root": "/Users/hsuyelin/.config/herdr/plugins/github/ramarivera.pretty-which-9cf671d5751a",
-    "enabled": true,
-    "platforms": [
-      "linux",
-      "macos"
-    ],
-    "build": [
-      {
-        "platforms": [
-          "linux",
-          "macos"
-        ],
-        "command": [
-          "cargo",
-          "build",
-          "--release"
-        ]
-      }
-    ],
-    "actions": [
-      {
-        "id": "open",
-        "title": "Open pretty which",
-        "contexts": [
-          "workspace",
-          "tab",
-          "pane",
-          "global"
-        ],
-        "command": [
-          "herdr",
-          "plugin",
-          "pane",
-          "open",
-          "--plugin",
-          "ramarivera.pretty-which",
-          "--entrypoint",
-          "overlay",
-          "--placement",
-          "overlay",
-          "--focus"
-        ]
-      }
-    ],
-    "panes": [
-      {
-        "id": "overlay",
-        "title": "Pretty Which",
-        "placement": "overlay",
-        "command": [
-          "target/release/herdr-pretty-which"
-        ]
-      }
-    ],
-    "source": {
-      "kind": "github",
-      "owner": "ramarivera",
-      "repo": "herdr-pretty-which",
-      "resolved_commit": "c11c6e5af6f866b70f837bdd89157ba7441dc543",
-      "managed_path": "/Users/hsuyelin/.config/herdr/plugins/github/ramarivera.pretty-which-9cf671d5751a",
-      "installed_unix_ms": 1784082090500
-    }
-  },
-  {
     "plugin_id": "herdr-floax",
     "name": "herdr-floax",
     "version": "0.2.0",
@@ -575,6 +603,47 @@
       "resolved_commit": "5bf869ab666c45a3a72af88c2a92b413f05f2c56",
       "managed_path": "/Users/hsuyelin/.config/herdr/plugins/github/herdr-floax-0151ef56c880",
       "installed_unix_ms": 1784082022417
+    }
+  },
+  {
+    "plugin_id": "herdr.push",
+    "name": "Herdr Push",
+    "version": "0.2.0",
+    "min_herdr_version": "0.7.0",
+    "description": "Push agent status to a remote dashboard for mobile monitoring and one-tap approval",
+    "manifest_path": "/Users/hsuyelin/.config/herdr/plugins/github/herdr.push-daeaa1550340/herdr-plugin.toml",
+    "plugin_root": "/Users/hsuyelin/.config/herdr/plugins/github/herdr.push-daeaa1550340",
+    "enabled": false,
+    "platforms": [
+      "macos",
+      "linux"
+    ],
+    "actions": [
+      {
+        "id": "test",
+        "title": "Test push to relay",
+        "command": [
+          "sh",
+          "test.sh"
+        ]
+      }
+    ],
+    "events": [
+      {
+        "on": "pane.agent_status_changed",
+        "command": [
+          "sh",
+          "on_event.sh"
+        ]
+      }
+    ],
+    "source": {
+      "kind": "github",
+      "owner": "dcolinmorgan",
+      "repo": "herdr-push",
+      "resolved_commit": "f4fdb06d5413ac2d96ca225ea33f288f41bfc001",
+      "managed_path": "/Users/hsuyelin/.config/herdr/plugins/github/herdr.push-daeaa1550340",
+      "installed_unix_ms": 1784258739273
     }
   },
   {
@@ -630,133 +699,105 @@
     }
   },
   {
-    "plugin_id": "trapple.herdr-focus",
-    "name": "Herdr Focus",
-    "version": "1.1.0",
+    "plugin_id": "copy-search",
+    "name": "Copy Search",
+    "version": "0.1.4",
     "min_herdr_version": "0.7.0",
-    "description": "Focus the next blocked/done agent pane and bring the terminal app to front. Global hotkey included.",
-    "manifest_path": "/Users/hsuyelin/.config/herdr/plugins/github/trapple.herdr-focus-8458823f751c/herdr-plugin.toml",
-    "plugin_root": "/Users/hsuyelin/.config/herdr/plugins/github/trapple.herdr-focus-8458823f751c",
-    "enabled": true,
-    "platforms": [
-      "macos"
-    ],
-    "actions": [
-      {
-        "id": "focus",
-        "title": "Focus next agent pane needing attention",
-        "contexts": [
-          "workspace"
-        ],
-        "command": [
-          "bin/focus"
-        ]
-      },
-      {
-        "id": "hotkey-install",
-        "title": "Install global hotkey daemon (optional)",
-        "command": [
-          "bin/hotkey-install"
-        ]
-      },
-      {
-        "id": "hotkey-uninstall",
-        "title": "Uninstall global hotkey daemon",
-        "command": [
-          "bin/hotkey-uninstall"
-        ]
-      }
-    ],
-    "panes": [
-      {
-        "id": "hotkey-install",
-        "title": "Install hotkey daemon",
-        "placement": "overlay",
-        "command": [
-          "bash",
-          "bin/hotkey-install"
-        ]
-      }
-    ],
-    "source": {
-      "kind": "github",
-      "owner": "trapple",
-      "repo": "herdr-focus",
-      "resolved_commit": "a65cd8b82831841915b2a2e4614eb01dbfc487de",
-      "managed_path": "/Users/hsuyelin/.config/herdr/plugins/github/trapple.herdr-focus-8458823f751c",
-      "installed_unix_ms": 1784082021012
-    }
-  },
-  {
-    "plugin_id": "vim-herdr-navigation",
-    "name": "Vim Herdr Navigation",
-    "version": "0.1.0",
-    "min_herdr_version": "0.7.0",
-    "description": "Seamless Ctrl+h/j/k/l navigation across herdr panes and Vim/Neovim splits",
-    "manifest_path": "/Users/hsuyelin/.config/herdr/plugins/github/vim-herdr-navigation-a8bf42123d81/herdr-plugin.toml",
-    "plugin_root": "/Users/hsuyelin/.config/herdr/plugins/github/vim-herdr-navigation-a8bf42123d81",
+    "description": "tmux-style copy mode, copycat pattern search, and extrakto token extraction for pane scrollback, copying via OSC 52",
+    "manifest_path": "/Users/hsuyelin/.config/herdr/plugins/github/copy-search-c76f1e25de11/herdr-plugin.toml",
+    "plugin_root": "/Users/hsuyelin/.config/herdr/plugins/github/copy-search-c76f1e25de11",
     "enabled": true,
     "platforms": [
       "linux",
       "macos"
     ],
+    "build": [
+      {
+        "command": [
+          "cargo",
+          "build",
+          "--release",
+          "--locked"
+        ]
+      }
+    ],
     "actions": [
       {
-        "id": "down",
-        "title": "Navigate down (Vim/herdr)",
+        "id": "copy",
+        "title": "Open copy mode",
         "contexts": [
-          "global"
+          "pane"
         ],
         "command": [
-          "bash",
-          "navigate.sh",
-          "down"
+          "sh",
+          "-c",
+          "exec \"$HERDR_BIN_PATH\" plugin pane open --plugin copy-search --entrypoint copy"
         ]
       },
       {
-        "id": "left",
-        "title": "Navigate left (Vim/herdr)",
+        "id": "extract",
+        "title": "Extract tokens",
         "contexts": [
-          "global"
+          "pane"
         ],
         "command": [
-          "bash",
-          "navigate.sh",
-          "left"
+          "sh",
+          "-c",
+          "exec \"$HERDR_BIN_PATH\" plugin pane open --plugin copy-search --entrypoint extract"
         ]
       },
       {
-        "id": "right",
-        "title": "Navigate right (Vim/herdr)",
+        "id": "search",
+        "title": "Search scrollback",
         "contexts": [
-          "global"
+          "pane"
         ],
         "command": [
-          "bash",
-          "navigate.sh",
-          "right"
+          "sh",
+          "-c",
+          "exec \"$HERDR_BIN_PATH\" plugin pane open --plugin copy-search --entrypoint search"
+        ]
+      }
+    ],
+    "panes": [
+      {
+        "id": "copy",
+        "title": "copy mode",
+        "placement": "overlay",
+        "command": [
+          "sh",
+          "-c",
+          "exec \"$HERDR_PLUGIN_ROOT/target/release/herdr-copy-search\" --mode copy"
         ]
       },
       {
-        "id": "up",
-        "title": "Navigate up (Vim/herdr)",
-        "contexts": [
-          "global"
-        ],
+        "id": "extract",
+        "title": "extract",
+        "placement": "overlay",
         "command": [
-          "bash",
-          "navigate.sh",
-          "up"
+          "sh",
+          "-c",
+          "exec \"$HERDR_PLUGIN_ROOT/target/release/herdr-copy-search\" --mode extract"
+        ]
+      },
+      {
+        "id": "search",
+        "title": "scrollback search",
+        "placement": "overlay",
+        "command": [
+          "sh",
+          "-c",
+          "exec \"$HERDR_PLUGIN_ROOT/target/release/herdr-copy-search\" --mode search"
         ]
       }
     ],
     "source": {
       "kind": "github",
-      "owner": "paulbkim-dev",
-      "repo": "vim-herdr-navigation",
-      "resolved_commit": "53e318c772c4d3b7fbd904ac43bcf3e5b5d8b244",
-      "managed_path": "/Users/hsuyelin/.config/herdr/plugins/github/vim-herdr-navigation-a8bf42123d81",
-      "installed_unix_ms": 1784082008618
+      "owner": "qq88976321",
+      "repo": "herdr-copy-search",
+      "resolved_commit": "4059440b5f43c1a74269108acfafbe4c5dc7f474",
+      "managed_path": "/Users/hsuyelin/.config/herdr/plugins/github/copy-search-c76f1e25de11",
+      "installed_unix_ms": 1784082039789
     }
   }
 ]

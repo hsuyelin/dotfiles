@@ -23,3 +23,15 @@ hhelp() {
         *)         _help_show "$_i18n" "$@" ;;
     esac
 }
+
+# hremote: Manage local herdr-remote relay and Telegram bot.
+hremote() {
+    "${XDG_CONFIG_HOME}/herdr/remote/local/herdr-remote.sh" "$@"
+}
+
+alias hremote-install='hremote install'
+alias hremote-uninstall='hremote uninstall'
+alias hremote-resume='hremote resume'
+alias hremote-pause='hremote pause'
+alias hremote-stop='hremote stop'
+alias hremote-status='hremote status'

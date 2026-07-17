@@ -138,7 +138,7 @@ ctrl-alt-t = [
 ]
 
 # Focus on Safari window if it exists on workspace 3.
-ctrl-alt-s = [
+shift-alt-s = [
     'workspace W',
     'exec-and-forget open -a Safari'
 ]
