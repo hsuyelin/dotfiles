@@ -2,5 +2,6 @@
 # OMP
 # ============================================================
 
-# Keep OMP agent state out of $HOME without relying on internal variables.
-export PI_CODING_AGENT_DIR="${PI_CODING_AGENT_DIR:-$HOME/.local/share/omp/agent}"
+# Keep OMP configuration and agent state out of $HOME.
+export PI_CONFIG_DIR="$HOME/.local/share/omp"
+export PI_CODING_AGENT_DIR="$PI_CONFIG_DIR/agent"
