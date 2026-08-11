@@ -35,12 +35,6 @@ if [[ "$(uname -s)" == "Linux" ]]; then
     _path_post "/root/bin"
 fi
 
-# ── Android SDK ─────────────────────────────────────────────
-if [[ -n "${ANDROID_SDK:-}" ]]; then
-    _path_post "$ANDROID_SDK/platform-tools"
-    _path_post "$ANDROID_SDK/tools"
-fi
-
 unset -f _path_pre _path_post
 
 export PATH

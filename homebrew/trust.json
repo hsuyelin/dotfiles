@@ -1,5 +1,6 @@
 {
   "trustedformulae": [
+    "can1357/tap/omp",
     "felixkratz/formulae/borders",
     "oven-sh/bun/bun",
     "xcodesorg/made/xcodes"

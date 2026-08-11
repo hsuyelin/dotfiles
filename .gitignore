@@ -83,3 +83,12 @@ herdr/plugins/github/*
 
 # Homebrew runtime locks
 homebrew/*.lock
+
+# Android SDK cache and local debug signing key
+.android/
+
+# Raycast extension cache and runtime state
+raycast/
+
+# Herdr plugin installation lock
+herdr/.plugins.lock

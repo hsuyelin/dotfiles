@@ -302,3 +302,15 @@ run = ['layout floating']
 [[on-window-detected]]
 if.app-id = 'imagetasks.iStatistica-Pro' # iStatistica Pro.app
 run = ['layout floating']
+
+[[on-window-detected]]
+if.app-name-regex-substring = 'scrcpy' # Android Device Scrcpy
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-name-regex-substring = 'qemu-system' # Android Emulator
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-name-regex-substring = 'mpv' # mpv player
+run = 'layout floating'
