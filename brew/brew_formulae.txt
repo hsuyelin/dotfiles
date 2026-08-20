@@ -54,6 +54,7 @@ gpgmepp
 graphite2
 gzip
 harfbuzz
+herdr
 hdrhistogram_c
 highway
 icu4c@78

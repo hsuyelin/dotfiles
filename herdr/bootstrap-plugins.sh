@@ -173,6 +173,8 @@ clear_state() {
 
 load_installed_plugins() {
     local plugin_id
+    local plugin_root
+    local manifest_path
     local plugin_ids
     local plugins_json
 
@@ -183,13 +185,24 @@ load_installed_plugins() {
     fi
 
     if ! plugin_ids="$(printf '%s\n' "${plugins_json}" \
-        | jq -r '.result.plugins[].plugin_id')"; then
+        | jq -r '.result.plugins[]
+            | select(
+                (.plugin_root | type == "string")
+                and (.manifest_path | type == "string")
+            )
+            | [.plugin_id, .plugin_root, .manifest_path]
+            | @tsv')"; then
         log_error "failed to parse installed Herdr plugins"
         exit 1
     fi
 
-    while IFS= read -r plugin_id; do
+    while IFS=$'\t' read -r plugin_id plugin_root manifest_path; do
         [[ -z "${plugin_id}" ]] && continue
+        if [[ ! -d "${plugin_root}" || ! -f "${manifest_path}" ]]; then
+            log_status "Stale" "${plugin_id} registry entry has no plugin files" \
+                "${COLOR_YELLOW}"
+            continue
+        fi
         INSTALLED_PLUGIN_IDS+=("${plugin_id}")
     done <<<"${plugin_ids}"
 }

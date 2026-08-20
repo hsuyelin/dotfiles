@@ -175,7 +175,7 @@ DOTFILES_REPO=https://github.com/hsuyelin/dotfiles \
 3. Install Homebrew
 4. Clone this repo to `~/.config`
 5. **Prompt: select terminal** — Ghostty or kitty (30 s timeout → Ghostty)
-6. Run `install.sh`
+6. Run `install.sh`, including the approved Herdr plugin bootstrap
 7. Install Homebrew formulae and casks from `brew/`
 8. Install RVM
 

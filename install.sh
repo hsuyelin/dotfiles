@@ -439,7 +439,8 @@ check_prerequisites() {
     local entry cmd formula
     for entry in "starship:starship" "fzf:fzf" "eza:eza" \
                  "zoxide:zoxide" "tmux:tmux" "nvim:neovim" \
-                 "node:node" "go:go" "yazi:yazi" "bat:bat"; do
+                 "node:node" "go:go" "yazi:yazi" "bat:bat" \
+                 "jq:jq" "herdr:herdr"; do
         cmd="${entry%%:*}"
         formula="${entry##*:}"
         if command -v "${cmd}" &>/dev/null; then
@@ -966,6 +967,30 @@ set_permissions() {
     [[ -f "${DOTFILES_DIR}/bootstrap.sh" ]] && chmod +x "${DOTFILES_DIR}/bootstrap.sh"
 }
 
+# ── Step: Herdr plugins ─────────────────────────────────────────────────────
+install_herdr_plugins() {
+    local plugin_bootstrap="${DOTFILES_DIR}/herdr/bootstrap-plugins.sh"
+
+    log_step "Checking" "approved Herdr plugins"
+
+    if [[ ! -x "${plugin_bootstrap}" ]]; then
+        log_warn "Herdr plugin bootstrap not found or not executable — skipping"
+        return 0
+    fi
+
+    if ! command -v herdr &>/dev/null || ! command -v jq &>/dev/null; then
+        log_warn "herdr or jq not found — skipping Herdr plugins"
+        return 0
+    fi
+
+    if [[ "${DRY_RUN}" == "true" ]]; then
+        "${plugin_bootstrap}" --dry-run
+        return 0
+    fi
+
+    "${plugin_bootstrap}" --yes
+}
+
 # ── Step: RTK (Rust Token Killer) ────────────────────────────────────────────
 # Installs RTK via Homebrew, runs `rtk init -g` (Claude Code hook), and
 # symlinks ~/Library/Application Support/rtk → $XDG_CONFIG_HOME/rtk so the
@@ -1239,6 +1264,7 @@ main() {
     [[ "${INSTALL_RTK}" == "true" ]] && install_rtk
     configure_file_associations
     install_claude_themes
+    install_herdr_plugins
     print_checklist
 
     # exec zsh -l when either:

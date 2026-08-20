@@ -78,6 +78,9 @@ herdr/release-notes.json
 herdr/herdr-client.log
 herdr/herdr-server.log
 
+# Herdr's plugin registry contains machine-specific absolute paths.
+herdr/plugins.json
+
 # Herdr plugins are installed by herdr/bootstrap-plugins.sh.
 herdr/plugins/github/*
 
