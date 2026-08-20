@@ -20,7 +20,8 @@
 config-version = 2
 
 # v1 inferred these workspaces from key bindings. v2 requires explicit entries.
-persistent-workspaces = ['D', 'T', 'W', 'C', 'O', 'F', 'L', '8', '9']
+persistent-workspaces = ['D', 'T', 'W', 'B', 'G', 'C', 'O', 'F', 'L', '8', '9']
+
 
 # Start AeroSpace at login
 start-at-login = true
@@ -58,7 +59,17 @@ outer.bottom =     [ { monitor."Built-in Retina Display" = 20 }, 25 ]
 outer.top =        [ { monitor."Built-in Retina Display" = 20 }, 25 ]
 outer.right =      [ { monitor."Built-in Retina Display" = 20 }, 25 ]
 
+# Keep chat applications on the secondary display without changing their
+# existing workspace identities: C for WeChat/Lark and 9 for Telegram. Browser
+# and Figma each use a dedicated secondary workspace.
+[workspace-to-monitor-force-assignment]
+B = 'secondary'
+G = 'secondary'
+C = 'secondary'
+9 = 'secondary'
+
 # --- Main Binding Mode: main ---
+
 # The primary mode for window management.
 [mode.main.binding]
 
@@ -87,6 +98,11 @@ alt-shift-minus = 'resize smart -100'
 alt-shift-equal = 'resize smart +100'
 
 # Quick application launch examples
+
+# Focus dedicated secondary-display workspaces. Alt+B remains the Chrome
+# launcher; Ctrl+Alt+B and Ctrl+Alt+G focus the browser and Figma workspaces.
+ctrl-alt-b = 'workspace B'
+ctrl-alt-g = 'workspace G'
 # Launch Terminal — default: Ghostty. To use kitty instead, swap the two lines.
 # Keep plain Alt+Enter free so terminal TUIs can receive Option+Enter.
 alt-shift-enter = 'exec-and-forget open -a Ghostty'
@@ -171,6 +187,11 @@ alt-shift-l = ['join-with right', 'mode main']
 # Automatically move new windows to specific workspaces.
 # Use `aerospace list-windows` to confirm the exact App IDs.
 
+## Figma (G)
+[[on-window-detected]]
+if.app-id = 'com.figma.Desktop'
+run = 'move-node-to-workspace G'
+
 ## 1. Dev (D)
 [[on-window-detected]]
 if.app-id = 'com.jetbrains.PyCharm'
@@ -217,14 +238,14 @@ run = 'move-node-to-workspace T'
 if.app-id = 'net.sourceforge.sqlitebrowser' # DB Browser for SQLite
 run = 'move-node-to-workspace T'
 
-## 3. Web (W)
+## 3. Web (W / B)
 [[on-window-detected]]
 if.app-id = 'com.apple.Safari'
 run = 'move-node-to-workspace W'
 
 [[on-window-detected]]
 if.app-id = 'com.google.Chrome'
-run = 'move-node-to-workspace W'
+run = 'move-node-to-workspace B'
 
 ## 4. Comms (C)
 [[on-window-detected]]
@@ -313,4 +334,12 @@ run = 'layout floating'
 
 [[on-window-detected]]
 if.app-name-regex-substring = 'mpv' # mpv player
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'io.playcover.PlayCover' # playcover
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.tencent.jkchess' # jkchess
 run = 'layout floating'
