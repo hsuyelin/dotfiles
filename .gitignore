@@ -71,6 +71,9 @@ etlp/
 # OpenSpec local configuration
 openspec/
 
+# Local research notes may contain machine-specific paths.
+docs/notes/
+
 # Herdr runtime state and logs
 herdr/session.json
 herdr/session-history.json
