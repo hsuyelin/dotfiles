@@ -72,7 +72,7 @@ fi
 
 command -v lazygit >/dev/null 2>&1 && alias lg='lazygit'
 
-alias real-rm='\rm'
+alias rrm='command rm'
 
 
 # -----------------------------
@@ -234,13 +234,13 @@ rd() {
     return 1
   fi
 
-  real-rm -rf "$TEMP_FILE"
+  command rm -rf "$TEMP_FILE"
   "$RATATUI_BETTER_CD"
 
   [ -f "$TEMP_FILE" ] || return 0
 
   read -r SELECTED_DIR < "$TEMP_FILE"
-  real-rm -rf "$TEMP_FILE"
+  command rm -rf "$TEMP_FILE"
 
   if [ -n "$SELECTED_DIR" ] && [ -d "$SELECTED_DIR" ]; then
     cd "$SELECTED_DIR" || return 1
@@ -323,4 +323,34 @@ shelp() {
         show)      shift; _help_show "$_i18n" "$@" ;;
         *)         _help_show "$_i18n" "$@" ;;
     esac
+}
+
+# -----------------------------
+# System Improve
+# -----------------------------
+# Fast copy powered by xcp.
+# Usage:
+#   fcp source destination
+#   fcp -r source destination
+#   fcp -R source destination
+#   fcp -f source destination
+#   fcp -rf source destination
+fcp() {
+    if ! command -v xcp &>/dev/null; then
+        command cp "$@"
+        return
+    fi
+
+    local args=()
+    local arg
+
+    for arg in "$@"; do
+        if [[ "$arg" == -[!-]* ]]; then
+            args+=("${arg//R/r}")
+        else
+            args+=("$arg")
+        fi
+    done
+
+    command xcp "${args[@]}"
 }

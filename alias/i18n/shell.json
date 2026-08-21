@@ -124,7 +124,7 @@
         { "type": "row", "key": "sign_app <name>",  "en": "strip quarantine & re-sign macOS .app bundle",  "zh": "清除隔离属性并重新签名 macOS .app" },
         { "type": "note", "en": "accepts: /path/to/App.app  |  App.app  |  app (searches /Applications)", "zh": "接受：绝对路径 | App.app | app 名称（在 /Applications 中搜索）" },
         { "type": "row", "key": "rm",              "en": "safer rm — moves to Trash via safe-trash",       "zh": "安全 rm — 通过 safe-trash 移入废纸篓" },
-        { "type": "row", "key": "real-rm",         "en": "raw /bin/rm (bypass the safe wrapper)",          "zh": "原始 /bin/rm（绕过安全封装）" },
+        { "type": "row", "key": "rrm",             "en": "raw system rm (bypass the safe wrapper)",     "zh": "原始系统 rm（绕过安全封装）" },
         { "type": "row", "key": "dns:flush",       "en": "flush macOS DNS cache",                         "zh": "刷新 macOS DNS 缓存" },
         { "type": "row", "key": "ssh",             "en": "ssh with TERM=xterm-256color",                  "zh": "ssh（自动设置 TERM=xterm-256color）" },
         { "type": "row", "key": "bash-reload",     "en": "re-source bash profile",                        "zh": "重新加载 bash profile" },
