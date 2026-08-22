@@ -36,7 +36,7 @@ font-codepoint-map = U+2E80-U+2EFF=LXGW WenKai Mono
 
 # ── Appearance ────────────────────────────────────────────────────────────────
 background-opacity = 0.7
-background-blur-radius = 25
+background-blur = 25
 theme = Catppuccin Mocha
 
 # ── Cursor ────────────────────────────────────────────────────────────────────
