@@ -50,6 +50,31 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
   alias xcode='"${XDG_CONFIG_HOME}/bin/xcode.sh"'
 fi
 
+# omni-app-id: list managed apps or filter by an application-name keyword.
+omni-app-id() {
+  if ! command -v omniwmctl >/dev/null 2>&1; then
+    printf 'omni-app-id: omniwmctl is not available.\n' >&2
+    return 127
+  fi
+
+  if (( $# == 0 )); then
+    omniwmctl query apps --format table
+    return
+  fi
+
+  if ! command -v jq >/dev/null 2>&1; then
+    printf 'omni-app-id: jq is not available.\n' >&2
+    return 127
+  fi
+
+  local keyword="$*"
+  omniwmctl query apps --format json | jq --arg keyword "$keyword" '
+    .result.payload.apps[]
+    | select(.appName | ascii_downcase | contains($keyword | ascii_downcase))
+    | {appName, bundleId}
+  '
+}
+
 
 # -----------------------------
 # eza / git helpers
