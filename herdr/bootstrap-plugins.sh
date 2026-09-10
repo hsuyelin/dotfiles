@@ -14,13 +14,13 @@ readonly -a APPROVED_PLUGINS=(
     "copy-search|qq88976321/herdr-copy-search"
     "jt.command-palette|JanTvrdik/herdr-command-palette"
     "herdr-focus-notify|yankewei/herdr-focus-notify"
-    "persiyanov.reviewr|persiyanov/herdr-reviewr"
     "tdi.worktree-from-pr|tdi/herdr-worktree-from-pr"
     "herdr-jira|a2u/herdr-jira"
     "ramarivera.pretty-which|ramarivera/herdr-pretty-which"
     "herdr-floax|Tyru5/herdr-floax"
     "edi.layout-tools|edouard-andrei/herdr-layout-tools"
     "trapple.herdr-focus|trapple/herdr-focus"
+    "herdr-sidebar|alexarthurs/herdr-sidebar/plugins/herdr-sidebar"
     "vim-herdr-navigation|paulbkim-dev/vim-herdr-navigation"
 )
 
@@ -114,6 +114,7 @@ check_dependencies() {
     require_command herdr
     require_command jq
 }
+
 
 ensure_state_dir() {
     mkdir -p "${STATE_DIR}"

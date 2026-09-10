@@ -138,6 +138,12 @@ key = "prefix+alt+shift+g"
 type = "shell"
 command = "herdr plugin action invoke open-lazygit-tab --plugin herdr-lazygit"
 
+[[keys.command]]
+key = "prefix+shift+b"
+type = "plugin_action"
+command = "herdr-sidebar.open-sidebar"
+description = "toggle plugin sidebar"
+
 [ui]
 accent = "#fab387"
 mouse_capture = true
@@ -147,6 +153,7 @@ show_agent_labels_on_pane_borders = true
 hide_tab_bar_when_single_tab = false
 sidebar_collapsed_mode = "hidden"
 
+agent_panel_sort = "spaces"
 [ui.toast]
 delivery = "herdr"
 delay_seconds = 1

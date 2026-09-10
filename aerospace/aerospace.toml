@@ -24,10 +24,10 @@ persistent-workspaces = ['D', 'T', 'W', 'B', 'G', 'C', 'O', 'F', 'L', '8', '9']
 
 
 # Start AeroSpace at login
-start-at-login = true
+start-at-login = false
 
-# Launch JankyBorders on AeroSpace startup; config is read from bordersrc
-after-startup-command = ['exec-and-forget borders']
+# Do not launch JankyBorders; OmniWM owns window borders.
+after-startup-command = []
 
 # Normalizations. Enable to keep layouts clean and predictable.
 enable-normalization-flatten-containers = true
