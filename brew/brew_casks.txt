@@ -14,9 +14,7 @@ pearcleaner
 swiftformat-for-xcode
 xcodes-app
 # ── Tiling WM ──────────────────────────────────────────────────────────────
-# aerospace requires: brew tap nikitabobko/tap
-# bootstrap.sh adds the tap automatically before this list is processed.
-aerospace
+omniwm
 # ── Terminal emulators — only one is installed based on your selection ─────
 # bootstrap.sh / install.sh prompt you to choose; default is Ghostty.
 ghostty

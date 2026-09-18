@@ -7,6 +7,7 @@ schemaVersion = 3
 
 [appearance]
 mode = "dark"
+tabRailAppIcons = false
 
 [borders]
 enabled = true
@@ -19,7 +20,7 @@ green = 0.6509803921568628
 red = 0.796078431372549
 
 [clipboard]
-historyEnabled = false
+historyEnabled = true
 maxItemBytes = 8388608
 maxItems = 200
 maxTotalBytes = 67108864
@@ -66,10 +67,17 @@ fingerCount = 3
 invertDirection = true
 mouseMoveModifierKey = "option"
 mouseResizeModifierKey = "option"
+overviewGestureEnabled = false
+overviewGestureFingerCount = 4
 scrollEnabled = true
 scrollModifierKey = "optionShift"
 scrollSensitivity = 5.0
 trackpadScrollStyle = "snap"
+windowGestureSensitivity = 1.0
+windowMoveEnabled = false
+windowMoveFingerCount = 4
+windowResizeEnabled = false
+windowResizeFingerCount = 3
 workspaceSwipeAxis = "vertical"
 workspaceSwipeEnabled = false
 workspaceSwipeFingerCount = 3
@@ -161,9 +169,13 @@ position = "overlappingMenuBar"
 reserveLayoutSpace = false
 revealHoldMilliseconds = 200.0
 revealModifier = "off"
+showAccentHighlights = true
 showFloatingWindows = false
+showItemBackgrounds = true
 showLabels = true
+solidBlackBackground = false
 systemStatsButton = false
+transparentBackground = false
 windowLevel = "popup"
 xOffset = 0.0
 yOffset = 0.0
@@ -645,35 +657,35 @@ binding = "Unassigned"
 id = "moveToWorkspaceSlot.5"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Option+A"
 id = "switchWorkspaceSlot.6"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Option+Shift+A"
 id = "moveToWorkspaceSlot.6"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Option+B"
 id = "switchWorkspaceSlot.7"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Control+Option+Shift+B"
 id = "moveToWorkspaceSlot.7"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Option+C"
 id = "switchWorkspaceSlot.8"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Option+Shift+C"
 id = "moveToWorkspaceSlot.8"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Option+D"
 id = "switchWorkspaceSlot.9"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Option+Shift+D"
 id = "moveToWorkspaceSlot.9"
 
 [[hotkeys]]
@@ -681,11 +693,11 @@ binding = "Control+Option+Tab"
 id = "workspaceBackAndForth"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Option+N"
 id = "switchWorkspace.next"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Option+P"
 id = "switchWorkspace.previous"
 
 [[hotkeys]]

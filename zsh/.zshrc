@@ -260,3 +260,5 @@ zstyle ':fzf-tab:*' fzf-flags '--bind=ctrl-d:preview-page-down,ctrl-u:preview-pa
 # ============================================================
 export STARSHIP_CONFIG="${XDG_CONFIG_HOME}/starship/starship.toml"
 (( ! ${precmd_functions[(I)prompt_starship_precmd]} )) && eval "$(starship init zsh)"
+
+[[ -f "${HOME}/.local/bin/env" ]] && source "${HOME}/.local/bin/env"

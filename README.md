@@ -46,7 +46,7 @@ Intel Macs are **allowed but untested** — the installer prompts for confirmati
 
 ### Experimental: Linux
 
-Arch Linux, Debian, and Ubuntu are supported on a best-effort basis. macOS-only features (AeroSpace, JankyBorders, Ghostty shaders, `osascript` notifications, Xcode tooling) are automatically skipped. The package installer maps Homebrew formulae and casks to native equivalents where available; unrecognized packages are skipped with a warning.
+Arch Linux, Debian, and Ubuntu are supported on a best-effort basis. macOS-only features (OmniWM, Ghostty shaders, `osascript` notifications, Xcode tooling) are automatically skipped. The package installer maps Homebrew formulae and casks to native equivalents where available; unrecognized packages are skipped with a warning.
 
 ### Tool Versions
 
@@ -105,8 +105,8 @@ Arch Linux, Debian, and Ubuntu are supported on a best-effort basis. macOS-only 
       <td align="center" width="50%">
         <video src="https://github.com/user-attachments/assets/991d2c8c-5c27-4be9-beda-8240b82d6379" controls width="100%"></video>
         <br/>
-        <strong>AeroSpace — Window Manager</strong><br/>
-        <sub>Tiling · JankyBorders · vim-style workspace navigation</sub>
+        <strong>OmniWM — Window Manager</strong><br/>
+        <sub>Niri-style scrolling · native borders · workspace navigation</sub>
       </td>
       <td align="center" width="50%">
         <img src="https://raw.githubusercontent.com/hsuyelin/dotfiles/refs/heads/main/assets/screenshots/btop.png" width="100%" alt="btop system monitor" />
@@ -144,8 +144,7 @@ Arch Linux, Debian, and Ubuntu are supported on a best-effort basis. macOS-only 
 | Terminal | [Ghostty](https://ghostty.org) *(default)* | Blur · CJK font map · cursor warp shader · quick terminal |
 | Terminal (alt) | [kitty](https://sw.kovidgoyal.net/kitty/) | Same theme + keybinds; no cursor shader or quick terminal |
 | Editor | [Neovim](https://neovim.io) | vim.pack · LSP · Treesitter |
-| Window Manager | [AeroSpace](https://github.com/nikitabobko/AeroSpace) | Tiling · vim-style keybinds |
-| Window Borders | [JankyBorders](https://github.com/FelixKratz/JankyBorders) | Auto-launched by AeroSpace |
+| Window Manager | [OmniWM](https://omniwm.app) | Niri-style scrolling · native borders · workspace navigation |
 | File manager | [Yazi](https://github.com/sxyazi/yazi) | `yy` alias · Catppuccin Mocha · image/video/PDF/archive preview |
 | File listing | [eza](https://github.com/eza-community/eza) | Replaces `ls` · icons · git status |
 | Fuzzy finder | [fzf](https://github.com/junegunn/fzf) + [zoxide](https://github.com/ajeetdsouza/zoxide) | `z` for directory jumping |
@@ -202,7 +201,7 @@ Then install packages:
 bash ~/.config/bin/pkg_install.sh
 ```
 
-`install.sh` detects Arch / Debian / Ubuntu automatically. macOS-only steps (Homebrew, AeroSpace, Ghostty shaders, Xcode) are skipped. `pkg_install.sh` maps Homebrew formulae and casks to native package manager equivalents; packages with no Linux mapping are skipped with a warning.
+`install.sh` detects Arch / Debian / Ubuntu automatically. macOS-only steps (Homebrew, OmniWM, Ghostty shaders, Xcode) are skipped. `pkg_install.sh` maps Homebrew formulae and casks to native package manager equivalents; packages with no Linux mapping are skipped with a warning.
 
 ### Terminal selection
 
@@ -232,7 +231,7 @@ bash bootstrap.sh --terminal=iterm2
 
 The `--terminal` flag is case-insensitive (`--terminal=iTerm2` also works).
 
-To switch terminals after install, re-run with the desired flag — then follow the two-line swap in `aerospace/aerospace.toml` (instructions are in the file header).
+To switch terminals after install, re-run with the desired flag. OmniWM applies the matching app rules from `omniwm/settings.toml` automatically.
 
 ### Options
 
@@ -272,13 +271,12 @@ Then:
 ```
 ~/.config/
 ├── .github/         # CI/CD — tag-based release workflow + asset cleanup
-├── aerospace/       # AeroSpace tiling WM
+├── omniwm/          # OmniWM tiling window manager
 ├── alias/           # Shell aliases
 ├── assets/          # Repository assets (logo, screenshots)
 ├── bash/            # bash_profile, AI shell helpers
 ├── bat/             # bat syntax highlighter — Catppuccin Mocha theme
 ├── bin/             # Utility scripts (brew export, Carthage, Xcode helpers)
-├── borders/         # JankyBorders config
 ├── brew/            # Homebrew formulae + casks
 ├── btop/            # System monitor — Catppuccin Mocha theme
 ├── bundle/          # Bundler config

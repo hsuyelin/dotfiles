@@ -14,7 +14,7 @@
 #   equivalents and installs them; packages with no mapping are skipped.
 #
 # Safe to re-run: already-installed packages are skipped.
-# The AeroSpace tap (nikitabobko/tap) is added automatically on macOS.
+# OmniWM is installed from the official Homebrew cask on macOS.
 # Non-full ffmpeg / imagemagick are removed before install on macOS
 # because Yazi requires the -full variants.
 
@@ -204,7 +204,7 @@ _linux_pkg_for_cask() {
         "oracle-jdk@25:jdk-openjdk:default-jdk"
         # font-lxgw-wenkai: AUR only, skipped
         # ghostty: AUR only, skipped
-        # aerospace/orbstack/applite/etc.: macOS-only, no Linux equivalent
+        # omniwm/orbstack/applite/etc.: macOS-only, no Linux equivalent
     )
     local entry bname rest arch_pkg deb_pkg
     for entry in "${_cmap[@]}"; do
@@ -637,14 +637,6 @@ main() {
     fi
 
     run brew update --quiet || log_warn "brew update failed — continuing with cached formula list"
-
-    if ! brew tap | grep -q "nikitabobko/tap"; then
-        log_step "brew" "tap nikitabobko/tap  (required for aerospace)"
-        run brew tap nikitabobko/tap \
-            || log_warn "tap nikitabobko/tap failed — aerospace install may fail"
-    else
-        log_info "tap nikitabobko/tap already active"
-    fi
 
     preflight_brew_conflicts
     preflight_claude_code

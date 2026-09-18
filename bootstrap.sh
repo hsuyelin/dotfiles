@@ -432,12 +432,6 @@ install_brew_packages() {
 
     run brew update --quiet
 
-    # aerospace (tiling WM) lives in a third-party tap
-    if ! brew tap | grep -q "nikitabobko/tap"; then
-        log_step "brew" "tap nikitabobko/tap (required for aerospace)"
-        run brew tap nikitabobko/tap || log_warn "tap nikitabobko/tap failed (skipping)"
-    fi
-
     _preflight_brew_conflicts
 
     _brew_install_list "formula" "${DOTFILES_DIR}/brew/brew_formulae.txt"
