@@ -3,8 +3,8 @@
 --allow-partial-wrapping true
 --anonymous-for-each convert
 --asset-literals visual-width
---async-capturing 
---before-marks 
+--async-capturing
+--before-marks
 --binary-grouping 4,8
 --blank-line-after-switch-case multiline-only
 --call-site-paren default
@@ -18,7 +18,7 @@
 --conflict-markers reject
 --date-format system
 --decimal-grouping ignore
---default-test-suite-attributes 
+--default-test-suite-attributes
 --doc-comments before-declarations
 --else-position same-line
 --empty-braces no-space
@@ -34,7 +34,7 @@
 --fraction-grouping disabled
 --fragment false
 --func-attributes preserve
---generic-types 
+--generic-types
 --group-blank-lines true
 --grouped-extension "MARK: %c"
 --guard-else auto
@@ -49,7 +49,7 @@
 --inferred-types always
 --init-coder-nil false
 --language-mode 0
---lifecycle 
+--lifecycle
 --line-after-marks true
 --line-between-guards false
 --linebreaks lf
@@ -62,41 +62,41 @@
 --mark-types always
 --markdown-files ignore
 --max-width 80
---modifier-order 
---never-trailing 
+--modifier-order
+--never-trailing
 --nil-init remove
---no-space-operators 
---no-wrap-operators 
---non-complex-attributes 
+--no-space-operators
+--no-wrap-operators
+--non-complex-attributes
 --octal-grouping 4,8
 --operator-func spaced
 --organization-mode visibility
 --organize-types actor,class,enum,struct
 --pattern-let hoist
---preserve-acronyms 
---preserve-decls 
+--preserve-acronyms
+--preserve-decls
 --preserved-property-types Package
 --property-types infer-locals-only
 --ranges spaced
 --redundant-async tests-only
 --redundant-throws tests-only
 --self remove
---self-required 
+--self-required
 --semicolons inline-only
 --short-optionals always
 --single-line-for-each ignore
 --smart-tabs enabled
 --some-any true
 --sort-swiftui-properties none
---sorted-patterns 
+--sorted-patterns
 --stored-var-attributes preserve
 --strip-unused-args always
 --struct-threshold 0
 --swift-version 5.9
 --tab-width unspecified
---throw-capturing 
+--throw-capturing
 --timezone system
---trailing-closures 
+--trailing-closures
 --trailing-commas never
 --trim-whitespace always
 --type-attributes preserve
@@ -104,11 +104,11 @@
 --type-body-marks preserve
 --type-delimiter space-after
 --type-mark "MARK: - %t"
---type-marks 
---type-order 
+--type-marks
+--type-order
 --url-macro none
---visibility-marks 
---visibility-order 
+--visibility-marks
+--visibility-order
 --void-type Void
 --wrap-arguments before-first
 --wrap-collections before-first
@@ -121,6 +121,6 @@
 --wrap-ternary default
 --wrap-type-aliases preserve
 --xcode-indentation disabled
---xctest-symbols 
+--xctest-symbols
 --yoda-swap always
---disable redundantEmptyView,redundantSendable,redundantViewBuilder,wrapMultilineStatementBraces
+--disable redundantEmptyView,redundantSendable,redundantViewBuilder,wrapMultilineStatementBraces,strongOutlets
