@@ -12,6 +12,10 @@ docker/cli-plugins/
 docker/config.json
 docker/contexts/
 
+# Local service runtime state and data
+colima/
+emby-server/
+
 # Zsh session history
 zsh/.zsh_history
 zsh/.zsh_sessions/
@@ -81,6 +85,8 @@ herdr/session-history.json
 herdr/release-notes.json
 herdr/herdr-client.log
 herdr/herdr-server.log
+herdr/session-snapshots/
+herdr/herdr.sock.agent
 
 # Herdr's plugin registry contains machine-specific absolute paths.
 herdr/plugins.json
