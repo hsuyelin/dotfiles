@@ -3,7 +3,7 @@ monitorDwindleOverrides = []
 monitorGapOverrides = []
 monitorNiriOverrides = []
 monitorOrientationOverrides = []
-schemaVersion = 3
+schemaVersion = 4
 
 [appearance]
 mode = "dark"
@@ -21,6 +21,7 @@ red = 0.796078431372549
 
 [clipboard]
 historyEnabled = true
+ignoredTypes = []
 maxItemBytes = 8388608
 maxItems = 200
 maxTotalBytes = 67108864
@@ -53,6 +54,7 @@ right = 20.0
 top = 20.0
 
 [general]
+animationSpeed = 1.0
 animationsEnabled = true
 defaultLayoutType = "niri"
 hotkeysEnabled = true
@@ -97,11 +99,16 @@ alwaysCenterSingleColumn = false
 centerFocusedColumn = "never"
 containerPrimarySpanPresets = [0.3333333333333333, 0.5, 0.6666666666666666]
 defaultContainerPrimarySpan = 0.5
+edgeGaps = true
 infiniteLoop = false
 singleWindowFit = "fill"
 visibleContainerCount = 2
 
 [overview]
+enabled = true
+invertScrollDirection = false
+matchFocusBorder = true
+mouseScrollSpeed = 1.0
 zoom = 1.0
 
 [overview.backdrop]
@@ -163,8 +170,11 @@ excludedBundleIDs = []
 height = 24.0
 hideEmptyWorkspaces = false
 hideInNativeFullscreen = false
+hoverPreviewsEnabled = true
 notchActiveZoneWidth = 180.0
 notchMode = "moveBelowMenuBar"
+notificationBadgeRefreshIntervalSeconds = 5.0
+notificationBadges = "off"
 position = "overlappingMenuBar"
 reserveLayoutSpace = false
 revealHoldMilliseconds = 200.0
@@ -661,7 +671,7 @@ binding = "Option+A"
 id = "switchWorkspaceSlot.6"
 
 [[hotkeys]]
-binding = "Option+Shift+A"
+binding = "Control+Option+Shift+A"
 id = "moveToWorkspaceSlot.6"
 
 [[hotkeys]]
@@ -677,7 +687,7 @@ binding = "Option+C"
 id = "switchWorkspaceSlot.8"
 
 [[hotkeys]]
-binding = "Option+Shift+C"
+binding = "Control+Option+Shift+C"
 id = "moveToWorkspaceSlot.8"
 
 [[hotkeys]]
@@ -685,7 +695,7 @@ binding = "Option+D"
 id = "switchWorkspaceSlot.9"
 
 [[hotkeys]]
-binding = "Option+Shift+D"
+binding = "Control+Option+Shift+D"
 id = "moveToWorkspaceSlot.9"
 
 [[hotkeys]]
@@ -1191,6 +1201,14 @@ id = "closeFocusedWindow"
 [[hotkeys]]
 binding = "Control+Option+M"
 id = "openMenuAnywhere"
+
+[[hotkeys]]
+binding = "Unassigned"
+id = "setWindowMark"
+
+[[hotkeys]]
+binding = "Unassigned"
+id = "removeWindowMark"
 
 [[hotkeys]]
 binding = "Unassigned"
