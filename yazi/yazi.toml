@@ -60,31 +60,3 @@ bizarre_retry    = 3
 suppress_preload = false
 image_alloc      = 536870912    # 512 MiB — raise if large RAW/HEIC files stall
 image_bound      = [0, 0]
-
-# ── Plugin: previewers / preloaders ───────────────────────────────────────────
-# Only entries that extend or override the built-in defaults.
-# Built-in: folder · code · json · image · video · pdf · archive
-#
-# External dependencies (all provided by Homebrew):
-#   imagemagick   → SVG / HEIC / JPEG XL / font preview
-#   ffmpegthumbnailer → video thumbnails
-#   poppler (pdftoppm) → PDF preview
-#   unar              → archive listing
-#   fd / ripgrep      → find / search (wired in keymap.toml)
-#   fzf / zoxide      → jump (wired in keymap.toml)
-
-[plugin]
-
-prepend_preloaders = [
-    # imagemagick handles formats the built-in loader cannot decode
-    { mime = "image/{svg+xml,avif,hei?,jxl}", run = "magick" },
-    { mime = "font/{ttf,otf,woff,woff2}",     run = "magick" },
-    { mime = "application/font-*",            run = "magick" },
-]
-
-prepend_previewers = [
-    # imagemagick — SVG · HEIC · JPEG XL · font glyphs
-    { mime = "image/{svg+xml,avif,hei?,jxl}", run = "magick" },
-    { mime = "font/{ttf,otf,woff,woff2}",     run = "magick" },
-    { mime = "application/font-*",            run = "magick" },
-]
