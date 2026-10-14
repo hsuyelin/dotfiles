@@ -18,6 +18,7 @@ require("plugins.lsp")
 require("plugins.telescope")
 require("plugins.fzf")
 require("plugins.neo-tree")
+require("plugins.media")
 require("plugins.filesystem")
 require("plugins.aerial")
 

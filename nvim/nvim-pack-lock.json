@@ -216,6 +216,10 @@
       "rev": "9e9378d6ee34bb3782e0e8c63d9ec8ca618b479b",
       "src": "https://github.com/sphamba/smear-cursor.nvim"
     },
+    "snacks.nvim": {
+      "rev": "882c996cf28183f4d63640de0b4c02ec886d01f2",
+      "src": "https://github.com/folke/snacks.nvim"
+    },
     "telescope-tabs": {
       "rev": "62c127346c04c698c0cbd1c1ba945609a0ad10db",
       "src": "https://github.com/LukasPietzschmann/telescope-tabs"

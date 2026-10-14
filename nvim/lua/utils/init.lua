@@ -12,5 +12,6 @@ utils.fold = require("utils.fold")
 utils.term = require("utils.terminal")
 utils.dashboard = require("utils.dashboard")
 utils.filter = require("utils.filter")
+utils.media_preview = require("utils.media_preview")
 
 require("utils.viewsaver")

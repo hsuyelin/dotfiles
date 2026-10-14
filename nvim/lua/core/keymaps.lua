@@ -25,6 +25,10 @@ vim.keymap.set("n", "<C-]>", "<cmd>tabnext<cr>")
 
 -- File
 vim.keymap.set("n", "<C-f>", "<cmd>Telescope find_files<cr>")
+vim.api.nvim_create_user_command("MediaPreview", function(opts)
+	require("utils.media_preview").open(opts.args ~= "" and opts.args or nil)
+end, { nargs = "?", complete = "file" })
+vim.keymap.set("n", "<leader>fp", "<cmd>MediaPreview<cr>", { desc = "预览图片、文档或视频封面 (Media Preview)" })
 
 -- Emoji
 vim.keymap.set("i", "<C-e>", "<cmd>Telescope emoji<cr>")

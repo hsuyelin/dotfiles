@@ -115,6 +115,12 @@ require("neo-tree").setup({
     window = {
       mappings = {
         ["f"] = fuzzy_find,
+        ["p"] = function(state)
+          local node = state.tree:get_node()
+          if node.type ~= "directory" then
+            require("utils.media_preview").open(node:get_id())
+          end
+        end,
         ["/"] = fuzzy_find,
         ["F"] = glob_find,
         ["Y"] = "copy_to_clipboard",

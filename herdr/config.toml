@@ -27,6 +27,8 @@ peach = "#fab387"
 [terminal]
 shell_mode = "auto"
 new_cwd = "follow"
+# Server restart required; reload-config cannot change graphics parsing.
+kitty_graphics = true
 
 [update]
 channel = "stable"
@@ -176,7 +178,6 @@ manage_ssh_config = false
 
 [experimental]
 allow_nested = false
-kitty_graphics = false
 pane_history = true
 switch_ascii_input_source_in_prefix = true
 reveal_hidden_cursor_for_cjk_ime = true
