@@ -101,6 +101,7 @@ containerPrimarySpanPresets = [0.3333333333333333, 0.5, 0.6666666666666666]
 defaultContainerPrimarySpan = 0.5
 edgeGaps = true
 infiniteLoop = false
+resizeStepPercent = 5
 singleWindowFit = "fill"
 visibleContainerCount = 2
 
@@ -159,10 +160,14 @@ mode = "macOS"
 
 [statusBar]
 showAppNames = false
+showIcon = true
 showWorkspaceName = false
 useWorkspaceId = false
 
 [workspaceBar]
+autoHide = false
+autoHideHideDelayMilliseconds = 0.0
+autoHideRevealDelayMilliseconds = 0.0
 backgroundOpacity = 0.1
 deduplicateAppIcons = false
 enabled = false
@@ -628,6 +633,62 @@ id = "moveToWorkspace.8"
 
 [[hotkeys]]
 binding = "Unassigned"
+id = "switchWorkspace.9"
+
+[[hotkeys]]
+binding = "Unassigned"
+id = "moveToWorkspace.9"
+
+[[hotkeys]]
+binding = "Unassigned"
+id = "switchWorkspace.10"
+
+[[hotkeys]]
+binding = "Unassigned"
+id = "moveToWorkspace.10"
+
+[[hotkeys]]
+binding = "Unassigned"
+id = "switchWorkspace.11"
+
+[[hotkeys]]
+binding = "Unassigned"
+id = "moveToWorkspace.11"
+
+[[hotkeys]]
+binding = "Unassigned"
+id = "switchWorkspace.12"
+
+[[hotkeys]]
+binding = "Unassigned"
+id = "moveToWorkspace.12"
+
+[[hotkeys]]
+binding = "Unassigned"
+id = "switchWorkspace.13"
+
+[[hotkeys]]
+binding = "Unassigned"
+id = "moveToWorkspace.13"
+
+[[hotkeys]]
+binding = "Unassigned"
+id = "switchWorkspace.14"
+
+[[hotkeys]]
+binding = "Unassigned"
+id = "moveToWorkspace.14"
+
+[[hotkeys]]
+binding = "Unassigned"
+id = "switchWorkspace.15"
+
+[[hotkeys]]
+binding = "Unassigned"
+id = "moveToWorkspace.15"
+
+[[hotkeys]]
+binding = "Unassigned"
 id = "switchWorkspaceSlot.1"
 
 [[hotkeys]]
@@ -711,23 +772,23 @@ binding = "Option+P"
 id = "switchWorkspace.previous"
 
 [[hotkeys]]
-binding = "Option+Left Arrow"
+binding = "Option+Command+Left Arrow"
 id = "focus.left"
 
 [[hotkeys]]
-binding = "Option+Down Arrow"
+binding = "Option+Command+Down Arrow"
 id = "focus.down"
 
 [[hotkeys]]
-binding = "Option+Up Arrow"
+binding = "Option+Command+Up Arrow"
 id = "focus.up"
 
 [[hotkeys]]
-binding = "Option+Right Arrow"
+binding = "Option+Command+Right Arrow"
 id = "focus.right"
 
 [[hotkeys]]
-binding = "Option+Tab"
+binding = "Option+Command+Tab"
 id = "focusPrevious"
 
 [[hotkeys]]
@@ -823,19 +884,47 @@ binding = "Unassigned"
 id = "moveColumnToWorkspace.8"
 
 [[hotkeys]]
-binding = "Option+Shift+Left Arrow"
+binding = "Unassigned"
+id = "moveColumnToWorkspace.9"
+
+[[hotkeys]]
+binding = "Unassigned"
+id = "moveColumnToWorkspace.10"
+
+[[hotkeys]]
+binding = "Unassigned"
+id = "moveColumnToWorkspace.11"
+
+[[hotkeys]]
+binding = "Unassigned"
+id = "moveColumnToWorkspace.12"
+
+[[hotkeys]]
+binding = "Unassigned"
+id = "moveColumnToWorkspace.13"
+
+[[hotkeys]]
+binding = "Unassigned"
+id = "moveColumnToWorkspace.14"
+
+[[hotkeys]]
+binding = "Unassigned"
+id = "moveColumnToWorkspace.15"
+
+[[hotkeys]]
+binding = "Option+Shift+Command+Left Arrow"
 id = "move.left"
 
 [[hotkeys]]
-binding = "Option+Shift+Down Arrow"
+binding = "Option+Shift+Command+Down Arrow"
 id = "move.down"
 
 [[hotkeys]]
-binding = "Option+Shift+Up Arrow"
+binding = "Option+Shift+Command+Up Arrow"
 id = "move.up"
 
 [[hotkeys]]
-binding = "Option+Shift+Right Arrow"
+binding = "Option+Shift+Command+Right Arrow"
 id = "move.right"
 
 [[hotkeys]]
@@ -907,7 +996,7 @@ binding = "Unassigned"
 id = "moveWindowToMonitor.down"
 
 [[hotkeys]]
-binding = "Option+Return"
+binding = "Option+Command+Return"
 id = "toggleFullscreen"
 
 [[hotkeys]]
@@ -943,11 +1032,11 @@ binding = "Option+T"
 id = "toggleColumnTabbed"
 
 [[hotkeys]]
-binding = "Option+Home"
+binding = "Option+Command+Home"
 id = "focusColumnFirst"
 
 [[hotkeys]]
-binding = "Option+End"
+binding = "Option+Command+End"
 id = "focusColumnLast"
 
 [[hotkeys]]
@@ -1185,6 +1274,10 @@ id = "openCommandPalette"
 [[hotkeys]]
 binding = "Option+Shift+R"
 id = "raiseAllFloatingWindows"
+
+[[hotkeys]]
+binding = "Unassigned"
+id = "toggleFloatingFocus"
 
 [[hotkeys]]
 binding = "Unassigned"
