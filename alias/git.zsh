@@ -86,6 +86,13 @@ alias gtag='git tag'
 alias grhs='git reset --soft HEAD~1'
 alias grhh='git reset --hard'
 alias gclean='git clean -dfx'
+gsubrestore() {
+    if [[ $# -eq 0 ]]; then
+        print -u2 'Usage: gsubrestore <submodule-path> [submodule-path ...]'
+        return 2
+    fi
+    git restore --staged -- "$@" && git submodule update --init --checkout -- "$@" && git status --short
+}
 # shellcheck disable=SC2139  # alias length exceeds 100 chars by necessity
 alias gnuke='git reset --hard && git clean -dfx && git submodule foreach --recursive "git reset --hard; git clean -fd" && git submodule update --init --recursive --force'
 alias gsnuke='git submodule foreach --recursive "git reset --hard; git clean -fd" && git submodule update --init --recursive --force'

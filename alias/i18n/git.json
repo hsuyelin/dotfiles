@@ -132,6 +132,7 @@
         { "type": "row", "key": "grhs",   "en": "git reset --soft HEAD~1  (undo last commit)",         "zh": "git reset --soft HEAD~1（软回退）" },
         { "type": "row", "key": "grhh",   "en": "git reset --hard",                                    "zh": "git reset --hard（⚠ 硬重置）" },
         { "type": "row", "key": "gclean", "en": "git clean -dfx",                                      "zh": "git clean -dfx（清理未追踪文件）" },
+        { "type": "row", "key": "gsubrestore", "en": "gsubrestore <path> [path ...]  (unstage and restore submodules)", "zh": "gsubrestore <路径> [路径 ...]（取消暂存并恢复子模块）" },
         { "type": "row", "key": "gnuke",  "en": "reset --hard + clean + nuke all submodules",          "zh": "硬重置 + 清理 + 递归清理所有子模块" },
         { "type": "row", "key": "gsnuke", "en": "nuke all submodules only",                            "zh": "仅递归清理所有子模块" }
       ]
