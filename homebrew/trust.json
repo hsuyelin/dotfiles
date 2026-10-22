@@ -8,5 +8,8 @@
   "trustedcasks": [
     "farion1231/ccswitch/cc-switch",
     "nikitabobko/tap/aerospace"
+  ],
+  "trustedtaps": [
+    "facebook/fb"
   ]
 }
