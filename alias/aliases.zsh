@@ -331,6 +331,97 @@ yy() {
 
 
 # -----------------------------
+# video-h265: compress video to HEVC MP4, without audio by default.
+# Usage: video-h265 [--audio] <video-file>
+# --audio keeps all source audio tracks, encoding them as MP4-compatible AAC.
+# -----------------------------
+video-h265() (
+    local keep_audio=false
+    if [[ "$1" == --audio ]]; then
+        keep_audio=true
+        shift
+    fi
+    if (( $# != 1 )) || [[ "$1" == -* ]]; then
+        printf 'Usage: video-h265 [--audio] <video-file>\n' >&2
+        return 2
+    fi
+
+    if ! command -v ffmpeg >/dev/null 2>&1 || ! command -v ffprobe >/dev/null 2>&1; then
+        printf 'video-h265: ffmpeg and ffprobe are required.\n' >&2
+        return 127
+    fi
+
+    local input name stem output tmp vcodec acodec
+    local -a audio_args
+    input="${1:a}"
+    if [[ ! -f "$input" || ! -r "$input" ]]; then
+        printf 'video-h265: not a readable file: %s\n' "$input" >&2
+        return 1
+    fi
+    vcodec="$(ffprobe -v error -select_streams v:0 -show_entries stream=codec_type -of default=noprint_wrappers=1:nokey=1 "$input")"
+    if [[ "$vcodec" != video* ]]; then
+        printf 'video-h265: no readable video stream: %s\n' "$input" >&2
+        return 1
+    fi
+    if [[ "$keep_audio" == true ]]; then
+        if [[ -z "$(ffprobe -v error -select_streams a -show_entries stream=codec_type -of default=noprint_wrappers=1:nokey=1 "$input")" ]]; then
+            printf 'video-h265: --audio requested but source has no audio track: %s\n' "$input" >&2
+            return 1
+        fi
+        audio_args=(-map 0:a -c:a aac -b:a 192k)
+    else
+        audio_args=(-an)
+    fi
+
+    name="${input##*/}"
+    stem="${name%.*}"
+    [[ -n "$stem" ]] || stem="$name"
+    if [[ "$keep_audio" == true ]]; then
+        output="${input%/*}/${stem}_H265_有音频.mp4"
+    else
+        output="${input%/*}/${stem}_H265_无音频.mp4"
+    fi
+    if [[ -e "$output" || -L "$output" ]]; then
+        printf 'video-h265: output already exists: %s\n' "$output" >&2
+        return 1
+    fi
+
+    tmp="$(mktemp "${output}.tmp.XXXXXXXX")" || return 1
+    local umask_bits=$(( 8#$(umask) ))
+    chmod "$(printf '%o' $(( 8#666 & ~umask_bits )))" "$tmp"
+    trap 'command rm -f -- "$tmp"' EXIT
+    if ! ffmpeg -hide_banner -nostdin -loglevel error -stats_period 30 -stats \
+        -i "$input" -map 0:v:0 "${audio_args[@]}" -sn -dn -fps_mode passthrough \
+        -c:v libx265 -preset slow -crf 21 -pix_fmt yuv420p \
+        -tag:v hvc1 -movflags +faststart -x265-params log-level=error \
+        -f mp4 -y "$tmp"; then
+        printf 'video-h265: encoding failed: %s\n' "$input" >&2
+        return 1
+    fi
+    vcodec="$(ffprobe -v error -select_streams v:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 "$tmp")" || return 1
+    if [[ "$keep_audio" == true ]]; then
+        acodec="$(ffprobe -v error -select_streams a:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 "$tmp")" || return 1
+        if [[ "$acodec" != aac* ]]; then
+            printf 'video-h265: output has no AAC audio track: %s\n' "$input" >&2
+            return 1
+        fi
+    elif [[ -n "$(ffprobe -v error -select_streams a -show_entries stream=index -of csv=p=0 "$tmp")" ]]; then
+        printf 'video-h265: output unexpectedly contains audio: %s\n' "$input" >&2
+        return 1
+    fi
+    if [[ "$vcodec" != hevc* ]] || ! ffmpeg -hide_banner -nostdin -v error -i "$tmp" -map 0 -f null -; then
+        printf 'video-h265: output verification failed: %s\n' "$input" >&2
+        return 1
+    fi
+    if ! command ln "$tmp" "$output"; then
+        printf 'video-h265: could not create output (possibly exists): %s\n' "$output" >&2
+        return 1
+    fi
+    printf 'video-h265: %s\n' "$output"
+)
+
+
+# -----------------------------
 # SSH
 # -----------------------------
 alias ssh='TERM=xterm-256color ssh'
