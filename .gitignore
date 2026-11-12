@@ -16,6 +16,10 @@ docker/contexts/
 colima/
 emby-server/
 
+# OmniWM application-managed defaults and schema migration backups
+omniwm/shell/default/
+omniwm/settings.toml.pre-v*
+
 # Zsh session history
 zsh/.zsh_history
 zsh/.zsh_sessions/
