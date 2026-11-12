@@ -18,6 +18,7 @@ _path_pre "$HOME/.rvm/bin"
 
 # ── Homebrew (macOS) ────────────────────────────────────────
 if [[ "$(uname -s)" == "Darwin" ]]; then
+    _path_pre "/opt/homebrew/sbin"
     _path_pre "/opt/homebrew/bin"
     _path_post "/Applications/Xcode.app/Contents/SharedFrameworks/DVTFoundation.framework/Versions/A/Resources"
 fi

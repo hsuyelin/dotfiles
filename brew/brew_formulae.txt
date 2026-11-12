@@ -56,7 +56,7 @@ harfbuzz
 herdr
 hdrhistogram_c
 highway
-icu4c@78
+icu4c@79
 imagemagick-full
 imath
 ipatool
@@ -154,7 +154,6 @@ openexr
 openjdk@17
 openjpeg
 openjph
-openssl@1.1
 openssl@3
 opus
 p11-kit

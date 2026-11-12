@@ -350,6 +350,8 @@ Uses the [Catppuccin Mocha](https://github.com/catppuccin/yazi) flavor, stored a
 
 **XDG compliance** — Everything lives under `~/.config`. A single `~/.zshenv` bootstraps `ZDOTDIR`; no scattered dotfiles in `$HOME`.
 
+On macOS, `zsh/env/path.zsh` places Homebrew's `bin` and `sbin` before system tools. The login profile reapplies that baseline after `/etc/zprofile` runs `path_helper`, before loading private overrides.
+
 **Private by default** — `private/git.config` holds identity; `secrets/` holds credentials. Both are gitignored and stubbed by `install.sh`. The repo contains zero personal data.
 
 **Theme consistency** — [Catppuccin](https://github.com/catppuccin/catppuccin) is the single theme family applied uniformly across every tool: Ghostty, Starship, bat, btop, Neovim, lazygit, and Yazi all use **Mocha** (dark). Claude Code ships two custom themes — **Mocha** (dark) and **Latte** (light) — selectable via `/theme`. Colors, contrast, and accent palette are identical everywhere — no visual context-switching between tools.
