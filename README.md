@@ -233,6 +233,8 @@ The `--terminal` flag is case-insensitive (`--terminal=iTerm2` also works).
 
 To switch terminals after install, re-run with the desired flag. OmniWM applies the matching app rules from `omniwm/settings.toml` automatically.
 
+OmniWM is the sole window manager managed by these dotfiles. Its settings and app rules live in `omniwm/settings.toml`; Ghostty reserves `Alt+N/P` for next/previous workspace navigation. The macOS package list installs the official `omniwm` cask.
+
 ### Options
 
 | Flag | Applies to | Effect |

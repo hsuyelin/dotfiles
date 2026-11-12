@@ -6,7 +6,6 @@
     "oven-sh/bun/bun"
   ],
   "trustedcasks": [
-    "farion1231/ccswitch/cc-switch",
-    "nikitabobko/tap/aerospace"
+    "farion1231/ccswitch/cc-switch"
   ]
 }
