@@ -1,21 +1,25 @@
-applite
-cc-switch
+antigravity-cli
 claude-code@latest
 codex
 db-browser-for-sqlite
+font-black-han-sans
 font-fira-code
 font-fira-code-nerd-font
 font-lxgw-wenkai
+font-poppins
+font-source-han-sans-vf
 font-symbols-only-nerd-font
+ghostty
+keycastr
+kitty
+launchos
 lyricsx
+markdown-preview
+omniwm
 oracle-jdk@25
-orbstack
 pearcleaner
 swiftformat-for-xcode
+syntax-highlight
+thaw
+vlc
 xcodes-app
-# ── Tiling WM ──────────────────────────────────────────────────────────────
-omniwm
-# ── Terminal emulators — only one is installed based on your selection ─────
-# bootstrap.sh / install.sh prompt you to choose; default is Ghostty.
-ghostty
-kitty
